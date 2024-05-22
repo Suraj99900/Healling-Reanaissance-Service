@@ -103,7 +103,7 @@ class UserController extends Controller
             if (password_verify($sPassword, $oUserResult->password)) {
                 return response()->json([
                     'message' => "Valid User.",
-                    'body' => true,
+                    'body' => $oUserResult,
                     'status' => 200,
                 ], 200);
             } else {
