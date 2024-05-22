@@ -64,6 +64,7 @@ class UserController extends Controller
             if ($oUserResult) {
                 return response()->json([
                     'message' => "User Added successfully !",
+                    'body' => true,
                     'status' => 200,
                 ], 200);
             }
@@ -74,6 +75,7 @@ class UserController extends Controller
             return response()->json([
                 'error' => 'An error occurred while processing your request.',
                 'message' => $e->getMessage(),
+                'body' => false,
                 'status' => 500
             ], 500);
         }
@@ -97,10 +99,11 @@ class UserController extends Controller
             if (!isset($oUserResult)) {
                 throw new Exception("user not found.");
             }
-            
+
             if (password_verify($sPassword, $oUserResult->password)) {
                 return response()->json([
                     'message' => "Valid User.",
+                    'body' => true,
                     'status' => 200,
                 ], 200);
             } else {
@@ -116,6 +119,7 @@ class UserController extends Controller
             return response()->json([
                 'error' => 'An error occurred while processing your request.',
                 'message' => $e->getMessage(),
+                'body' => false,
                 'status' => 500
             ], 500);
         }
