@@ -50,7 +50,7 @@ class EmailController extends Controller
             // Send the email
            $oResult =  Mail::to($userEmail)->send(new OTP($details));
 
-            return response()->json(['message' => 'Email sent successfully!','body' => $oResult,,'status'=>200], 200);
+            return response()->json(['message' => 'Email sent successfully!','body' => null,'status'=>200], 200);
 
         } catch (Exception $e) {
             // Log the error for further analysis
