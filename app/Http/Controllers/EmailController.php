@@ -48,9 +48,9 @@ class EmailController extends Controller
             }
 
             // Send the email
-            Mail::to($userEmail)->send(new OTP($details));
+           $oResult =  Mail::to($userEmail)->send(new OTP($details));
 
-            return response()->json(['message' => 'Email sent successfully!','body' => true,,'status'=>200], 200);
+            return response()->json(['message' => 'Email sent successfully!','body' => $oResult,,'status'=>200], 200);
 
         } catch (Exception $e) {
             // Log the error for further analysis
@@ -58,7 +58,6 @@ class EmailController extends Controller
 
             return response()->json([
                 'error' => 'An error occurred while processing your request.',
-                'body' => false,
                 'message' => $e->getMessage(),
                 'status'=> 500
             ], 500);

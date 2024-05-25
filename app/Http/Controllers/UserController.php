@@ -64,7 +64,7 @@ class UserController extends Controller
             if ($oUserResult) {
                 return response()->json([
                     'message' => "User Added successfully !",
-                    'body' => true,
+                    'body' => $oUserResult,
                     'status' => 200,
                 ], 200);
             }
@@ -75,7 +75,6 @@ class UserController extends Controller
             return response()->json([
                 'error' => 'An error occurred while processing your request.',
                 'message' => $e->getMessage(),
-                'body' => false,
                 'status' => 500
             ], 500);
         }
@@ -119,7 +118,6 @@ class UserController extends Controller
             return response()->json([
                 'error' => 'An error occurred while processing your request.',
                 'message' => $e->getMessage(),
-                'body' => false,
                 'status' => 500
             ], 500);
         }
