@@ -104,4 +104,22 @@ class User extends Authenticatable
             throw $e;
         }
     }
+
+    public static function updateUserByEmailId($sEmail, $sPassword)
+    {
+        try {
+            $oUser = self::where('email', $sEmail)
+                ->where('status', 1)
+                ->where('deleted', 0)
+                ->update(['password' => $sPassword]);
+
+            if ($oUser) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (Exception $e) {
+            throw $e;
+        }
+    }
 }

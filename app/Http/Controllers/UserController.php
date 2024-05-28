@@ -122,4 +122,53 @@ class UserController extends Controller
             ], 500);
         }
     }
+
+    public function updatePassword(Request $request)
+    {
+        try {
+
+            $oValidator = Validator::make($request->all(), [
+                'email' => 'required',
+                'password' => 'required',
+                'otp' => 'required',
+            ]);
+            if ($oValidator->fails()) {
+                return response()->json(['error' => $oValidator->errors()], 400);
+            }
+
+            $sEmail = $request->input('email');
+            $sNewPassword = $request->input('newPassword');
+            $sOTP = $request->input('otp');
+
+            // check otp valid or not 
+            $oCheckOTP = (new WellnessOtp())->fetchActiveOTP($sEmail);
+
+            // Checlk key is valid or not 
+            if (((new User())->checkUserPresent($sEmail))) {
+                throw new Exception('User already present.');
+            }
+
+            if (!(isset($oCheckOTP))) {
+                throw new Exception('OTP Expired');
+            } else {
+                (new WellnessOtp())->validateOTP($sOTP);
+            }
+
+            // Convert the Normal TextPassword in HashPassword
+            $sNewPassword = (new BasicOpration())->convertPasswordToHash($sNewPassword);
+
+            //! update user Password
+            $oResult = (new User());
+
+        } catch (Exception $e) {
+            // Log the error for further analysis
+            Log::error('Error in sending email: ' . $e->getMessage());
+
+            return response()->json([
+                'error' => 'An error occurred while processing your request.',
+                'message' => $e->getMessage(),
+                'status' => 500
+            ], 500);
+        }
+    }
 }
