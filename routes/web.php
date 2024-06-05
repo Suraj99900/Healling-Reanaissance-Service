@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\EmailController;
+use App\Http\Controllers\VideoController;
 
 /*
 |--------------------------------------------------------------------------
@@ -32,5 +33,28 @@ Route::prefix('api')->middleware('ensure.token.is.valid')->group(function () {
 
     // Email route
     Route::post('email', [EmailController::class, 'generateMail']);
-    Route::post('forgetPassword', [UserController::class, 'generateMail']);
+
+    // Video upload
+    Route::post('video', [VideoController::class, 'upload']);
+    
+    // Fetch video by ID
+    Route::get('video/{id}', [VideoController::class, 'fetchById']);
+    
+    // Fetch all videos
+    Route::get('videos', [VideoController::class, 'fetchAll']);
+    
+    // Fetch all videos with pagination
+    Route::get('videos/paginated', [VideoController::class, 'fetchAllWithPagination']);
+    
+    // Search videos by title
+    Route::get('videos/search', [VideoController::class, 'searchByTitle']);
+    
+    // Update video by ID
+    Route::put('video/{id}', [VideoController::class, 'update']);
+    
+    // Delete video by ID
+    Route::delete('video/{id}', [VideoController::class, 'destroy']);
+    
+    // Stream video
+    Route::get('/stream/{id}', [VideoController::class, 'stream']);
 });
