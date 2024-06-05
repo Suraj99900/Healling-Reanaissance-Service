@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\EmailController;
 use App\Http\Controllers\VideoController;
+use App\Http\Controllers\VideoCategoryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -36,25 +37,41 @@ Route::prefix('api')->middleware('ensure.token.is.valid')->group(function () {
 
     // Video upload
     Route::post('video', [VideoController::class, 'upload']);
-    
+
     // Fetch video by ID
     Route::get('video/{id}', [VideoController::class, 'fetchById']);
-    
+
     // Fetch all videos
     Route::get('videos', [VideoController::class, 'fetchAll']);
-    
+
     // Fetch all videos with pagination
     Route::get('videos/paginated', [VideoController::class, 'fetchAllWithPagination']);
-    
+
     // Search videos by title
     Route::get('videos/search', [VideoController::class, 'searchByTitle']);
-    
+
     // Update video by ID
     Route::put('video/{id}', [VideoController::class, 'update']);
-    
+
     // Delete video by ID
     Route::delete('video/{id}', [VideoController::class, 'destroy']);
-    
+
     // Stream video
-    Route::get('/stream/{id}', [VideoController::class, 'stream']);
+    Route::get('stream/{id}', [VideoController::class, 'stream']);
+
+    // Add a new video category
+    Route::post('video-category', [VideoCategoryController::class, 'addCategory']);
+
+    // Get all video categories
+    Route::get('video-categories', [VideoCategoryController::class, 'getAllCategories']);
+
+    // Get a single video category by ID
+    Route::get('video-category/{id}', [VideoCategoryController::class, 'getCategoryById']);
+
+    // Update a video category by ID
+    Route::put('video-category/{id}', [VideoCategoryController::class, 'updateCategory']);
+
+    // Delete a video category by ID
+    Route::delete('video-category/{id}', [VideoCategoryController::class, 'deleteCategory']);
+
 });
