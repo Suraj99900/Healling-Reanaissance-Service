@@ -22,11 +22,12 @@ class VideoCategory extends Model
     /**
      * Add video category
      */
-    public static function addCategory($sName)
+    public static function addCategory($sName,$sDesc)
     {
         try {
             $oCategory = self::create([
                 'name' => $sName,
+                'description'=>$sDesc,
                 'added_on' => now(),
                 'status' => 1,
                 'deleted' => 0

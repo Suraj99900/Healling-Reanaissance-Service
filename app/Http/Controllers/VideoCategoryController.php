@@ -16,7 +16,7 @@ class VideoCategoryController extends Controller
                 'name' => 'required',
             ]);
 
-            $oResult = (new VideoCategory())->addCategory($request->input('name'));
+            $oResult = (new VideoCategory())->addCategory($request->input('name'),$request->input('desc'));
             if ($oResult) {
                 return response()->json([
                     'message' => "successful",
