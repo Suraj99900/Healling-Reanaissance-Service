@@ -17,6 +17,7 @@ class VideoCategory extends Model
         'status',
         'added_on',
         'deleted',
+        'description',
     ];
 
     /**
