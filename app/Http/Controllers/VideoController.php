@@ -83,6 +83,16 @@ class VideoController extends Controller
     {
         try {
             $videos = (new Video)->fetchAllVideos();
+
+            foreach ($videos as &$video) {
+                $thumbnailPath = $video->thumbnail;
+                if (!$thumbnailPath || !Storage::exists($thumbnailPath)) {
+                    $video->thumbnail_url = "https://suraj99900.github.io/myprotfolio.github.io/img/gallery_1.jpg";
+                } else {
+                    $video->thumbnail_url = Storage::url($thumbnailPath);
+                }
+            }
+            
             return response()->json([
                 'message' => "Videos fetched successfully!",
                 'body' => $videos,
@@ -207,6 +217,13 @@ class VideoController extends Controller
             }
 
             $thumbnailPath = $video->thumbnail; // Assuming the column name in the database is `thumbnail_path`
+            if ($thumbnailPath == '' && $thumbnailPath == null) {
+                return response()->json([
+                    'message' => 'Thumbnail URL fetched successfully!',
+                    'thumbnail_url' => "https://suraj99900.github.io/myprotfolio.github.io/img/gallery_1.jpg",
+                    'status' => 200,
+                ], 200);
+            }
             if (!Storage::exists($thumbnailPath)) {
                 return response()->json(['error' => 'Thumbnail file not found'], 404);
             }
@@ -222,5 +239,5 @@ class VideoController extends Controller
             return response()->json(['error' => 'An error occurred while fetching the thumbnail: ' . $e->getMessage()], 500);
         }
     }
-    
+
 }
