@@ -16,8 +16,8 @@ class VideoController extends Controller
     {
         // Validate the incoming request
         $oValidator = Validator::make($request->all(), [
-            'video' => 'required|file|mimes:mp4,mov,ogg,qt|max:20000',
-            'title' => 'required|string|max:255',
+            'video' => 'required|file|mimes:mp4,mov,ogg,qt|max:2000000',
+            'title' => 'required|string|max:25500',
             'description' => 'nullable|string',
             'category_id' => 'required|integer'
         ]);
@@ -223,7 +223,7 @@ class VideoController extends Controller
             return response()->json(['error' => 'An error occurred while streaming the video: ' . $e->getMessage()], 500);
         }
     }
-    
+
 
     public function thumbnailImages($id)
     {
