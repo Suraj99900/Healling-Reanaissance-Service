@@ -24,15 +24,16 @@ class VideoController extends Controller
         try {
             if ($request->hasFile('video')) {
                 // Store the uploaded video file
-                $path = $request->file('video')->store('videos');
+                $sVideoPath = $request->file('video')->store('videos');
+                $sThumbnailPath = $request->file('thumbnail')->store('thumbnail');
 
                 // Create a new video record in the database
                 $video = (new Video)->addVideoDetails(
                     $request->input('category_id'),
                     $request->input('title'),
                     $request->input('description'),
-                    $path,
-                    null,
+                    $sVideoPath,
+                    $sThumbnailPath,
                     ""
                 );
 
@@ -197,5 +198,32 @@ class VideoController extends Controller
             return response()->json(['error' => 'An error occurred while streaming the video: ' . $e->getMessage()], 500);
         }
     }
+    public function thumbnailImages($id)
+    {
+        try {
+            $video = (new Video)->fetchVideoById($id);
+            if (!$video) {
+                return response()->json(['error' => 'Video not found'], 404);
+            }
 
+            $thumbnailPath = storage_path('app/' . $video->thumbnail);
+            if (!file_exists($thumbnailPath)) {
+                return response()->json(['error' => 'Thumbnail file not found'], 404);
+            }
+
+            $stream = new \Symfony\Component\HttpFoundation\StreamedResponse(function () use ($thumbnailPath) {
+                $stream = fopen($thumbnailPath, 'rb');
+                fpassthru($stream);
+                fclose($stream);
+            });
+
+            $stream->headers->set('Content-Type', 'image/jpeg');
+            $stream->headers->set('Content-Length', filesize($thumbnailPath));
+
+            return $stream;
+        } catch (Exception $e) {
+            return response()->json(['error' => 'An error occurred while fetching the thumbnail: ' . $e->getMessage()], 500);
+        }
+    }
+    
 }

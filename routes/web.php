@@ -58,6 +58,7 @@ Route::prefix('api')->middleware('ensure.token.is.valid')->group(function () {
 
     // Stream video
     Route::get('stream/{id}', [VideoController::class, 'stream']);
+    Route::get('thumbnail/{id}', [VideoController::class, 'thumbnailImages']);
 
     // Add a new video category
     Route::post('video-category', [VideoCategoryController::class, 'addCategory']);
