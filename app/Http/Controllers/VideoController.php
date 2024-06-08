@@ -206,21 +206,18 @@ class VideoController extends Controller
                 return response()->json(['error' => 'Video not found'], 404);
             }
 
-            $thumbnailPath = storage_path('app/' . $video->thumbnail);
-            if (!file_exists($thumbnailPath)) {
+            $thumbnailPath = $video->thumbnail; // Assuming the column name in the database is `thumbnail_path`
+            if (!Storage::exists($thumbnailPath)) {
                 return response()->json(['error' => 'Thumbnail file not found'], 404);
             }
 
-            $stream = new \Symfony\Component\HttpFoundation\StreamedResponse(function () use ($thumbnailPath) {
-                $stream = fopen($thumbnailPath, 'rb');
-                fpassthru($stream);
-                fclose($stream);
-            });
+            $thumbnailUrl = Storage::url($thumbnailPath);
 
-            $stream->headers->set('Content-Type', 'image/jpeg');
-            $stream->headers->set('Content-Length', filesize($thumbnailPath));
-
-            return $stream;
+            return response()->json([
+                'message' => 'Thumbnail URL fetched successfully!',
+                'thumbnail_url' => $thumbnailUrl,
+                'status' => 200,
+            ], 200);
         } catch (Exception $e) {
             return response()->json(['error' => 'An error occurred while fetching the thumbnail: ' . $e->getMessage()], 500);
         }
