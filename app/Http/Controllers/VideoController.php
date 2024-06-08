@@ -28,9 +28,11 @@ class VideoController extends Controller
 
         try {
             if ($request->hasFile('video')) {
-                // Store the uploaded video file
-                $sVideoPath = $request->file('video')->store('videos');
-                $sThumbnailPath = $request->file('thumbnail')->store('thumbnail');
+                // Store the uploaded video file in the 'public' disk
+                $sVideoPath = $request->file('video')->store('videos', 'public');
+
+                // Store the thumbnail file in the 'public' disk
+                $sThumbnailPath = $request->file('thumbnail')->store('thumbnails', 'public');
 
                 // Create a new video record in the database
                 $video = (new Video)->addVideoDetails(
@@ -59,6 +61,7 @@ class VideoController extends Controller
             return response()->json(['error' => 'An error occurred while uploading the video: ' . $e->getMessage()], 500);
         }
     }
+
 
     /**
      * Fetch a video by ID
@@ -91,13 +94,18 @@ class VideoController extends Controller
 
             foreach ($videos as &$video) {
                 $thumbnailPath = $video->thumbnail;
-                if (!$thumbnailPath || !Storage::exists($thumbnailPath)) {
+                if (!$thumbnailPath || !Storage::disk('public')->exists($thumbnailPath)) {
+                    // If thumbnail does not exist, set a default URL
                     $video->thumbnail_url = "https://suraj99900.github.io/myprotfolio.github.io/img/gallery_1.jpg";
                 } else {
-                    $video->thumbnail_url = Storage::url($thumbnailPath);
+                    // Generate the proper URL for the thumbnail stored in the 'public' disk
+                    $video->thumbnail_url = Storage::disk('public')->url($thumbnailPath);
                 }
+
+                // Assuming the videos are stored in the 'public' disk
+                $video->video_url = Storage::disk('public')->url($video->path);
             }
-            
+
             return response()->json([
                 'message' => "Videos fetched successfully!",
                 'body' => $videos,
@@ -107,6 +115,8 @@ class VideoController extends Controller
             return response()->json(['error' => 'An error occurred while fetching videos: ' . $e->getMessage()], 500);
         }
     }
+
+
 
     /**
      * Fetch all videos with pagination
@@ -194,7 +204,7 @@ class VideoController extends Controller
                 return response()->json(['error' => 'Video not found'], 404);
             }
 
-            $path = storage_path('app/' . $video->path);
+            $path = Storage::disk('public')->path($video->path);
             if (!file_exists($path)) {
                 return response()->json(['error' => 'Video file not found'], 404);
             }
@@ -206,13 +216,15 @@ class VideoController extends Controller
             });
 
             $stream->headers->set('Content-Type', 'video/mp4');
-            $stream->headers->set('Content-Length', filesize($path));
+            $stream->headers->set('Content-Length', Storage::disk('public')->size($video->path));
 
             return $stream;
         } catch (Exception $e) {
             return response()->json(['error' => 'An error occurred while streaming the video: ' . $e->getMessage()], 500);
         }
     }
+    
+
     public function thumbnailImages($id)
     {
         try {
@@ -222,18 +234,16 @@ class VideoController extends Controller
             }
 
             $thumbnailPath = $video->thumbnail; // Assuming the column name in the database is `thumbnail_path`
-            if ($thumbnailPath == '' && $thumbnailPath == null) {
+            if (!$thumbnailPath || !Storage::disk('public')->exists($thumbnailPath)) {
                 return response()->json([
                     'message' => 'Thumbnail URL fetched successfully!',
                     'thumbnail_url' => "https://suraj99900.github.io/myprotfolio.github.io/img/gallery_1.jpg",
                     'status' => 200,
                 ], 200);
             }
-            if (!Storage::exists($thumbnailPath)) {
-                return response()->json(['error' => 'Thumbnail file not found'], 404);
-            }
 
-            $thumbnailUrl = Storage::url($thumbnailPath);
+            // Generate the proper URL for the thumbnail stored in the 'public' disk
+            $thumbnailUrl = Storage::disk('public')->url($thumbnailPath);
 
             return response()->json([
                 'message' => 'Thumbnail URL fetched successfully!',
@@ -244,5 +254,6 @@ class VideoController extends Controller
             return response()->json(['error' => 'An error occurred while fetching the thumbnail: ' . $e->getMessage()], 500);
         }
     }
+
 
 }
