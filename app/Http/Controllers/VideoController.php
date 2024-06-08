@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Video;
+use Illuminate\Support\Facades\Validator;
 use Exception;
 
 class VideoController extends Controller
@@ -14,12 +15,16 @@ class VideoController extends Controller
     public function upload(Request $request)
     {
         // Validate the incoming request
-        $request->validate([
+        $oValidator = Validator::make($request->all(), [
             'video' => 'required|file|mimes:mp4,mov,ogg,qt|max:20000',
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'category_id' => 'nullable|integer'
+            'category_id' => 'required|integer'
         ]);
+
+        if ($oValidator->fails()) {
+            return response()->json(['error' => $oValidator->errors()], 400);
+        }
 
         try {
             if ($request->hasFile('video')) {
