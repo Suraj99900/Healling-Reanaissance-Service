@@ -144,6 +144,21 @@ class VideoController extends Controller
         try {
             $title = $request->input('title');
             $videos = (new Video)->searchVideosByTitle($title);
+
+            foreach ($videos as &$video) {
+                $thumbnailPath = $video->thumbnail;
+                if (!$thumbnailPath || !Storage::disk('public')->exists($thumbnailPath)) {
+                    // If thumbnail does not exist, set a default URL
+                    $video->thumbnail_url = "https://suraj99900.github.io/myprotfolio.github.io/img/gallery_1.jpg";
+                } else {
+                    // Generate the proper URL for the thumbnail stored in the 'public' disk
+                    $video->thumbnail_url = Storage::disk('public')->url($thumbnailPath);
+                }
+
+                // Assuming the videos are stored in the 'public' disk
+                $video->video_url = Storage::disk('public')->url($video->path);
+            }
+            
             return response()->json([
                 'message' => "Videos fetched successfully!",
                 'body' => $videos,
@@ -159,6 +174,20 @@ class VideoController extends Controller
     {
         try {
             $videos = (new Video)->fetchAllVideoDataByCategoryId($id);
+
+            foreach ($videos as &$video) {
+                $thumbnailPath = $video->thumbnail;
+                if (!$thumbnailPath || !Storage::disk('public')->exists($thumbnailPath)) {
+                    // If thumbnail does not exist, set a default URL
+                    $video->thumbnail_url = "https://suraj99900.github.io/myprotfolio.github.io/img/gallery_1.jpg";
+                } else {
+                    // Generate the proper URL for the thumbnail stored in the 'public' disk
+                    $video->thumbnail_url = Storage::disk('public')->url($thumbnailPath);
+                }
+
+                // Assuming the videos are stored in the 'public' disk
+                $video->video_url = Storage::disk('public')->url($video->path);
+            }
 
             return response()->json([
                 'message' => "Videos fetched successfully!",

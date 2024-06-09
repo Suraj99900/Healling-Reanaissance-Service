@@ -60,10 +60,14 @@ class Video extends Model
     public function fetchAllVideoDataByCategoryId($iCategoryId)
     {
         try {
-            $oResult = self::with('category')
-                ->where('category_id', $iCategoryId)
-                ->where('status', 1)
-                ->where('deleted', 0)
+            $oResult = DB::table('videos AS A')
+                ->leftJoin('video_category AS B', 'A.category_id', '=', 'B.id')
+                ->select('A.*', 'B.name')
+                ->where('A.category_id', $iCategoryId)
+                ->where('A.status', 1)
+                ->where('A.deleted', 0)
+                ->where('B.status', 1)
+                ->where('B.deleted', 0)
                 ->get();
 
             return $oResult;
@@ -175,11 +179,17 @@ class Video extends Model
     public function searchVideosByTitle($sTitle)
     {
         try {
-            $oResult = self::with('category')
+            $oResult = DB::table('videos AS A')
+                ->leftJoin('video_category AS B', 'A.category_id', '=', 'B.id')
+                ->select('A.*', 'B.name')
                 ->where('title', 'LIKE', '%' . $sTitle . '%')
-                ->where('status', 1)
-                ->where('deleted', 0)
+                ->where('A.status', 1)
+                ->where('A.deleted', 0)
+                ->where('B.status', 1)
+                ->where('B.deleted', 0)
                 ->get();
+
+
 
             return $oResult;
         } catch (Exception $e) {
