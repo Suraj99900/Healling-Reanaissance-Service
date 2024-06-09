@@ -133,7 +133,7 @@ class Video extends Model
                 ->leftJoin('video_category AS B', 'A.category_id', '=', 'B.id')
                 ->select('A.*', 'B.name')
                 ->where('A.status', 1)
-                ->where('B.deleted', 0)
+                ->where('A.deleted', 0)
                 ->where('B.status', 1)
                 ->where('B.deleted', 0)
                 ->get();
