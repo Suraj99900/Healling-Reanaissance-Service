@@ -43,6 +43,7 @@ Route::prefix('api')->middleware('ensure.token.is.valid')->group(function () {
 
     // Fetch all videos
     Route::get('videos', [VideoController::class, 'fetchAll']);
+    Route::get('videos-category/{id}', [VideoController::class, 'fetchAllVideoDataByCategoryId']);
 
     // Fetch all videos with pagination
     Route::get('videos/paginated', [VideoController::class, 'fetchAllWithPagination']);

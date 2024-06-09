@@ -154,6 +154,23 @@ class VideoController extends Controller
         }
     }
 
+
+    public function fetchAllVideoDataByCategoryId($id)
+    {
+        try {
+            $videos = (new Video)->fetchAllVideoDataByCategoryId($id);
+
+            return response()->json([
+                'message' => "Videos fetched successfully!",
+                'body' => $videos,
+                'status' => 200,
+            ], 200);
+
+        } catch (Exception $e) {
+            return response()->json(['error' => 'An error occurred while Fecthing the video: ' . $e->getMessage()], 500);
+        }
+    }
+
     /**
      * Update a video by ID
      */
