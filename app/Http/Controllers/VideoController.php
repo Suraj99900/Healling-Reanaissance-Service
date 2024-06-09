@@ -160,7 +160,7 @@ class VideoController extends Controller
     public function update(Request $request, $id)
     {
         try {
-            $data = $request->only(['title', 'description', 'status']);
+            $data = $request->only(['title', 'description', 'category_id']);
             $video = (new Video)->updateVideoById($id, $data);
             if ($video) {
                 return response()->json([
