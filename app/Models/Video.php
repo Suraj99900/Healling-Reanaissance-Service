@@ -4,6 +4,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Exception;
+use Illuminate\Support\Facades\DB;
 
 class Video extends Model
 {
@@ -12,7 +13,16 @@ class Video extends Model
     protected $table = 'videos';
 
     protected $fillable = [
-        'id', 'category_id', 'title', 'description', 'path', 'thumbnail', 'duration', 'added_on', 'status', 'deleted'
+        'id',
+        'category_id',
+        'title',
+        'description',
+        'path',
+        'thumbnail',
+        'duration',
+        'added_on',
+        'status',
+        'deleted'
     ];
 
     /**
@@ -46,9 +56,9 @@ class Video extends Model
     {
         try {
             $oResult = self::where('category_id', $iCategoryId)
-                            ->where('status', 1)
-                            ->where('deleted', 0)
-                            ->get();
+                ->where('status', 1)
+                ->where('deleted', 0)
+                ->get();
 
             return $oResult;
         } catch (Exception $e) {
@@ -63,9 +73,9 @@ class Video extends Model
     {
         try {
             $oResult = self::where('id', $iVideoId)
-                            ->where('status', 1)
-                            ->where('deleted', 0)
-                            ->first();
+                ->where('status', 1)
+                ->where('deleted', 0)
+                ->first();
 
             return $oResult;
         } catch (Exception $e) {
@@ -80,8 +90,8 @@ class Video extends Model
     {
         try {
             $oVideo = self::where('id', $iVideoId)
-                            ->where('deleted', 0)
-                            ->first();
+                ->where('deleted', 0)
+                ->first();
 
             if ($oVideo) {
                 $oVideo->update($aData);
@@ -100,8 +110,8 @@ class Video extends Model
     {
         try {
             $oVideo = self::where('id', $iVideoId)
-                            ->where('deleted', 0)
-                            ->first();
+                ->where('deleted', 0)
+                ->first();
 
             if ($oVideo) {
                 $oVideo->update(['deleted' => 1]);
@@ -119,15 +129,21 @@ class Video extends Model
     public function fetchAllVideos()
     {
         try {
-            $oResult = self::where('status', 1)
-                            ->where('deleted', 0)
-                            ->get();
+            $oResult = DB::table('videos AS A')
+                ->leftJoin('video_category AS B', 'A.category_id', '=', 'B.id')
+                ->select('A.*', 'B.name')
+                ->where('A.status', 1)
+                ->where('B.deleted', 0)
+                ->where('B.status', 1)
+                ->where('B.deleted', 0)
+                ->get();
 
             return $oResult;
         } catch (Exception $e) {
             throw $e;
         }
     }
+
 
     /**
      * Fetch all videos with pagination
@@ -136,8 +152,8 @@ class Video extends Model
     {
         try {
             $oResult = self::where('status', 1)
-                            ->where('deleted', 0)
-                            ->paginate($iPerPage);
+                ->where('deleted', 0)
+                ->paginate($iPerPage);
 
             return $oResult;
         } catch (Exception $e) {
@@ -152,9 +168,9 @@ class Video extends Model
     {
         try {
             $oResult = self::where('title', 'LIKE', '%' . $sTitle . '%')
-                            ->where('status', 1)
-                            ->where('deleted', 0)
-                            ->get();
+                ->where('status', 1)
+                ->where('deleted', 0)
+                ->get();
 
             return $oResult;
         } catch (Exception $e) {
