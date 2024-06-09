@@ -25,6 +25,11 @@ class Video extends Model
         'deleted'
     ];
 
+    public function category()
+    {
+        return $this->belongsTo(VideoCategory::class, 'category_id', 'id');
+    }
+
     /**
      * Add video details
      */
@@ -55,7 +60,8 @@ class Video extends Model
     public function fetchAllVideoDataByCategoryId($iCategoryId)
     {
         try {
-            $oResult = self::where('category_id', $iCategoryId)
+            $oResult = self::with('category')
+                ->where('category_id', $iCategoryId)
                 ->where('status', 1)
                 ->where('deleted', 0)
                 ->get();
@@ -72,7 +78,8 @@ class Video extends Model
     public function fetchVideoById($iVideoId)
     {
         try {
-            $oResult = self::where('id', $iVideoId)
+            $oResult = self::with('category')
+                ->where('id', $iVideoId)
                 ->where('status', 1)
                 ->where('deleted', 0)
                 ->first();
@@ -151,7 +158,8 @@ class Video extends Model
     public function fetchAllVideosWithPagination($iPerPage = 10)
     {
         try {
-            $oResult = self::where('status', 1)
+            $oResult = self::with('category')
+                ->where('status', 1)
                 ->where('deleted', 0)
                 ->paginate($iPerPage);
 
@@ -167,7 +175,8 @@ class Video extends Model
     public function searchVideosByTitle($sTitle)
     {
         try {
-            $oResult = self::where('title', 'LIKE', '%' . $sTitle . '%')
+            $oResult = self::with('category')
+                ->where('title', 'LIKE', '%' . $sTitle . '%')
                 ->where('status', 1)
                 ->where('deleted', 0)
                 ->get();
