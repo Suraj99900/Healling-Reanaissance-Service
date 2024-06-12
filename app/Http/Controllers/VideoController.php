@@ -69,11 +69,25 @@ class VideoController extends Controller
     public function fetchById($id)
     {
         try {
-            $video = (new Video)->fetchVideoById($id);
-            if ($video) {
+            $videos = (new Video)->fetchVideoById($id);
+
+            foreach ($videos as &$video) {
+                $thumbnailPath = $video->thumbnail;
+                if (!$thumbnailPath || !Storage::disk('public')->exists($thumbnailPath)) {
+                    // If thumbnail does not exist, set a default URL
+                    $video->thumbnail_url = "https://suraj99900.github.io/myprotfolio.github.io/img/gallery_1.jpg";
+                } else {
+                    // Generate the proper URL for the thumbnail stored in the 'public' disk
+                    $video->thumbnail_url = Storage::disk('public')->url($thumbnailPath);
+                }
+
+                // Assuming the videos are stored in the 'public' disk
+                $video->video_url = Storage::disk('public')->url($video->path);
+            }
+            if ($videos) {
                 return response()->json([
                     'message' => "Video fetched successfully!",
-                    'body' => $video,
+                    'body' => $videos,
                     'status' => 200,
                 ], 200);
             } else {
@@ -158,7 +172,7 @@ class VideoController extends Controller
                 // Assuming the videos are stored in the 'public' disk
                 $video->video_url = Storage::disk('public')->url($video->path);
             }
-            
+
             return response()->json([
                 'message' => "Videos fetched successfully!",
                 'body' => $videos,
