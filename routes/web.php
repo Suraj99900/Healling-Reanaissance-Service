@@ -5,6 +5,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\EmailController;
 use App\Http\Controllers\VideoController;
 use App\Http\Controllers\VideoCategoryController;
+use App\http\Controllers\AttachmentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -75,5 +76,10 @@ Route::prefix('api')->middleware('ensure.token.is.valid')->group(function () {
 
     // Delete a video category by ID
     Route::delete('video-category/{id}', [VideoCategoryController::class, 'deleteCategory']);
+
+    // Attachment route
+    Route::post('attachment',[AttachmentController::class,'addAttchment']);
+    Route::get('video-attachment/{id}',[AttachmentController::class,'fetchAllAttachmentByVideoId']);
+    Route::delete('attachment/{id}',[AttachmentController::class,'removedAttchment']);
 
 });
