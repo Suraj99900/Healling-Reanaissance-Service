@@ -15,8 +15,8 @@ class AttachmentController extends Controller
     {
         $oValidator = Validator::make($request->all(), [
             'attachment' => 'required|file|max:200000',
-            'attachment_name' => 'required|string|max:25500',
-            'video_id' => 'nullable|string',
+            'attachment_name' => 'required',
+            'video_id' => 'nullable',
         ]);
 
         if ($oValidator->fails()) {

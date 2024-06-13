@@ -28,9 +28,9 @@ class Attachment extends Model
         try {
             $oAttchment = self::create([
                 'video_id' => $iVideoId,
-                'file_name' => $sFileName,
-                'path' => $sPath,
-                'file_url' => $sFileUrl,
+                'attachment_name' => $sFileName,
+                'attachment_path' => $sPath,
+                'attachment_url' => $sFileUrl,
                 'added_on' => now(),
             ]);
 
