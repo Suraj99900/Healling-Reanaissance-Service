@@ -78,8 +78,8 @@ Route::prefix('api')->middleware('ensure.token.is.valid')->group(function () {
     Route::delete('video-category/{id}', [VideoCategoryController::class, 'deleteCategory']);
 
     // Attachment route
-    Route::post('attachment',[AttachmentController::class,'addAttchment']);
-    Route::get('video-attachment/{id}',[AttachmentController::class,'fetchAllAttachmentByVideoId']);
-    Route::delete('attachment/{id}',[AttachmentController::class,'removedAttchment']);
+    Route::post('video/attachment', [AttachmentController::class, 'addAttchmentData']);
+    Route::get('video/attachment/{id}', [AttachmentController::class, 'fetchAllAttachmentDataByVideoId']);
+    Route::delete('video/attachment/{id}', [AttachmentController::class, 'removedAttchment']);
 
 });

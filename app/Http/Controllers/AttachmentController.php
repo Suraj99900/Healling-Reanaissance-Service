@@ -11,7 +11,7 @@ class AttachmentController extends Controller
 {
 
 
-    public function addAttchment(Request $request)
+    public function addAttchmentData(Request $request)
     {
         $oValidator = Validator::make($request->all(), [
             'attachment' => 'required|file|max:200000',
@@ -72,7 +72,7 @@ class AttachmentController extends Controller
         }
     }
 
-    public function fetchAllAttachmentByVideoId($id)
+    public function fetchAllAttachmentDataByVideoId($id)
     {
         try {
             $oAttachment = (new Attachment)->fetchAttchmentByVideoId($id);
