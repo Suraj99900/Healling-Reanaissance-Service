@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Exception;
 
-class AttachmentController extends Controller
+class AttachmentFileController extends Controller
 {
 
 

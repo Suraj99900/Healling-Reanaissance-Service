@@ -1,11 +1,11 @@
 <?php
 
+use App\Http\Controllers\AttachmentFileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\EmailController;
 use App\Http\Controllers\VideoController;
 use App\Http\Controllers\VideoCategoryController;
-use App\http\Controllers\AttachmentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -78,8 +78,8 @@ Route::prefix('api')->middleware('ensure.token.is.valid')->group(function () {
     Route::delete('video-category/{id}', [VideoCategoryController::class, 'deleteCategory']);
 
     // Attachment route
-    Route::post('app-attachment', [AttachmentController::class, 'addAttchmentData']);
-    Route::get('app-attachment/{id}', [AttachmentController::class, 'fetchAllAttachmentDataByVideoId']);
-    Route::delete('app-attachment/{id}', [AttachmentController::class, 'removedAttchment']);
+    Route::post('app-attachment', [AttachmentFileController::class, 'addAttchmentData']);
+    Route::get('app-attachment/{id}', [AttachmentFileController::class, 'fetchAllAttachmentDataByVideoId']);
+    Route::delete('app-attachment/{id}', [AttachmentFileController::class, 'removedAttchment']);
 
 });
