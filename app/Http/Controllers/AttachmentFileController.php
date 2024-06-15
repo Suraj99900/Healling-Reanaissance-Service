@@ -58,7 +58,7 @@ class AttachmentFileController extends Controller
     public function removedAttchment(Request $request, $id)
     {
         try {
-            $oAttachment = (new Attachment)->deleteVideoById($id);
+            $oAttachment = (new Attachment)->removedAttchment($id);
             if ($oAttachment) {
                 return response()->json([
                     'message' => "attchment deleted successfully!",
