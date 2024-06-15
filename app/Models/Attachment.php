@@ -43,13 +43,10 @@ class Attachment extends Model
     public static function removedAttchment($iRecordId)
     {
         try {
-            $oAttachment = Attachment::where('id', $iRecordId)
+            $oAttachment = DB::table('app_attachment')
+                ->where('id', $iRecordId)
                 ->where('deleted', 0)
-                ->whereNull('deleted_at')
-                ->update([
-                    'deleted' => 1,
-                    'updated_at' => now(),
-                ]);
+                ->update(['deleted' => 1, 'updated_at' => now()]);
             return $oAttachment;
         } catch (\Exception $e) {
             throw $e;
