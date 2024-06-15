@@ -56,7 +56,7 @@ class Attachment extends Model
     {
         try {
             $oAttchment = DB::table('app_attachment AS A')
-                ->leftJoin('video AS B', 'A.id', '=', 'B.video_id')
+                ->leftJoin('videos AS B', 'A.id', '=', 'B.video_id')
                 ->select('A.*', 'B.title',',B.id')
                 ->where('B.id', $iVideoId)
                 ->where('A.status', 1)
