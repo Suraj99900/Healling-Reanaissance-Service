@@ -84,7 +84,8 @@ class Video extends Model
         try {
             $oResult = DB::table('videos AS A')
                 ->leftJoin('video_category AS B', 'A.category_id', '=', 'B.id')
-                ->select('A.*', 'B.name')
+                ->leftJoin('app_attachment AS C','C.video_id','=','A.id')
+                ->select('A.*', 'B.name','C.attachment_name','C.attachment_url')
                 ->where('A.id', $iVideoId)
                 ->where('A.status', 1)
                 ->where('A.deleted', 0)
