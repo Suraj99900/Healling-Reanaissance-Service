@@ -79,7 +79,7 @@ Route::prefix('api')->middleware('ensure.token.is.valid')->group(function () {
 
     // Attachment route
     Route::post('app-attachment', [AttachmentFileController::class, 'addAttchmentData']);
-    Route::get('app-attachment/{id}', [AttachmentFileController::class, 'fetchAllAttachmentDataByVideoId']);
+    Route::get('video/app-attachment/{id}', [AttachmentFileController::class, 'fetchAllAttachmentDataByVideoId']);
     Route::delete('app-attachment/{id}', [AttachmentFileController::class, 'removedAttchment']);
 
 });
