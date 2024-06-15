@@ -79,6 +79,7 @@ class AttachmentFileController extends Controller
             if ($oAttachment) {
                 return response()->json([
                     'message' => "Fetch attchment successfully!",
+                    'body' => $oAttachment,
                     'status' => 200,
                 ], 200);
             } else {
