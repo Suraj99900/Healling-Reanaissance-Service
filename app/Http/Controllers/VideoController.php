@@ -16,7 +16,7 @@ class VideoController extends Controller
     {
         // Validate the incoming request
         $oValidator = Validator::make($request->all(), [
-            'video' => 'required|file|mimes:mp4,mov,ogg,qt|max:2000000',
+            'video' => 'required|file|mimes:mp4,mov,ogg,qt,avi,flv,webm,3gp,mpeg,mpeg2,mpeg4,mkv,wmv,m4v,mxf,asf,vob,ts,tsv,mts,m2ts|max:2000000',
             'title' => 'required|string|max:25500',
             'description' => 'nullable|string',
             'category_id' => 'required|integer'
