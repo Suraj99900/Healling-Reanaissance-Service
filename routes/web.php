@@ -4,6 +4,7 @@ use App\Http\Controllers\AttachmentFileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\EmailController;
+use App\Http\Controllers\UserCommentController;
 use App\Http\Controllers\VideoController;
 use App\Http\Controllers\VideoCategoryController;
 
@@ -81,5 +82,12 @@ Route::prefix('api')->middleware('ensure.token.is.valid')->group(function () {
     Route::post('app-attachment', [AttachmentFileController::class, 'addAttchmentData']);
     Route::get('video/app-attachment/{id}', [AttachmentFileController::class, 'fetchAllAttachmentDataByVideoId']);
     Route::delete('app-attachment/{id}', [AttachmentFileController::class, 'removedAttchment']);
+
+    // Video Comment 
+    Route::post('video/comment', [UserCommentController::class, 'addUserComment']);
+    Route::put('video/comment', [UserCommentController::class, 'updateUserComment']);
+    Route::get('video/comment/{id}', [UserCommentController::class, 'fetchUserCommentByVideoId']);
+    Route::get('video/comment', [UserCommentController::class, 'fetchAllUserComment']);
+    Route::delete('video/comment/{id}', [UserCommentController::class, 'invalidUserCommentById']);
 
 });
