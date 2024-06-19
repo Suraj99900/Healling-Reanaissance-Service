@@ -37,7 +37,7 @@ class EmailController extends Controller
             $otp = (new BasicOpration())->genrateRandomNummber();
 
             $details = [
-                'title' => 'WELLNESS SERVICE',
+                'title' => 'kavitas Healling Reanaissance',
                 'otp' => $otp,
                 'contact_details' => 'For more information, contact us at support@wellnessservice.com or call (123) 456-7890.',
             ];

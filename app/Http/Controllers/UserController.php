@@ -137,14 +137,14 @@ class UserController extends Controller
             }
 
             $sEmail = $request->input('email');
-            $sNewPassword = $request->input('newPassword');
+            $sNewPassword = $request->input('password');
             $sOTP = $request->input('otp');
 
             // check otp valid or not 
             $oCheckOTP = (new WellnessOtp())->fetchActiveOTP($sEmail);
 
             // Checlk key is valid or not 
-            if (((new User())->checkUserPresent($sEmail))) {
+            if (!((new User())->checkUserPresent($sEmail))) {
                 throw new Exception('User already present.');
             }
 
