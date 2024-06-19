@@ -158,7 +158,20 @@ class UserController extends Controller
             $sNewPassword = (new BasicOpration())->convertPasswordToHash($sNewPassword);
 
             //! update user Password
-            $oResult = (new User());
+            $oResult = (new User())->updateUserByEmailId($sEmail,$sNewPassword);
+
+            if ($oResult) {
+                return response()->json([
+                    'message' => "Successfully updated",
+                    'body' => $oResult,
+                    'status' => 200,
+                ], 200);
+            } else {
+                return response()->json([
+                    'message' => "Error",
+                    'status' => 500,
+                ], 500);
+            }
 
         } catch (Exception $e) {
             // Log the error for further analysis
