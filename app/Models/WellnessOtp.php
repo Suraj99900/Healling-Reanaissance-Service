@@ -37,7 +37,7 @@ class WellnessOtp extends Model
                 'otp' => $sOTP,
                 'email' => $sEmailId,
                 'added_on' => now(),
-                'exp_on' => now()->addMinutes(5),
+                'exp_on' => now()->addMinutes(60),
                 'status' => 1,
                 'deleted' => 0,
             ]);

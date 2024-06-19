@@ -39,7 +39,7 @@ class EmailController extends Controller
             $details = [
                 'title' => 'kavitas Healling Reanaissance',
                 'otp' => $otp,
-                'contact_details' => 'For more information, contact us at support@wellnessservice.com or call (123) 456-7890.',
+                'contact_details' => 'For more information, contact us at healling.reanaissance@lifehealerkavita.com or call (123) 456-7890.',
             ];
 
             $resultData = (new WellnessOtp())->genrateOTP($userEmail, $otp);
