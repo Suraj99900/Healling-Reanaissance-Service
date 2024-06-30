@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AppPostController;
 use App\Http\Controllers\AttachmentFileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
@@ -89,5 +90,14 @@ Route::prefix('api')->middleware('ensure.token.is.valid')->group(function () {
     Route::get('video/comment/{id}', [UserCommentController::class, 'fetchUserCommentByVideoId']);
     Route::get('video/comment', [UserCommentController::class, 'fetchAllUserComment']);
     Route::delete('video/comment/{id}', [UserCommentController::class, 'invalidUserCommentById']);
+
+
+    // blog post api
+
+    Route::post('blog',[AppPostController::class,'store']);
+    Route::put('blog/{id}',[AppPostController::class,'update']);
+    Route::get('blog',[AppPostController::class,'index']);
+    Route::get('blog/{id}',[AppPostController::class,'show']);
+    Route::delete('blog',[AppPostController::class,'destroy']);
 
 });
