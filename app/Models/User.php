@@ -122,4 +122,20 @@ class User extends Authenticatable
             throw $e;
         }
     }
+
+
+    public static function fetchAllUser()
+    {
+        try {
+            $oUser = self::where('status', 1)
+                ->where('deleted', 0);
+
+           
+            return $oUser;
+        } catch (Exception $e) {
+            throw $e;
+        }
+    }
+
+
 }

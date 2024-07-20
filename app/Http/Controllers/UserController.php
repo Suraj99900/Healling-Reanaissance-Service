@@ -184,4 +184,20 @@ class UserController extends Controller
             ], 500);
         }
     }
+
+    public function fetchAllUser(Request $request){
+
+        try {
+            //code...
+        } catch (Exception $e) {
+            Log::error('Error in sending email: ' . $e->getMessage());
+
+            return response()->json([
+                'error' => 'An error occurred while processing your request.',
+                'message' => $e->getMessage(),
+                'status' => 500
+            ], 500);
+        }
+
+    }
 }
