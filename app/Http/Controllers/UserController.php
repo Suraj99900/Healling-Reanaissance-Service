@@ -145,7 +145,7 @@ class UserController extends Controller
 
             // Checlk key is valid or not 
             if (!((new User())->checkUserPresent($sEmail))) {
-                throw new Exception('User already present.');
+                throw new Exception('User not present.');
             }
 
             if (!(isset($oCheckOTP))) {
@@ -158,7 +158,7 @@ class UserController extends Controller
             $sNewPassword = (new BasicOpration())->convertPasswordToHash($sNewPassword);
 
             //! update user Password
-            $oResult = (new User())->updateUserByEmailId($sEmail,$sNewPassword);
+            $oResult = (new User())->updateUserByEmailId($sEmail, $sNewPassword);
 
             if ($oResult) {
                 return response()->json([
@@ -185,10 +185,17 @@ class UserController extends Controller
         }
     }
 
-    public function fetchAllUser(Request $request){
-
+    public function fetchAllUser(Request $request)
+    {
         try {
-            //code...
+            $aUserData = (new User())->fetchAllUser();
+
+            return response()->json([
+                'message' => "Successfully ",
+                'body' => $aUserData,
+                'status' => 200,
+            ], 200);
+
         } catch (Exception $e) {
             Log::error('Error in sending email: ' . $e->getMessage());
 
@@ -200,4 +207,26 @@ class UserController extends Controller
         }
 
     }
+
+    public function FreezeUnFreeze($id){
+        try {
+            $aUserData = (new User())->freezeUnFreeze($id);
+
+            return response()->json([
+                'message' => "Successfully ",
+                'body' => $aUserData,
+                'status' => 200,
+            ], 200);
+
+        } catch (Exception $e) {
+            Log::error('Error in sending email: ' . $e->getMessage());
+
+            return response()->json([
+                'error' => 'An error occurred while processing your request.',
+                'message' => $e->getMessage(),
+                'status' => 500
+            ], 500);
+        }
+    }
+
 }

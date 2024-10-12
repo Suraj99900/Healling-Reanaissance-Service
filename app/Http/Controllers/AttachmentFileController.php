@@ -76,6 +76,16 @@ class AttachmentFileController extends Controller
     {
         try {
             $oAttachment = (new Attachment)->fetchAttchmentByVideoId($id);
+            foreach ($oAttachment as &$oAttachmentElement) {
+                $oAttachmentPath = $oAttachmentElement->attachment_path;
+                if (!$oAttachmentPath || !Storage::disk('public')->exists($oAttachmentPath)) {
+                    // If thumbnail does not exist, set a default URL
+                    $oAttachmentElement->attachment_url = "https://suraj99900.github.io/myprotfolio.github.io/img/gallery_1.jpg";
+                } else {
+                    // Generate the proper URL for the thumbnail stored in the 'public' disk
+                    $oAttachmentElement->attachment_url = Storage::disk('public')->url($oAttachmentPath);
+                }
+            }
             if ($oAttachment) {
                 return response()->json([
                     'message' => "Fetch attchment successfully!",

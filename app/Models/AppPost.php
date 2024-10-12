@@ -82,7 +82,7 @@ class AppPost extends Model
         try {
             $oPostData = self::where('id', $id)->where('status', 1)->where('deleted', 0)->first();
             if ($oPostData) {
-                $oPostData->update([
+                $oPostData->update(attributes: [
                     'deleted' => 1,
                 ]);
             }

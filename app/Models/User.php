@@ -127,10 +127,30 @@ class User extends Authenticatable
     public static function fetchAllUser()
     {
         try {
-            $oUser = self::where('status', 1)
-                ->where('deleted', 0);
+            $oUser = self::select('*')
+                ->get();
 
-           
+
+            return $oUser;
+        } catch (Exception $e) {
+            throw $e;
+        }
+    }
+
+    public static function freezeUnFreeze($iId)
+    {
+        try {
+            // Find the user by id
+            $oUser = self::find($iId);
+
+            if (!$oUser) {
+                throw new Exception('User not found');
+            }
+
+            // Toggle the status between 0 (frozen) and 1 (active)
+            $oUser->status = $oUser->status == 1 ? 0 : 1;
+            $oUser->save();
+
             return $oUser;
         } catch (Exception $e) {
             throw $e;

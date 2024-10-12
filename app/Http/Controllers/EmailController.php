@@ -29,7 +29,7 @@ class EmailController extends Controller
 
             $oCheckOTP = (new WellnessOtp())->fetchActiveOTP($userEmail);
 
-            if((isset($oCheckOTP))){
+            if ((isset($oCheckOTP))) {
                 throw new Exception('Already otp send');
             }
 
@@ -42,15 +42,18 @@ class EmailController extends Controller
                 'contact_details' => 'For more information, contact us at healling.reanaissance@lifehealerkavita.com or call (123) 456-7890.',
             ];
 
-            $resultData = (new WellnessOtp())->genrateOTP($userEmail, $otp);
-            if (!$resultData) {
-                throw new Exception('Failed to generate OTP entry in the database.');
+            // Send the email
+            $oResult = Mail::to($userEmail)->send(new OTP($details));
+            if ($oResult) {
+                $resultData = (new WellnessOtp())->genrateOTP($userEmail, $otp);
+                if (!$resultData) {
+                    throw new Exception('Failed to generate OTP entry in the database.');
+                }
+            }else{
+                throw new Exception('Failed to Send OTP.');
             }
 
-            // Send the email
-           $oResult =  Mail::to($userEmail)->send(new OTP($details));
-
-            return response()->json(['message' => 'Email sent successfully!','body' => null,'status'=>200], 200);
+            return response()->json(['message' => 'Email sent successfully!', 'body' => null, 'status' => 200], 200);
 
         } catch (Exception $e) {
             // Log the error for further analysis
@@ -59,7 +62,7 @@ class EmailController extends Controller
             return response()->json([
                 'error' => 'An error occurred while processing your request.',
                 'message' => $e->getMessage(),
-                'status'=> 500
+                'status' => 500
             ], 500);
         }
     }

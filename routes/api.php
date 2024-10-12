@@ -27,7 +27,9 @@ Route::middleware('ensure.token.is.valid')->group(function () {
     Route::post('users', [UserController::class, 'addUser']);
     Route::put('password', [UserController::class, 'updatePassword']);
     Route::put('users/{id}', [UserController::class, 'update']);
-    Route::delete('users/{id}', [UserController::class, 'destroy']);
+    Route::delete('users/{id}', [UserController::class, 'FreezeUnFreeze']);
+    // get All users
+    Route::get('users', [UserController::class, 'fetchAllUser']);
 
     // Email route
     Route::post('email', [EmailController::class, 'generateMail']);

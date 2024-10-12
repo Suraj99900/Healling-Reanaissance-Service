@@ -99,5 +99,22 @@ class WellnessOtp extends Model
         }
     }
 
+    public static function InvalidOTP($sOTP)
+    {
+        try {
+            $sOTPResult = self::where('otp', $sOTP)->update([
+                'status' => 0
+            ]);
+            // Check if the OTP exists
+            if (!$sOTPResult) {
+                return response()->json(['error' => 'Invalid OTP'], 400);
+            }
+
+            return $sOTPResult;
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+
 }
 
