@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('otp');
             $table->string('email');
-            $table->timestamp('added_on');
-            $table->timestamp('exp_on');
+            $table->timestamp('added_on')->nullable();
+            $table->timestamp('exp_on')->nullable();
             $table->integer('status')->index()->default(1);
             $table->integer('deleted')->index()->default(0);
             $table->timestamps();

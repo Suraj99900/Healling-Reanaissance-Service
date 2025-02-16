@@ -15,7 +15,7 @@ class Kernel extends HttpKernel
      */
     protected $middleware = [
         \App\Http\Middleware\Cors::class,
-        'ensure.token.is.valid' => \App\Http\Middleware\EnsureTokenIsValid::class,
+        // 'ensure.token.is.valid' => \App\Http\Middleware\EnsureTokenIsValid::class,
         // \App\Http\Middleware\TrustHosts::class,
         \App\Http\Middleware\TrustProxies::class,
         \Illuminate\Http\Middleware\HandleCors::class,
