@@ -9,6 +9,7 @@ use App\Http\Controllers\EmailController;
 use App\Http\Controllers\UserCommentController;
 use App\Http\Controllers\VideoController;
 use App\Http\Controllers\VideoCategoryController;
+use App\Http\Controllers\UserCategoryAccessController;
 
 /*
 |--------------------------------------------------------------------------
@@ -70,3 +71,8 @@ Route::put('blog/{id}', [AppPostController::class, 'update']);
 Route::get('blog', [AppPostController::class, 'index']);
 Route::get('blog/{id}', [AppPostController::class, 'show']);
 Route::delete('blog', [AppPostController::class, 'destroy']);
+// Access API
+Route::get('/user-category-access', [UserCategoryAccessController::class, 'getUsersWithCategoryAccess']);
+Route::post('/user-category-access', [UserCategoryAccessController::class, 'grantAccess']);
+Route::put('/user-category-access/{id}', [UserCategoryAccessController::class, 'updateAccess']);
+Route::delete('/user-category-access/{id}', [UserCategoryAccessController::class, 'deleteAccess']);
