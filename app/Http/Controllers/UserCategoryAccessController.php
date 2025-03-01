@@ -40,8 +40,7 @@ class UserCategoryAccessController extends Controller
         $validated = Validator::make($request->all(), [
             'user_id' => 'required|integer|exists:wellness_users,id',
             'category_id' => 'required|integer|exists:video_category,id',
-            'expiration_time' => 'required|date|after:now',
-            'access_time' => 'required|date|after:now',
+            'expiration_time' => 'required|date|after:now'
         ]);
 
         if ($validated->fails()) {
