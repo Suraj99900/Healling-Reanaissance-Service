@@ -41,6 +41,7 @@ class UserCategoryAccessController extends Controller
             'user_id' => 'required|integer|exists:wellness_users,id',
             'category_id' => 'required|integer|exists:video_category,id',
             'expiration_time' => 'required|date|after:now',
+            'access_time' => 'required|date|after:now',
         ]);
 
         if ($validated->fails()) {
@@ -50,14 +51,14 @@ class UserCategoryAccessController extends Controller
         $access = UserCategoryAccess::create([
             'user_id' => $request->user_id,
             'category_id' => $request->category_id,
-            'access_time' => now(),
+            'access_time' => $request->access_time,
             'expiration_time' => $request->expiration_time,
             'added_on' => now(),
             'status' => 1,
             'deleted' => 0,
         ]);
 
-        return response()->json(['message' => 'Access granted successfully', 'data' => $access], 201);
+        return response()->json(['message' => 'Access granted successfully', 'data' => $access], 200);
     }
 
     /**
