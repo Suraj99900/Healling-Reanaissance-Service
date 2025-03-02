@@ -8,26 +8,41 @@ use Illuminate\Support\Facades\Validator;
 
 class UserCategoryAccessController extends Controller
 {
+    public function index()
+    {
+        return view('user-access.index');
+    }
+
     /**
-     * Fetch users who have access to a given category.
+     * Fetch users with active access, filtered by user_id and/or category_id.
      */
     public function getUsersWithCategoryAccess(Request $request)
     {
         $validated = Validator::make($request->all(), [
             'user_id' => 'nullable|integer',
             'category_id' => 'nullable|integer',
-            'status' => 'nullable|integer|in:0,1',
         ]);
 
         if ($validated->fails()) {
             return response()->json(['error' => $validated->errors()], 422);
         }
 
-        $userId = $request->input('user_id');
-        $categoryId = $request->input('category_id');
-        $status = $request->input('status', 1);
+        $validatedData = $validated->validated();
+        $users = UserCategoryAccess::getUsersWithCategoryDetails(
+            $validatedData['user_id'] ?? null,
+            $validatedData['category_id'] ?? null
+        );
 
-        $users = UserCategoryAccess::getUsersWithCategoryDetails($userId, $categoryId, $status);
+
+        // if ($request->has('user_id')) {
+        //     $query->where('user_id', $request->user_id);
+        // }
+
+        // if ($request->has('category_id')) {
+        //     $query->where('category_id', $request->category_id);
+        // }
+
+        // $users = $query->get();
 
         return response()->json(['data' => $users], 200);
     }
@@ -74,7 +89,7 @@ class UserCategoryAccessController extends Controller
             return response()->json(['error' => $validated->errors()], 422);
         }
 
-        $access = UserCategoryAccess::find($id);
+        $access = UserCategoryAccess::where('id', $id)->where('deleted', 0)->first();
         if (!$access) {
             return response()->json(['error' => 'Access record not found'], 404);
         }
@@ -92,7 +107,7 @@ class UserCategoryAccessController extends Controller
      */
     public function deleteAccess($id)
     {
-        $access = UserCategoryAccess::find($id);
+        $access = UserCategoryAccess::where('id', $id)->where('deleted', 0)->first();
         if (!$access) {
             return response()->json(['error' => 'Access record not found'], 404);
         }

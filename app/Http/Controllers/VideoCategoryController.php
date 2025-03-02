@@ -9,6 +9,11 @@ use Illuminate\Http\Request;
 class VideoCategoryController extends Controller
 {
 
+    public function index()
+    {
+        return view('category-management'); // Create this Blade file in resources/views/
+    }
+
     public function addCategory(Request $request)
     {
         try {

@@ -123,11 +123,29 @@ class User extends Authenticatable
         }
     }
 
+    public function fetchUserById($id)
+    {
+        return self::find($id);
+    }
+
+    public function updateUserById($id, array $data)
+    {
+        $user = self::find($id);
+        if ($user) {
+            $user->update($data);
+            return $user;
+        }
+        return null;
+    }
+
+
 
     public static function fetchAllUser()
     {
         try {
             $oUser = self::select('*')
+            ->where('status',1)
+            ->where('deleted', 0)
                 ->get();
 
 

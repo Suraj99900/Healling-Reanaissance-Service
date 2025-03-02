@@ -26,10 +26,13 @@ use App\Http\Controllers\UserCategoryAccessController;
 Route::get('login', [UserController::class, 'login']);
 Route::post('users', [UserController::class, 'addUser']);
 Route::put('password', [UserController::class, 'updatePassword']);
-Route::put('users/{id}', [UserController::class, 'update']);
+Route::post('users/direct', [UserController::class, 'addUserWithoutOTP']);
+Route::put('users/{id}', [UserController::class, 'updateUserById']);
 Route::delete('users/{id}', [UserController::class, 'FreezeUnFreeze']);
 // get All users
 Route::get('users', [UserController::class, 'fetchAllUser']);
+Route::get('users/{id}', [UserController::class, 'fetchUserById']);
+
 
 // Email route
 Route::post('email', [EmailController::class, 'generateMail']);

@@ -9,6 +9,12 @@ use Exception;
 
 class VideoController extends Controller
 {
+    
+    public function index()
+    {
+        return view('video-management'); // Create resources/views/video-management.blade.php
+    }
+    
     /**
      * Upload a video
      */

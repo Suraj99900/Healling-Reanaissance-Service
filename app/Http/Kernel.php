@@ -32,7 +32,7 @@ class Kernel extends HttpKernel
      * @var array<string, array<int, class-string|string>>
      */
     protected $middlewareGroups = [
-        // 'web' => [
+        'web' => [
         //     \App\Http\Middleware\Cors::class,
         //     \App\Http\Middleware\EncryptCookies::class,
         //     \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
@@ -40,7 +40,7 @@ class Kernel extends HttpKernel
         //     \Illuminate\View\Middleware\ShareErrorsFromSession::class,
         //     // \App\Http\Middleware\VerifyCsrfToken::class,
         //     \Illuminate\Routing\Middleware\SubstituteBindings::class,
-        // ],
+        ],
 
         'api' => [
              \App\Http\Middleware\Cors::class,
