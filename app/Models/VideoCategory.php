@@ -160,6 +160,7 @@ class VideoCategory extends Model
                 ->where('A.deleted', 0)
                 ->where('A.status', 1)
                 ->where('A.user_id', $iUserId)
+                ->where('A.expiration_time', '>=', now()) // Only show active (not expired) rows
                 ->get();
 
             return $oResult;
