@@ -8,7 +8,6 @@ use Illuminate\Http\Request;
 
 class VideoCategoryController extends Controller
 {
-
     public function index()
     {
         return view('category-management'); // Create this Blade file in resources/views/
@@ -21,16 +20,21 @@ class VideoCategoryController extends Controller
                 'name' => 'required',
             ]);
 
-            $oResult = (new VideoCategory())->addCategory($request->input('name'),$request->input('desc'));
+            if ($oValidator->fails()) {
+                return response()->json(['error' => $oValidator->errors()], 400);
+            }
+
+            $oResult = VideoCategory::addCategory($request->input('name'), $request->input('desc'));
+
             if ($oResult) {
                 return response()->json([
-                    'message' => "successful",
+                    'message' => "Category added successfully",
                     'body' => $oResult,
                     'status' => 200,
                 ], 200);
             } else {
                 return response()->json([
-                    'message' => "Error While inserting category",
+                    'message' => "Error while inserting category",
                     'status' => 500,
                 ], 500);
             }
@@ -43,6 +47,7 @@ class VideoCategoryController extends Controller
             ], 500);
         }
     }
+
     // Get all categories
     public function getAllCategories()
     {
@@ -101,6 +106,7 @@ class VideoCategoryController extends Controller
             }
 
             $oResult = VideoCategory::updateCategoryById($id, $request->all());
+
             if ($oResult) {
                 return response()->json([
                     'message' => "Category updated successfully",
@@ -127,6 +133,7 @@ class VideoCategoryController extends Controller
     {
         try {
             $oResult = VideoCategory::deleteCategoryById($id);
+
             if ($oResult) {
                 return response()->json([
                     'message' => "Category deleted successfully",
@@ -141,6 +148,35 @@ class VideoCategoryController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'error' => 'An error occurred while deleting the category.',
+                'message' => $e->getMessage(),
+                'status' => 500
+            ], 500);
+        }
+    }
+
+    /**
+     * Fetch user category access by user ID
+     */
+    public function getUserCategoryAccess($userId)
+    {
+        try {
+            $categories = VideoCategory::fetchUserCategoryAccessByUserId($userId);
+
+            if ($categories->isEmpty()) {
+                return response()->json([
+                    'message' => "No categories found for this user",
+                    'status' => 404,
+                ], 404);
+            }
+
+            return response()->json([
+                'message' => "User category access fetched successfully",
+                'body' => $categories,
+                'status' => 200,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'An error occurred while fetching user category access.',
                 'message' => $e->getMessage(),
                 'status' => 500
             ], 500);

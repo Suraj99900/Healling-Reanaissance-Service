@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Exception;
+use Illuminate\Support\Facades\DB;
 
 class VideoCategory extends Model
 {
@@ -23,12 +24,12 @@ class VideoCategory extends Model
     /**
      * Add video category
      */
-    public static function addCategory($sName,$sDesc)
+    public static function addCategory($sName, $sDesc)
     {
         try {
             $oCategory = self::create([
                 'name' => $sName,
-                'description'=>$sDesc,
+                'description' => $sDesc,
                 'added_on' => now(),
                 'status' => 1,
                 'deleted' => 0
@@ -138,6 +139,27 @@ class VideoCategory extends Model
             $oResult = self::where('name', 'LIKE', '%' . $sName . '%')
                 ->where('status', 1)
                 ->where('deleted', 0)
+                ->get();
+
+            return $oResult;
+        } catch (Exception $e) {
+            throw $e;
+        }
+    }
+
+    /**
+     * Fetch user category access by user ID
+     */
+    public static function fetchUserCategoryAccessByUserId($iUserId)
+    {
+        try {
+            $oResult = DB::table('user_category_access as A')
+                ->leftJoin('wellness_users as B', 'B.id', '=', 'A.user_id')
+                ->leftJoin('video_category as C', 'C.id', '=', 'A.category_id')
+                ->select('A.*', 'B.name as user_name', 'C.name as category_name')
+                ->where('A.deleted', 0)
+                ->where('A.status', 1)
+                ->where('A.user_id', $iUserId)
                 ->get();
 
             return $oResult;

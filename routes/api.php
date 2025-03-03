@@ -52,6 +52,7 @@ Route::get('thumbnail/{id}', [VideoController::class, 'thumbnailImages']);
 // Video Category
 Route::post('video-category', [VideoCategoryController::class, 'addCategory']);
 Route::get('video-categories', [VideoCategoryController::class, 'getAllCategories']);
+Route::get('video-categories/{userId}/user', [VideoCategoryController::class, 'getUserCategoryAccess']);
 Route::get('video-category/{id}', [VideoCategoryController::class, 'getCategoryById']);
 Route::put('video-category/{id}', [VideoCategoryController::class, 'updateCategory']);
 Route::delete('video-category/{id}', [VideoCategoryController::class, 'deleteCategory']);
