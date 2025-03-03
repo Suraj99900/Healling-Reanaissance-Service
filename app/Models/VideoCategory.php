@@ -156,7 +156,7 @@ class VideoCategory extends Model
             $oResult = DB::table('user_category_access as A')
                 ->leftJoin('wellness_users as B', 'B.id', '=', 'A.user_id')
                 ->leftJoin('video_category as C', 'C.id', '=', 'A.category_id')
-                ->select('A.*', 'B.user_name as user_name', 'C.name as category_name')
+                ->select('A.*', 'B.user_name as user_name', 'C.*')
                 ->where('A.deleted', 0)
                 ->where('A.status', 1)
                 ->where('A.user_id', $iUserId)
