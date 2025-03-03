@@ -1,14 +1,8 @@
 @extends('layouts.app')
 
 @push('styles')
-    <!-- DataTables CSS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
     <style>
-        /* Custom styling for management screen */
-        .offcanvas-header .btn-close {
-            margin: -1rem -1rem -1rem auto;
-        }
-
         .alert-message {
             position: fixed;
             top: 10px;
@@ -18,7 +12,6 @@
             transition: opacity 0.5s ease-in-out;
         }
 
-        /* Button hover effect */
         .btn {
             transition: all 0.3s ease;
         }
@@ -27,15 +20,30 @@
             transform: scale(1.05);
         }
 
-        /* Offcanvas animation */
         .offcanvas {
             transition: transform 0.4s ease-in-out;
         }
 
-        /* Table row hover */
         #userTable tbody tr:hover {
             background-color: #f8f9fa;
             transition: background-color 0.3s;
+        }
+
+        /* Responsive Table */
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Mobile-friendly form */
+        @media (max-width: 768px) {
+            .offcanvas {
+                width: 100%;
+            }
+
+            .btn {
+                width: 100%;
+            }
         }
     </style>
 @endpush
@@ -43,8 +51,8 @@
 @section('content')
     <div class="container my-4">
         <div class="pagetitle">
-            <h1 class="animate__animated animate__fadeInDown">User Management</h1>
-            <nav>
+            <h1 class="animate__animated animate__fadeInDown text-center">User Management</h1>
+            <nav class="d-flex justify-content-center">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
                     <li class="breadcrumb-item active">User Management</li>
@@ -54,22 +62,24 @@
 
         <div id="alertContainer"></div>
 
-        <button class="btn btn-primary mb-3 animate__animated animate__pulse animate__infinite" id="btnAddUser" 
-            data-bs-toggle="offcanvas" data-bs-target="#userOffcanvas" aria-controls="userOffcanvas">
+        <button class="btn btn-primary mb-3 animate__animated animate__pulse animate__infinite w-100" id="btnAddUser" 
+            data-bs-toggle="offcanvas" data-bs-target="#userOffcanvas">
             Add User
         </button>
 
-        <table id="userTable" class="table table-striped table-bordered animate__animated animate__fadeIn">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>User Name</th>
-                    <th>Email</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
+        <div class="table-responsive">
+            <table id="userTable" class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>User Name</th>
+                        <th>Email</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
     </div>
 
     <div class="offcanvas offcanvas-end" tabindex="-1" id="userOffcanvas" aria-labelledby="userOffcanvasLabel">
@@ -77,7 +87,7 @@
             <h5 id="userOffcanvasLabel">Add / Update User</h5>
             <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"></button>
         </div>
-        <div class="offcanvas-body animate__animated animate__fadeInRight">
+        <div class="offcanvas-body">
             <form id="userForm">
                 <input type="hidden" id="userId" name="userId">
                 <div class="mb-3">
@@ -118,6 +128,7 @@
             }
 
             var table = $('#userTable').DataTable({
+                responsive: true,
                 ajax: { url: '/api/users', dataSrc: 'body' },
                 columns: [
                     { data: 'id' },
