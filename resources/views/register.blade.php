@@ -1,5 +1,5 @@
 @include('CDN_Header')
-@include('NavBar')
+@include('navbar')
 
 <!-- main Content start -->
 <div class="main-content">

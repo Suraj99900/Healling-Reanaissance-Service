@@ -1,6 +1,6 @@
 @include('CDN_Header')
 <link rel="stylesheet" href="{{asset('css/lifeHealerStyle.css')}}">
-@include('NavBar')
+@include('navbar')
 
 
 
