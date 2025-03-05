@@ -5,6 +5,14 @@ use Illuminate\Support\ServiceProvider;
 
 return [
 
+    'event' => [
+        'year' => env('EVENT_YEAR', 2025),
+        'month' => env('EVENT_MONTH', 07),
+        'day' => env('EVENT_DAY', 10),
+        'hour' => env('EVENT_HOUR', 11),
+        'minute' => env('EVENT_MINUTE', 59),
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Application Name

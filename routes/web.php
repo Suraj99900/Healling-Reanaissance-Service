@@ -7,6 +7,10 @@ use App\Http\Controllers\VideoController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
+    return view('index');
+});
+
+Route::get('/login', action: function () {
     return view('login');
 });
 
@@ -18,6 +22,10 @@ Route::get('/register', function () {
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->name('dashboard');
+
+Route::get('/forgotPasswordScreen', function () {
+    return view('forgotPasswordScreen');
+});
 
 Route::get('/user-access', [UserCategoryAccessController::class, 'index'])->name('access.management');
 

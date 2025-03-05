@@ -87,7 +87,7 @@
         <h1>Dashboard</h1>
         <nav>
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Home</a></li>
+                <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
                 <li class="breadcrumb-item active">Dashboard</li>
             </ol>
         </nav>
@@ -169,7 +169,7 @@
                 </div>
 
                 <!-- Video Management Card -->
-                <div class="col" style="display: none;">
+                <div class="col" style="">
                     <a href="{{ route('video.management') }}" style="text-decoration: none;">
                         <div class="card" style="background-color: #3F51B5;">
                             <h4>Video Management</h4>
