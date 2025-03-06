@@ -72,7 +72,7 @@
     </div>
 
     <!-- Offcanvas for Add Video -->
-    <div class="offcanvas offcanvas-end" tabindex="-1" id="videoOffcanvas">
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="videoOffcanvas" style="width:60vw;">
         <div class="offcanvas-header">
             <h5 class="offcanvas-title" id="offcanvasVideoLabel">Add Video</h5>
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
