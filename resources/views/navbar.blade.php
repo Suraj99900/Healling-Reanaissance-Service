@@ -39,24 +39,24 @@
                                     <i class="fa fa-home mx-2"></i>Home
                                 </a>
                             </li>
-                            <!-- <li class="nav-item mx-3">
-                                <a href="{{ url('searchBook') }}"
+                            <li class="nav-item mx-3">
+                                <a href="{{ url('/') }}"
                                    class="nav-link bar-link {{ $iActive == 6 ? 'active' : '' }}">
-                                    <i class="fa fa-book mx-2"></i>Download Books
+                                    <i class="fa fa-book mx-2"></i>Course
                                 </a>
                             </li>
                             <li class="nav-item mx-3">
-                                <a href="{{ url('renderBlog') }}"
+                                <a href="{{ url('/') }}"
                                    class="nav-link bar-link {{ $iActive == 4 ? 'active' : '' }}">
-                                    <i class="fa fa-blog mx-2"></i>Blog
+                                    <i class="fa fa-blog mx-2"></i>Category
                                 </a>
                             </li>
                             <li class="nav-item mx-1">
-                                <a href="{{ url('MyAbout') }}"
+                                <a href="{{ url('/') }}"
                                    class="nav-link bar-link {{ $iActive == 2 ? 'active' : '' }}">
                                     <i class="fa fa-user mx-2"></i>About
                                 </a>
-                            </li> -->
+                            </li>
 
                             @if ($bIsLogin)
                                 <li class="nav-item mx-3">
