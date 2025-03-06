@@ -52,9 +52,9 @@
                                 </a>
                             </li>
                             <li class="nav-item mx-1">
-                                <a href="{{ url('/') }}"
+                                <a href="{{ url('https://drive.google.com/file/d/1lJhqEmxmhLf36ct9CeEqvT9CH7uUfnl6/view?usp=sharing') }}"
                                    class="nav-link bar-link {{ $iActive == 2 ? 'active' : '' }}">
-                                    <i class="fa fa-user mx-2"></i>About
+                                    <i class="fa fa-user mx-2"></i>Download App
                                 </a>
                             </li>
 
