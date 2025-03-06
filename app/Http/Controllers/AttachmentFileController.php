@@ -14,7 +14,7 @@ class AttachmentFileController extends Controller
     public function addAttchmentData(Request $request)
     {
         $oValidator = Validator::make($request->all(), [
-            'attachment' => 'required|max:200000',
+            'attachment' => 'required|max:2000000',
             'attachment_name' => 'required',
             'video_id' => 'nullable',
         ]);

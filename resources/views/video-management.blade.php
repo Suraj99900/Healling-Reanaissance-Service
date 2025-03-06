@@ -35,14 +35,14 @@
         <!-- Video Management Table -->
 
         <div class="pagetitle">
-                <h1>Video Management</h1>
-                <nav>
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-                        <li class="breadcrumb-item active">Video Management</li>
-                    </ol>
-                </nav>
-            </div>
+            <h1>Video Management</h1>
+            <nav>
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item active">Video Management</li>
+                </ol>
+            </nav>
+        </div>
 
         <div class="card shadow mb-4">
             <div class="card-header py-3 d-flex justify-content-between align-items-center">
@@ -170,13 +170,13 @@
                         </div>
                         <!-- Optionally, allow re-uploading files -->
                         <!-- <div class="mb-3">
-                            <label for="editVideoFile" class="form-label">Video File (optional)</label>
-                            <input type="file" id="editVideoFile" class="form-control" accept="video/*">
-                        </div>
-                        <div class="mb-3">
-                            <label for="editThumbnailFile" class="form-label">Thumbnail File (optional)</label>
-                            <input type="file" id="editThumbnailFile" class="form-control" accept="image/*">
-                        </div> -->
+                                <label for="editVideoFile" class="form-label">Video File (optional)</label>
+                                <input type="file" id="editVideoFile" class="form-control" accept="video/*">
+                            </div>
+                            <div class="mb-3">
+                                <label for="editThumbnailFile" class="form-label">Thumbnail File (optional)</label>
+                                <input type="file" id="editThumbnailFile" class="form-control" accept="image/*">
+                            </div> -->
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -225,9 +225,9 @@
                     {
                         data: 'id',
                         render: (data) => `
-                        <button class="btn btn-info btn-sm edit-video" data-id="${data}">Edit</button>
-                        <button class="btn btn-danger btn-sm delete-video" data-id="${data}">Delete</button>
-                    `
+                            <button class="btn btn-info btn-sm edit-video" data-id="${data}">Edit</button>
+                            <button class="btn btn-danger btn-sm delete-video" data-id="${data}">Delete</button>
+                        `
                     }
                 ]
             });
@@ -238,17 +238,17 @@
                 $('#videoId').val('');
                 $('#offcanvasVideoLabel').text('Add Video');
                 $('#attachmentsContainer').html(`
-                <div class="attachment-item mb-3">
-                    <div class="mb-2">
-                        <label class="form-label">Attachment Name</label>
-                        <input type="text" class="form-control attachment-name" name="attachment_names[]" placeholder="Enter Attachment Name">
+                    <div class="attachment-item mb-3">
+                        <div class="mb-2">
+                            <label class="form-label">Attachment Name</label>
+                            <input type="text" class="form-control attachment-name" name="attachment_names[]" placeholder="Enter Attachment Name">
+                        </div>
+                        <div>
+                            <label class="form-label">Attachment File</label>
+                            <input type="file" class="form-control attachment-file" name="attachment_files[]" required>
+                        </div>
                     </div>
-                    <div>
-                        <label class="form-label">Attachment File</label>
-                        <input type="file" class="form-control attachment-file" name="attachment_files[]" required>
-                    </div>
-                </div>
-            `);
+                `);
                 let offcanvasEl = document.getElementById('videoOffcanvas');
                 let offcanvas = new bootstrap.Offcanvas(offcanvasEl);
                 offcanvas.show();
@@ -274,18 +274,18 @@
             // Add new attachment field
             $('#addAttachmentBtn').on('click', function () {
                 $('#attachmentsContainer').append(`
-                <div class="attachment-item mb-3">
-                    <div class="mb-2">
-                        <label class="form-label">Attachment Name</label>
-                        <input type="text" class="form-control attachment-name" name="attachment_names[]" placeholder="Enter Attachment Name">
+                    <div class="attachment-item mb-3">
+                        <div class="mb-2">
+                            <label class="form-label">Attachment Name</label>
+                            <input type="text" class="form-control attachment-name" name="attachment_names[]" placeholder="Enter Attachment Name">
+                        </div>
+                        <div>
+                            <label class="form-label">Attachment File</label>
+                            <input type="file" class="form-control attachment-file" name="attachment_files[]" required>
+                        </div>
+                        <button type="button" class="btn btn-danger btn-sm mt-2 remove-attachment">Remove</button>
                     </div>
-                    <div>
-                        <label class="form-label">Attachment File</label>
-                        <input type="file" class="form-control attachment-file" name="attachment_files[]" required>
-                    </div>
-                    <button type="button" class="btn btn-danger btn-sm mt-2 remove-attachment">Remove</button>
-                </div>
-            `);
+                `);
             });
 
             // Remove attachment field
@@ -330,7 +330,7 @@
                         $('.progress-indicator').hide();
 
                         // Assume the response returns a video_id for further attachment processing
-                        let newVideoId = response.video_id;
+                        let newVideoId = response['body'].id;
                         let attachmentFormData = new FormData();
                         attachmentFormData.append('video_id', newVideoId);
 
@@ -338,27 +338,29 @@
                             let attachmentName = $(this).find('.attachment-name').val();
                             let attachmentFile = $(this).find('.attachment-file')[0].files[0];
                             if (attachmentName && attachmentFile) {
-                                attachmentFormData.append('attachment_names[]', attachmentName);
-                                attachmentFormData.append('attachment_files[]', attachmentFile);
+                                attachmentFormData.append('attachment_name', attachmentName);
+                                attachmentFormData.append('attachment', attachmentFile);
+
+                                if ($('.attachment-item').length > 0) {
+                                    $.ajax({
+                                        url: '/api/app-attachment',
+                                        method: 'POST',
+                                        data: attachmentFormData,
+                                        processData: false,
+                                        contentType: false,
+                                        success: function () {
+                                            alert("Attachments uploaded successfully!");
+                                        },
+                                        error: function () {
+                                            alert("Error uploading attachments.");
+                                        }
+                                    });
+                                }
                             }
                         });
 
                         // Send attachments if available
-                        if ($('.attachment-item').length > 0) {
-                            $.ajax({
-                                url: '/app-attachment',
-                                method: 'POST',
-                                data: attachmentFormData,
-                                processData: false,
-                                contentType: false,
-                                success: function () {
-                                    alert("Attachments uploaded successfully!");
-                                },
-                                error: function () {
-                                    alert("Error uploading attachments.");
-                                }
-                            });
-                        }
+
 
                         $('#videoForm')[0].reset();
                         let offcanvasEl = document.getElementById('videoOffcanvas');
@@ -431,7 +433,7 @@
                 let videoId = $(this).data('id');
                 if (confirm("Are you sure you want to delete this video?")) {
                     $.ajax({
-                        url: `/api/videos/${videoId}`,
+                        url: `/api/video/${videoId}`,
                         type: 'DELETE',
                         success: function () {
                             table.ajax.reload();

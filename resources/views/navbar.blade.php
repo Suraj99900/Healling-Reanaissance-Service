@@ -39,7 +39,7 @@
                                     <i class="fa fa-home mx-2"></i>Home
                                 </a>
                             </li>
-                            <li class="nav-item mx-3">
+                            <!-- <li class="nav-item mx-3">
                                 <a href="{{ url('searchBook') }}"
                                    class="nav-link bar-link {{ $iActive == 6 ? 'active' : '' }}">
                                     <i class="fa fa-book mx-2"></i>Download Books
@@ -56,7 +56,7 @@
                                    class="nav-link bar-link {{ $iActive == 2 ? 'active' : '' }}">
                                     <i class="fa fa-user mx-2"></i>About
                                 </a>
-                            </li>
+                            </li> -->
 
                             @if ($bIsLogin)
                                 <li class="nav-item mx-3">
