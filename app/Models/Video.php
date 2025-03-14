@@ -21,6 +21,7 @@ class Video extends Model
         'thumbnail',
         'duration',
         'added_on',
+        'hls_path',
         'status',
         'deleted'
     ];
@@ -33,7 +34,7 @@ class Video extends Model
     /**
      * Add video details
      */
-    public function addVideoDetails($iCategoryId, $sTitle, $sDescription, $sPath, $sThumbnail, $sDuration)
+    public function addVideoDetails($iCategoryId, $sTitle, $sDescription, $sPath, $sThumbnail, $sDuration,$sHlsPath)
     {
         try {
             $oVideo = self::create([
@@ -43,6 +44,7 @@ class Video extends Model
                 'thumbnail' => $sThumbnail,
                 'category_id' => $iCategoryId,
                 'duration' => $sDuration,
+                'hls_path' => $sHlsPath,
                 'added_on' => now(),
                 'status' => 1, // Assuming 1 means active
                 'deleted' => 0  // Assuming 0 means not deleted
