@@ -6,18 +6,15 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\Video;
 use Illuminate\Support\Facades\Validator;
 use Exception;
-use Str;
-use Symfony\Component\Process\Process;
-use Symfony\Component\setHeaders;
 
 class VideoController extends Controller
 {
-
+    
     public function index()
     {
         return view('video-management'); // Create resources/views/video-management.blade.php
     }
-
+    
     /**
      * Upload a video
      */
@@ -36,102 +33,38 @@ class VideoController extends Controller
         }
 
         try {
-            if (!$request->hasFile('video')) {
+            if ($request->hasFile('video')) {
+                // Store the uploaded video file in the 'public' disk
+                $sVideoPath = $request->file('video')->store('videos', 'public');
+
+                // Store the thumbnail file in the 'public' disk
+                $sThumbnailPath = $request->file('thumbnail')->store('thumbnails', 'public');
+
+                // Create a new video record in the database
+                $video = (new Video)->addVideoDetails(
+                    $request->input('category_id'),
+                    $request->input('title'),
+                    $request->input('description'),
+                    $sVideoPath,
+                    $sThumbnailPath,
+                    ""
+                );
+
+                // Return a response with the video details
                 return response()->json([
-                    'error' => 'No file uploaded',
-                    'message' => "No file uploaded",
-                    'status' => 400
-                ], 400);
+                    'message' => "Video uploaded successfully!",
+                    'body' => $video,
+                    'status' => 200,
+                ], 200);
             }
-
-            // 1) Store the original video
-            $sVideoPath = $request->file('video')->store('videos', 'public');
-
-            // If you have a thumbnail, store it too (if not, remove this):
-            $sThumbnailPath = $request->file('thumbnail')
-                ? $request->file('thumbnail')->store('thumbnails', 'public')
-                : null;
-
-            // 2) Create a unique subfolder for HLS output
-            // e.g. 'public/hls/<uuid>'
-            $lessonId = (string) Str::uuid();
-            $outputFolder = "hls/{$lessonId}";
-            $outputAbsolutePath = Storage::disk('public')->path($outputFolder);
-
-            if (!is_dir($outputAbsolutePath)) {
-                mkdir($outputAbsolutePath, 0775, true);
-            }
-
-            // 3) Build the ffmpeg command
-            // Example: ffmpeg -i {videoPath} -codec:v libx264 -codec:a aac -hls_time 10 -hls_playlist_type vod -hls_segment_filename "outputFolder/segment%03d.ts" -start_number 0 {outputFolder}/index.m3u8
-
-            // Input file (absolute path)
-            $videoAbsolutePath = Storage::disk('public')->path($sVideoPath);
-
-            // HLS output (index.m3u8)
-            $hlsFile = "{$outputAbsolutePath}/index.m3u8";
-            // Segment pattern
-            $segmentPattern = "{$outputAbsolutePath}/segment%03d.ts";
-
-            // We'll use Symfony Process for better control, but you could use exec()
-            $command = [
-                'ffmpeg',
-                '-i',
-                $videoAbsolutePath,
-                '-codec:v',
-                'libx264',
-                '-codec:a',
-                'aac',
-                '-hls_time',
-                '10',
-                '-hls_playlist_type',
-                'vod',
-                '-hls_segment_filename',
-                $segmentPattern,
-                '-start_number',
-                '0',
-                $hlsFile
-            ];
-
-            $process = new Process($command);
-            $process->setTimeout(3600); // e.g., 1 hour. Adjust as needed for big files.
-
-            $process->run();
-
-            if (!$process->isSuccessful()) {
-                // If FFmpeg fails
-                return response()->json([
-                    'error' => 'FFmpeg failed to convert video to HLS',
-                    'ffmpeg_output' => $process->getErrorOutput()
-                ], 500);
-            }
-
-            // 4) The final M3U8 path will be "public/hls/<uuid>/index.m3u8"
-            // We'll store it in the DB as something like 'hls/<uuid>/index.m3u8'
-            $hlsRelativePath = "{$outputFolder}/index.m3u8";
-
-            // 5) Create the video record in DB
-            $videoModel = new Video;
-            $video = $videoModel->addVideoDetails(
-                $request->input('category_id'),
-                $request->input('title'),
-                $request->input('description'),
-                $sVideoPath,        // Original MP4 path
-                $sThumbnailPath,    // Optional thumbnail path
-                "",
-                $hlsRelativePath    // The M3U8 file (hls_path)
-            );
 
             return response()->json([
-                'message' => "Video uploaded & converted to HLS successfully!",
-                'body' => $video,
-                'status' => 200,
-            ], 200);
-
+                'error' => 'No file uploaded',
+                'message' => "No file uploaded",
+                'status' => 400
+            ], 400);
         } catch (Exception $e) {
-            return response()->json([
-                'error' => 'An error occurred while uploading the video: ' . $e->getMessage()
-            ], 500);
+            return response()->json(['error' => 'An error occurred while uploading the video: ' . $e->getMessage()], 500);
         }
     }
 
@@ -332,32 +265,28 @@ class VideoController extends Controller
     public function stream($id)
     {
         try {
-            $video = (new Video)->fetchVideoById($id)[0];
-
+            $video = (new Video)->fetchVideoById($id);
             if (!$video) {
                 return response()->json(['error' => 'Video not found'], 404);
             }
 
-            // Determine the path and content type
-            if (!empty($video->hls_path)) {
-                $video->video_url = Storage::disk('public')->url($video->hls_path);
-            } else {
-                // Fallback to MP4 streaming
-                $path = Storage::disk('public')->path($video->path);
-                if (!file_exists($path)) {
-                    return response()->json(['error' => 'Video file not found'], 404);
-                }
-                $contentType = 'video/mp4'; // MIME type for MP4
+            $path = Storage::disk('public')->path($video->path);
+            if (!file_exists($path)) {
+                return response()->json(['error' => 'Video file not found'], 404);
             }
 
-            // Stream the video or M3U8 file
-            return response()->json([
-                'data'=> $video->video_url,
-            ]);
+            $stream = new \Symfony\Component\HttpFoundation\StreamedResponse(function () use ($path) {
+                $stream = fopen($path, 'rb');
+                fpassthru($stream);
+                fclose($stream);
+            });
+
+            $stream->headers->set('Content-Type', 'video/mp4');
+            $stream->headers->set('Content-Length', Storage::disk('public')->size($video->path));
+
+            return $stream;
         } catch (Exception $e) {
-            return response()->json([
-                'error' => 'An error occurred while streaming the video: ' . $e->getMessage()
-            ], 500);
+            return response()->json(['error' => 'An error occurred while streaming the video: ' . $e->getMessage()], 500);
         }
     }
 

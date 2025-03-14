@@ -35,6 +35,3 @@ Route::get('/video-management', [VideoController::class, 'index'])->name('video.
 
 Route::get('/category-management', [VideoCategoryController::class, 'index'])->name('category.management');
 
-Route::get('/test', action: function () {
-    return view('test');
-});
