@@ -12,7 +12,11 @@ class VideoController extends Controller
     
     public function index()
     {
-        return view('video-management'); // Create resources/views/video-management.blade.php
+        return view('video-management', [
+            'cloudflareAccountId' => env('CLOUDFLARE_ACCOUNT_ID'),
+            'cloudflareApiToken' => env('CLOUDFLARE_API_TOKEN'),
+            'cloudflareEmail' => env('CLOUDFLARE_EMAIL')
+        ]);
     }
     
     /**
@@ -22,10 +26,12 @@ class VideoController extends Controller
     {
         // Validate the incoming request
         $oValidator = Validator::make($request->all(), [
-            'video' => 'required|file|mimes:mp4,mov,ogg,qt,avi,flv,webm,3gp,mpeg,mpeg2,mpeg4,mkv,wmv,m4v,mxf,asf,vob,ts,tsv,mts,m2ts|max:2000000',
+            'video_json_data' => 'required|json',
             'title' => 'required|string|max:25500',
             'description' => 'nullable|string',
-            'category_id' => 'required|integer'
+            'category_id' => 'required|integer',
+            'cloudflare_video_id' => 'required|string',
+            'thumbnail' => 'required|file|mimes:jpeg,png,jpg,gif,svg|max:2048'
         ]);
 
         if ($oValidator->fails()) {
@@ -33,38 +39,29 @@ class VideoController extends Controller
         }
 
         try {
-            if ($request->hasFile('video')) {
-                // Store the uploaded video file in the 'public' disk
-                $sVideoPath = $request->file('video')->store('videos', 'public');
+            // Store the thumbnail file in the 'public' disk
+            $sThumbnailPath = $request->file('thumbnail')->store('thumbnails', 'public');
 
-                // Store the thumbnail file in the 'public' disk
-                $sThumbnailPath = $request->file('thumbnail')->store('thumbnails', 'public');
+            // Create a new video record in the database
+            $video = (new Video)->addVideoDetails(
+                $request->input('category_id'),
+                $request->input('title'),
+                $request->input('description'),
+                '', // No video path since we are not uploading the video file directly
+                $sThumbnailPath,
+                '',
+                $request->input('cloudflare_video_id'),
+                json_decode($request->input('video_json_data'), true)
+            );
 
-                // Create a new video record in the database
-                $video = (new Video)->addVideoDetails(
-                    $request->input('category_id'),
-                    $request->input('title'),
-                    $request->input('description'),
-                    $sVideoPath,
-                    $sThumbnailPath,
-                    ""
-                );
-
-                // Return a response with the video details
-                return response()->json([
-                    'message' => "Video uploaded successfully!",
-                    'body' => $video,
-                    'status' => 200,
-                ], 200);
-            }
-
+            // Return a response with the video details
             return response()->json([
-                'error' => 'No file uploaded',
-                'message' => "No file uploaded",
-                'status' => 400
-            ], 400);
+                'message' => "Video metadata saved successfully!",
+                'body' => $video,
+                'status' => 200,
+            ], 200);
         } catch (Exception $e) {
-            return response()->json(['error' => 'An error occurred while uploading the video: ' . $e->getMessage()], 500);
+            return response()->json(['error' => 'An error occurred while saving the video metadata: ' . $e->getMessage()], 500);
         }
     }
 

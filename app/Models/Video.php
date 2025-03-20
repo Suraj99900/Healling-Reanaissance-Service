@@ -5,6 +5,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Exception;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class Video extends Model
 {
@@ -14,10 +15,13 @@ class Video extends Model
 
     protected $fillable = [
         'id',
+        'video_uid',
         'category_id',
         'title',
         'description',
         'path',
+        'cloudflare_video_id',
+        'video_json_data',
         'thumbnail',
         'duration',
         'added_on',
@@ -25,15 +29,29 @@ class Video extends Model
         'deleted'
     ];
 
+    protected $casts = [
+        'video_json_data' => 'array',
+    ];
+
+    protected static function boot()
+    {
+        parent::boot();
+        
+        // Auto-generate UUID before creating a new record
+        static::creating(function ($video) {
+            $video->video_uid = (string) Str::uuid();
+        });
+    }
+
     public function category()
     {
         return $this->belongsTo(VideoCategory::class, 'category_id', 'id');
     }
 
     /**
-     * Add video details
+     * Add video details with Cloudflare information
      */
-    public function addVideoDetails($iCategoryId, $sTitle, $sDescription, $sPath, $sThumbnail, $sDuration)
+    public function addVideoDetails($iCategoryId, $sTitle, $sDescription, $sPath, $sThumbnail, $sDuration, $sCloudflareVideoId = null, $aVideoJsonData = null)
     {
         try {
             $oVideo = self::create([
@@ -43,6 +61,8 @@ class Video extends Model
                 'thumbnail' => $sThumbnail,
                 'category_id' => $iCategoryId,
                 'duration' => $sDuration,
+                'cloudflare_video_id' => $sCloudflareVideoId,
+                'video_json_data' => $aVideoJsonData,
                 'added_on' => now(),
                 'status' => 1, // Assuming 1 means active
                 'deleted' => 0  // Assuming 0 means not deleted
