@@ -169,6 +169,19 @@
             });
         }
 
+        function deleteUser(userId) {
+            $.ajax({
+                url: `/api/users/${userId}`,
+                type: 'delete',
+                success: function (response) {
+                    var user = response.body;
+                    showAlert('User deleted successfully!');
+                    table.ajax.reload();
+                },
+                error: function () { showAlert('Failed to fetch user details.', 'danger'); }
+            });
+        }
+
         $('#btnAddUser').on('click', function () {
             $('#userForm')[0].reset();
             $('#userId').val('');
