@@ -39,18 +39,18 @@
 </div>
 
 <!-- Modal for user type 1 -->
-<div class="modal fade bg-dark" id="userTypeModal" tabindex="-1" aria-labelledby="userTypeModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+<div class="modal fade" id="userTypeModal" tabindex="-1" aria-labelledby="userTypeModalLabel" aria-hidden="true">
+    <div class="modal-dialog text-center">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="userTypeModalLabel">Choose Destination</h5>
+                <h5 class="modal-title" id="userTypeModalLabel" style="color: black;">Choose Destination</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <p>Where would you like to go?</p>
-                <div class="d-grid gap-2">
-                    <button type="button" class="btnWAN btn-primary" id="goToDashboard">Admin Dashboard</button>
-                    <button type="button" class="btnWAN btn-secondary" id="goToHome">Home</button>
+                <p style="color: black;">Where would you like to go?</p>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btnWAN btn-primary" style="width:15rem;" id="goToDashboard"><i class="fa-solid fa-grip-vertical mx-2"></i>Admin Dashboard</button>
+                    <button type="button" class="btnWAN btn-secondary" style="width:15rem;" id="goToHome"><i class="fa-solid fa-film"></i> Video Category</button>
                 </div>
             </div>
         </div>

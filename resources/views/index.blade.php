@@ -41,7 +41,7 @@
                                         <!-- <div id="timer" class="timer"></div> -->
                                         <div class="row">
                                             <div class="col-12">
-                                                <h3>20 October 2024 Sunday</h3>
+                                                <h3>20 October 2025 Sunday</h3>
                                             </div>
                                             <div class="col-12">
                                                 Time : 11 AM to 1 PM
@@ -134,7 +134,7 @@
                         <div class="carousel-item active">
                             <div class="row justify-content-center align-items-center">
                                 <div class="col-lg-6 col-md-6 col-sm-12">
-                                    <img src="https://img.flexifunnels.com/images/14218/320/u0nzy_720_2.jpg"
+                                    <img src="{{asset("img/LifeHealer/c2oti_980_65.jpg")}}"
                                         class="img-fluid rounded" alt="Testimonial 1">
                                 </div>
                                 <div class="col-lg-6 col-md-6 col-sm-12">
@@ -160,7 +160,7 @@
                         <div class="carousel-item">
                             <div class="row justify-content-center align-items-center">
                                 <div class="col-lg-6 col-md-6 col-sm-12">
-                                    <img src="https://img.flexifunnels.com/images/14218/320/m1nza_576_1.jpg"
+                                    <img src="{{ asset("img/LifeHealer/m1nza_576_1.jpg") }}"
                                         class="img-fluid rounded" alt="Testimonial 2">
                                 </div>
                                 <div class="col-lg-6 col-md-6 col-sm-12">
@@ -187,7 +187,7 @@
                         <div class="carousel-item">
                             <div class="row justify-content-center align-items-center">
                                 <div class="col-lg-6 col-md-6 col-sm-12">
-                                    <img src="https://img.flexifunnels.com/images/14218/qxnza_684_56.jpg"
+                                    <img src="{{asset("img/LifeHealer/qxnza_684_56.jpg")}}"
                                         class="img-fluid rounded" alt="Testimonial 2">
                                 </div>
                                 <div class="col-lg-6 col-md-6 col-sm-12">
@@ -214,7 +214,7 @@
                         <div class="carousel-item">
                             <div class="row justify-content-center align-items-center">
                                 <div class="col-lg-6 col-md-6 col-sm-12">
-                                    <img src="https://img.flexifunnels.com/images/14218/c2oti_980_65.jpg"
+                                    <img src="{{asset("img/LifeHealer/u0nzy_720_2.jpg")}}"
                                         class="img-fluid rounded" alt="Testimonial 2">
                                 </div>
                                 <div class="col-lg-6 col-md-6 col-sm-12">
@@ -288,7 +288,7 @@
                         <div class="col-lg-6 col-md-6 col-sm-12 card-Video">
                             <div class="video-container">
                                 <video controls autoplay loop muted>
-                                    <source src="../res/img/LifeHealer/user_video_1.mp4" type="video/mp4">
+                                    <source src="{{ asset("/img/LifeHealer/user_video_1.mp4") }}" type="video/mp4">
                                     Your browser does not support the video tag.
                                 </video>
                             </div>
@@ -569,7 +569,7 @@
                                     <!-- <div id="timermodal" class="timer"></div> -->
                                     <div class="row">
                                         <div class="col-12">
-                                            <h3>20 October 2024 Sunday</h3>
+                                            <h3>20 October 2025 Sunday</h3>
                                         </div>
                                         <div class="col-12">
                                             <h4>Time : 11 AM to 1 PM</h4>

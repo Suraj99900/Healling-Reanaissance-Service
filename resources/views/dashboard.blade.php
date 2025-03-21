@@ -1,22 +1,33 @@
-@extends('layouts.app')
+@include('CDN_Header')
+@include('navbar')
 
-@push('styles')
+@php
+    $sessionManager = new \App\Models\SessionManager();
+    $iUserId = $sessionManager->iUserID;
+    $iUserType = $sessionManager->iUserType;
+@endphp
+
+
 <style>
     .card {
         margin: 10px;
         padding: 20px;
         border-radius: 15px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        backdrop-filter: blur(10px); /* Frosted glass effect */
-        border: 1px solid rgba(255, 255, 255, 0.1); /* Transparent border */
+        backdrop-filter: blur(10px);
+        /* Frosted glass effect */
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        /* Transparent border */
         color: white;
         transition: all 0.3s ease;
         cursor: pointer;
     }
 
     .card:hover {
-        transform: scale(1.05); /* Zoom effect on hover */
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Stronger shadow on hover */
+        transform: scale(1.05);
+        /* Zoom effect on hover */
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        /* Stronger shadow on hover */
     }
 
     .card h4 {
@@ -61,6 +72,7 @@
         .row {
             flex-direction: column;
         }
+
         .col {
             margin-bottom: 20px;
         }
@@ -79,126 +91,81 @@
         margin-bottom: 30px;
     }
 </style>
-@endpush
 
-@section('content')
-<main id="main" class="main">
-    <div class="pagetitle">
-        <h1>Dashboard</h1>
-        <nav>
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
-                <li class="breadcrumb-item active">Dashboard</li>
-            </ol>
-        </nav>
-    </div><!-- End Page Title -->
 
-    <!-- Dashboard Metrics Section -->
-    <section class="section dashboard">
-        <div class="row">
-            <!-- Dashboard Cards -->
-            <div class="col-lg-12">
-                <div class="row container-box" style="display: none;">
-                    <div class="row " >
-                        <!-- Total Borrowers Card -->
-                        <div class="col">
-                            <div class="card" style="background-color: #4CAF50;">
-                                <h4>Total Borrowers</h4>
-                                <div class="count" id="totalBorrowers"></div>
-                                <div class="label">Users who have borrowed funds</div>
-                            </div>
-                        </div>
 
-                        <!-- Total Referral Users Card -->
-                        <div class="col">
-                            <div class="card" style="background-color: #2196F3;">
-                                <h4>Total Referral Users</h4>
-                                <div class="count" id="totalReferralUsers"></div>
-                                <div class="label">Users referred by others</div>
-                            </div>
-                        </div>
-
-                        <!-- Total Payments Card -->
-                        <div class="col">
-                            <div class="card" style="background-color: #FF5722;">
-                                <h4>Total Payments</h4>
-                                <div class="count" id="totalPayments"></div>
-                                <div class="label">Total amount of payments made</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <!-- Total Revenue Card -->
-                        <div class="col">
-                            <div class="card" style="background-color: #FF9800;">
-                                <h4>Total Revenue</h4>
-                                <div class="count" id="totalRevenue"></div>
-                                <div class="label">Total revenue generated</div>
-                            </div>
-                        </div>
-                    </div>
-                </div><!-- End container-box for dashboard metrics -->
-            </div><!-- End Dashboard Cards -->
-        </div>
-    </section>
-
-    <!-- Management Sections -->
-    <section class="section management">
-        <div class="container-box">
-            <h2 class="mb-4">Management Sections</h2>
+<div class="main-content">
+    <section class="service section" id="service">
+        <div class="container">
             <div class="row">
-                <!-- User Management Card -->
-                <div class="col">
-                    <a href="{{ route('user.management') }}" style="text-decoration: none;">
-                        <div class="card" style="background-color: #673AB7;">
-                            <h4>User Management</h4>
-                            <div class="label">Manage application users</div>
-                        </div>
-                    </a>
+                <div class="section-title padd-15">
+                    <h2> Dashboard</h2>
+                    <nav style="margin: 20px 0px;">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
+                            <li class="breadcrumb-item active">Dashboard</li>
+                        </ol>
+                    </nav>
                 </div>
 
-                <!-- Access Management Card -->
-                <div class="col">
-                    <a href="{{ route('access.management') }}" style="text-decoration: none;">
-                        <div class="card" style="background-color: #009688;">
-                            <h4>Access Management</h4>
-                            <div class="label">Control user access rights</div>
+                <!-- Management Sections -->
+                <div class="container-fluid">
+                    <h2 class="mb-4">Management Sections</h2>
+                    <div class="row">
+                        <!-- User Management Card -->
+                        <div class="col" style="margin: 0px 0px;">
+                            <a href="{{ route('user.management') }}" style="text-decoration: none;">
+                                <div class="card" style="background-color: #673AB7;">
+                                    <h4>User Management</h4>
+                                    <div class="label">Manage application users</div>
+                                </div>
+                            </a>
                         </div>
-                    </a>
-                </div>
 
-                <!-- Video Management Card -->
-                <div class="col" style="">
-                    <a href="{{ route('video.management') }}" style="text-decoration: none;">
-                        <div class="card" style="background-color: #3F51B5;">
-                            <h4>Video Management</h4>
-                            <div class="label">Manage uploaded videos</div>
+                        <!-- Access Management Card -->
+                        <div class="col" style="margin: 0px 0px;">
+                            <a href="{{ route('access.management') }}" style="text-decoration: none;">
+                                <div class="card" style="background-color: #009688;">
+                                    <h4>Access Management</h4>
+                                    <div class="label">Control user access rights</div>
+                                </div>
+                            </a>
                         </div>
-                    </a>
-                </div>
 
-                <!-- Category Management Card -->
-                <div class="col">
-                    <a href="{{ route('category.management') }}" style="text-decoration: none;">
-                        <div class="card" style="background-color: #E91E63;">
-                            <h4>Category Management</h4>
-                            <div class="label">Manage video categories</div>
+                        <!-- Video Management Card -->
+                        <div class="col" style="margin: 0px 0px;">
+                            <a href="{{ route('video.management') }}" style="text-decoration: none;">
+                                <div class="card" style="background-color: #3F51B5;">
+                                    <h4>Video Management</h4>
+                                    <div class="label">Manage uploaded videos</div>
+                                </div>
+                            </a>
                         </div>
-                    </a>
-                </div>
 
-                <!-- More Card -->
-                <div class="col" style="display: none;">
-                    <a href="" style="text-decoration: none;">
-                        <div class="card" style="background-color: #FF9800;">
-                            <h4>More</h4>
-                            <div class="label">Additional settings</div>
+                        <!-- Category Management Card -->
+                        <div class="col" style="margin: 0px 0px;">
+                            <a href="{{ route('category.management') }}" style="text-decoration: none;">
+                                <div class="card" style="background-color: #E91E63;">
+                                    <h4>Category Management</h4>
+                                    <div class="label">Manage video categories</div>
+                                </div>
+                            </a>
                         </div>
-                    </a>
+
+                        <!-- More Card -->
+                        <div class="col" style="display: none;">
+                            <a href="" style="text-decoration: none;">
+                                <div class="card" style="background-color: #FF9800;">
+                                    <h4>More</h4>
+                                    <div class="label">Additional settings</div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
-</main>
-@endsection
+</div>
+
+@include('CDN_Footer')
