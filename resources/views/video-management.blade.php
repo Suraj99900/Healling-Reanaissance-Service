@@ -123,7 +123,7 @@
                     </div>
                     <div>
                         <label class="form-label">Attachment File</label>
-                        <input type="file" class="form-control attachment-file" name="attachment_files[]" required>
+                        <input type="file" class="form-control attachment-file" name="attachment_files[]">
                     </div>
                 </div>
             </div>
@@ -170,6 +170,13 @@
                             {{-- Options will be loaded via AJAX --}}
                         </select>
                     </div>
+                    <!-- Dynamic Attachment Fields for Edit -->
+                    <div id="editAttachmentsContainer">
+                        <!-- Existing attachments will be loaded here -->
+                    </div>
+                    <button type="button" class="btnWAN btn-secondary mb-3" id="addEditAttachmentBtn">
+                        <i class="bi bi-plus"></i> Add Attachment
+                    </button>
                     <!-- Optionally, allow re-uploading files -->
                     <!-- <div class="mb-3">
                                             <label for="editVideoFile" class="form-label">Video File (optional)</label>
@@ -257,7 +264,7 @@
                                     </div>
                                     <div>
                                         <label class="form-label">Attachment File</label>
-                                        <input type="file" class="form-control attachment-file" name="attachment_files[]" required>
+                                        <input type="file" class="form-control attachment-file" name="attachment_files[]">
                                     </div>
                                 </div>
                             `);
@@ -265,6 +272,28 @@
             let offcanvas = new bootstrap.Offcanvas(offcanvasEl);
             offcanvas.show();
         });
+
+        $('#addEditAttachmentBtn').on('click', function () {
+            $('#editAttachmentsContainer').append(`
+            <div class="attachment-item mb-3">
+                <div class="mb-2">
+                    <label class="form-label">Attachment Name</label>
+                    <input type="text" class="form-control attachment-name" name="editAttachment_names[]" placeholder="Enter Attachment Name">
+                </div>
+                <div>
+                    <label class="form-label">Attachment File</label>
+                    <input type="file" class="form-control attachment-file" name="editAttachment_files[]">
+                </div>
+                <button type="button" class="btnWAN btn-danger btn-sm mt-2 remove-attachment">Remove</button>
+            </div>
+        `);
+        });
+
+        // Remove attachment field in edit modal
+        $('#editAttachmentsContainer').on('click', '.remove-attachment', function () {
+            $(this).closest('.attachment-item').remove();
+        });
+
 
         // Load video categories for both add and edit forms
         function loadCategories(selectElementId) {
@@ -293,7 +322,7 @@
                                     </div>
                                     <div>
                                         <label class="form-label">Attachment File</label>
-                                        <input type="file" class="form-control attachment-file" name="attachment_files[]" required>
+                                        <input type="file" class="form-control attachment-file" name="attachment_files[]">
                                     </div>
                                     <button type="button" class="btnWAN btn-danger btn-sm mt-2 remove-attachment">Remove</button>
                                 </div>
@@ -453,7 +482,26 @@
                     $('#editTitle').val(video.title);
                     $('#editDescription').val(video.description);
                     $('#editCategory').val(video.category_id);
-                    // Optionally, you can preload current file info if needed
+
+                    // Load existing attachments
+                    $('#editAttachmentsContainer').empty();
+                    if (video.attachments && video.attachments.length > 0) {
+                        video.attachments.forEach(attachment => {
+                            $('#editAttachmentsContainer').append(`
+                            <div class="attachment-item mb-3">
+                                <div class="mb-2">
+                                    <label class="form-label">Attachment Name</label>
+                                    <input type="text" class="form-control attachment-name" name="existingAttachment_names[]" value="${attachment.name}" placeholder="Enter Attachment Name">
+                                </div>
+                                <div>
+                                    <label class="form-label">Attachment File</label>
+                                    <input type="file" class="form-control attachment-file" name="existingAttachment_files[]">
+                                </div>
+                                <button type="button" class="btnWAN btn-danger btn-sm mt-2 remove-attachment">Remove</button>
+                            </div>
+                        `);
+                        });
+                    }
 
                     let editModal = new bootstrap.Modal(document.getElementById('editVideoModal'));
                     editModal.show();
@@ -480,6 +528,9 @@
                 data: JSON.stringify(updatedData),
                 contentType: 'application/json',
                 success: function (response) {
+                    // Handle attachments
+                    handleEditAttachments(videoId);
+
                     $('#editVideoModal').modal('hide');
                     table.ajax.reload();
                     alert("Video updated successfully!");
@@ -489,6 +540,36 @@
                 }
             });
         });
+
+        // Helper function to handle attachments in edit modal
+        function handleEditAttachments(videoId) {
+            $('.attachment-item').each(function () {
+                const attachmentName = $(this).find('.attachment-name').val();
+                const attachmentFile = $(this).find('.attachment-file')[0].files[0];
+
+                if (attachmentName && attachmentFile) {
+                    const attachmentFormData = new FormData();
+                    attachmentFormData.append('video_id', videoId);
+                    attachmentFormData.append('attachment_name', attachmentName);
+                    attachmentFormData.append('attachment', attachmentFile);
+
+                    $.ajax({
+                        url: '/api/app-attachment',
+                        method: 'POST',
+                        data: attachmentFormData,
+                        processData: false,
+                        contentType: false,
+                        success: function () {
+                            console.log("Attachment uploaded successfully!");
+                        },
+                        error: function (xhr, status, error) {
+                            console.error("Error uploading attachment:", error);
+                        }
+                    });
+                }
+            });
+        }
+
 
 
         // Delete video
