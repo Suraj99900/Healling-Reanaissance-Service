@@ -9,6 +9,8 @@ class SessionManager
     public $iUserID;
     public $sUserMobileNo;
     public $sUserName;
+    public $sEmail;
+    public $iUserType;
     public $isLoggedIn;
 
     public function __construct()
@@ -16,9 +18,11 @@ class SessionManager
         // Initialize session variables
         if (Session::has('isLoggedIn')) {
             $this->iUserID = Session::get('iUserID');
-            $this->sUserMobileNo = Session::get('sUserMobileNo');
+            $this->sEmail = Session::get('email');
             $this->sUserName = Session::get('sUserName');
+            $this->iUserType = Session::get('user_type');
             $this->isLoggedIn = Session::get('isLoggedIn');
+            // print_r($this->sEmail);die;
         }
     }
 
@@ -27,17 +31,23 @@ class SessionManager
      */
     public function fSetSessionData($aSessionData)
     {
+        
         // Set session data
-        Session::put('iUserID', $aSessionData['id']);
-        Session::put('sUserName', $aSessionData['username']);
-        Session::put('sUserMobileNo', $aSessionData['phoneNumber']);
-        Session::put('isLoggedIn', $aSessionData['login']);
+        Session::put('iUserID', $aSessionData['iUserID']);
+        Session::put('sUserName', $aSessionData['sUserName']);
+        Session::put('email', $aSessionData['email']);
+        Session::put('isLoggedIn', $aSessionData['isLoggedIn']);
+        Session::put('user_type', $aSessionData['user_type']);
+        Session::save();
+        
 
         // Update properties
-        $this->iUserID = $aSessionData['id'];
-        $this->sUserMobileNo = $aSessionData['phoneNumber'];
-        $this->sUserName = $aSessionData['username'];
-        $this->isLoggedIn = $aSessionData['login'];
+        $this->iUserID = $aSessionData['iUserID'];
+        $this->sUserName = $aSessionData['sUserName'];
+        $this->sEmail = $aSessionData['email'];
+        $this->isLoggedIn = $aSessionData['isLoggedIn'];
+        $this->iUserType = $aSessionData['user_type'];
+
     }
 
     /**

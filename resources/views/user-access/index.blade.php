@@ -18,7 +18,7 @@
             <h1 class="animate__animated animate__fadeInDown">User Access Management</h1>
             <nav>
                 <ol class="breadcrumb justify-content-center">
-                    <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url('dashboard') }}">Dashboard</a></li>
                     <li class="breadcrumb-item active">User Access Management</li>
                 </ol>
             </nav>

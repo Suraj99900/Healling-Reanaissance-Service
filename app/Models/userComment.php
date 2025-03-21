@@ -55,7 +55,7 @@ class userComment extends Model
     {
         try {
             $oUserComment = DB::table('user_comment as A')
-                ->select('A.comment', 'C.user_name', 'C.user_type', 'C.type')
+                ->select('A.comment', 'C.user_name', 'C.user_type', 'C.type','A.added_on')
                 ->leftJoin('videos as B', function ($join) {
                     $join->on('A.video_id', '=', 'B.id')
                         ->where('B.deleted', '=', 0)
@@ -69,6 +69,7 @@ class userComment extends Model
                 ->where('A.video_id', '=', $iVideoId)
                 ->where('A.status', '=', 1)
                 ->where('A.deleted', '=', 0)
+                ->orderBy('A.added_on', 'desc')
                 ->get();
 
             return $oUserComment;
@@ -95,7 +96,7 @@ class userComment extends Model
     {
         try {
             $oUserComment = DB::table('user_comment as A')
-                ->select('A.id', 'A.comment', 'C.user_name', 'C.user_type', 'C.type')
+                ->select('A.id', 'A.comment', 'C.user_name', 'C.user_type', 'C.type','A.added_on')
                 ->leftJoin('videos as B', function ($join) {
                     $join->on('A.video_id', '=', 'B.id')
                         ->where('B.deleted', '=', 0)

@@ -54,7 +54,7 @@
             <h1 class="animate__animated animate__fadeInDown text-center">User Management</h1>
             <nav class="d-flex justify-content-center">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url('dashboard') }}">Dashboard</a></li>
                     <li class="breadcrumb-item active">User Management</li>
                 </ol>
             </nav>

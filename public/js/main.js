@@ -1,6 +1,22 @@
 // Main API URL
-var API_URL = "'http://localhost/project/Game-Collection-App";
+var API_URL = "";
+$('#logoutId').on('click',()=>{
+    logoutSessions();
+});
 
+function logoutSessions() {
+    $.ajax({
+        url: '/logOutSession',
+        method: 'get',
+        success: function (data) {
+            window.location = "/"
+        },
+        error: function (xhr, status, error) {
+            console.log(error);
+            
+        }
+    })
+}
 // =============== types
 const typed = document.querySelector(".typing");
 const string_data = ["Welcome to smartplace", "Explore smartplace", "Discover a world of smartplace"];
@@ -294,8 +310,8 @@ const hideSidebar = () => {
     hideSidebarBtn.style.display = 'none';
     showSidebarBtn.style.display = 'inline-block';
 }
-showSidebarBtn.addEventListener('click', showSidebar);
-hideSidebarBtn.addEventListener('click', hideSidebar);
+// showSidebarBtn.addEventListener('click', showSidebar);
+// hideSidebarBtn.addEventListener('click', hideSidebar);
 
 
 
@@ -310,20 +326,3 @@ function responsePop(title = '', message = '', icon = '', confirmButtonText = ''
     });
 }
 
-$('#logoutId').on('click',()=>{
-    logoutSessions();
-});
-
-function logoutSessions() {
-    $.ajax({
-        url: '/logOutSession',
-        method: 'get',
-        success: function (data) {
-            window.location = "/"
-        },
-        error: function (xhr, status, error) {
-            console.log(error);
-            
-        }
-    })
-}

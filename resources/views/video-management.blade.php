@@ -38,7 +38,7 @@
             <h1>Video Management</h1>
             <nav>
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url('dashboard') }}">Dashboard</a></li>
                     <li class="breadcrumb-item active">Video Management</li>
                 </ol>
             </nav>
@@ -170,13 +170,13 @@
                         </div>
                         <!-- Optionally, allow re-uploading files -->
                         <!-- <div class="mb-3">
-                                    <label for="editVideoFile" class="form-label">Video File (optional)</label>
-                                    <input type="file" id="editVideoFile" class="form-control" accept="video/*">
-                                </div>
-                                <div class="mb-3">
-                                    <label for="editThumbnailFile" class="form-label">Thumbnail File (optional)</label>
-                                    <input type="file" id="editThumbnailFile" class="form-control" accept="image/*">
-                                </div> -->
+                                            <label for="editVideoFile" class="form-label">Video File (optional)</label>
+                                            <input type="file" id="editVideoFile" class="form-control" accept="video/*">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="editThumbnailFile" class="form-label">Thumbnail File (optional)</label>
+                                            <input type="file" id="editThumbnailFile" class="form-control" accept="image/*">
+                                        </div> -->
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -216,19 +216,27 @@
                         }
                     },
                     {
-                        data: 'path',
-                        render: (data) => {
-                            let baseUrl = window.location.origin;
-                            let fullVideoUrl = `${baseUrl}/storage/${data}`;
-                            return `<a href="${fullVideoUrl}" target="_blank">View Video</a>`;
+                        data: 'video_json_data',
+                        render: (data, type, row, meta) => {
+                            var aData = JSON.parse(data);
+                           
+                            
+                            if (aData != null) {
+                                const previewUrl = aData.preview;
+                                // Return the anchor tag with the preview URL
+                                return `<a href="${previewUrl}" target="_blank">View Video</a>`;
+                            } else {
+                                // Return a placeholder or a message indicating no preview is available
+                                return 'No preview available';
+                            }
                         }
                     },
                     {
                         data: 'id',
                         render: (data) => `
-                                <button class="btn btn-info btn-sm edit-video" data-id="${data}">Edit</button>
-                                <button class="btn btn-danger btn-sm delete-video" data-id="${data}">Delete</button>
-                            `
+                                        <button class="btn btn-info btn-sm edit-video" data-id="${data}">Edit</button>
+                                        <button class="btn btn-danger btn-sm delete-video" data-id="${data}">Delete</button>
+                                    `
                     }
                 ]
             });
@@ -239,17 +247,17 @@
                 $('#videoId').val('');
                 $('#offcanvasVideoLabel').text('Add Video');
                 $('#attachmentsContainer').html(`
-                        <div class="attachment-item mb-3">
-                            <div class="mb-2">
-                                <label class="form-label">Attachment Name</label>
-                                <input type="text" class="form-control attachment-name" name="attachment_names[]" placeholder="Enter Attachment Name">
-                            </div>
-                            <div>
-                                <label class="form-label">Attachment File</label>
-                                <input type="file" class="form-control attachment-file" name="attachment_files[]" required>
-                            </div>
-                        </div>
-                    `);
+                                <div class="attachment-item mb-3">
+                                    <div class="mb-2">
+                                        <label class="form-label">Attachment Name</label>
+                                        <input type="text" class="form-control attachment-name" name="attachment_names[]" placeholder="Enter Attachment Name">
+                                    </div>
+                                    <div>
+                                        <label class="form-label">Attachment File</label>
+                                        <input type="file" class="form-control attachment-file" name="attachment_files[]" required>
+                                    </div>
+                                </div>
+                            `);
                 let offcanvasEl = document.getElementById('videoOffcanvas');
                 let offcanvas = new bootstrap.Offcanvas(offcanvasEl);
                 offcanvas.show();
@@ -275,18 +283,18 @@
             // Add new attachment field
             $('#addAttachmentBtn').on('click', function () {
                 $('#attachmentsContainer').append(`
-                        <div class="attachment-item mb-3">
-                            <div class="mb-2">
-                                <label class="form-label">Attachment Name</label>
-                                <input type="text" class="form-control attachment-name" name="attachment_names[]" placeholder="Enter Attachment Name">
-                            </div>
-                            <div>
-                                <label class="form-label">Attachment File</label>
-                                <input type="file" class="form-control attachment-file" name="attachment_files[]" required>
-                            </div>
-                            <button type="button" class="btn btn-danger btn-sm mt-2 remove-attachment">Remove</button>
-                        </div>
-                    `);
+                                <div class="attachment-item mb-3">
+                                    <div class="mb-2">
+                                        <label class="form-label">Attachment Name</label>
+                                        <input type="text" class="form-control attachment-name" name="attachment_names[]" placeholder="Enter Attachment Name">
+                                    </div>
+                                    <div>
+                                        <label class="form-label">Attachment File</label>
+                                        <input type="file" class="form-control attachment-file" name="attachment_files[]" required>
+                                    </div>
+                                    <button type="button" class="btn btn-danger btn-sm mt-2 remove-attachment">Remove</button>
+                                </div>
+                            `);
             });
 
             // Remove attachment field
