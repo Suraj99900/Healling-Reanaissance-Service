@@ -55,7 +55,7 @@
                                 <li class="nav-item mx-3">
                                     <a href="{{ url('home') }}"
                                         class="nav-link bar-link {{ $iActive == 3 ? 'active' : '' }}">
-                                        <i class="fa-solid fa-home-vertical mx-2"></i>Home
+                                        <i class="fa-solid fa-film"></i> Video Category
                                     </a>
                                 </li>
 
