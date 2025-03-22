@@ -6,10 +6,12 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\Video;
 use Illuminate\Support\Facades\Validator;
 use Exception;
+use Symfony\Component\Process\Process;
+use Illuminate\Support\Str;
 
 class VideoController extends Controller
 {
-    
+
     public function index()
     {
         return view('video-management', [
@@ -18,7 +20,7 @@ class VideoController extends Controller
             'cloudflareEmail' => env('CLOUDFLARE_EMAIL')
         ]);
     }
-    
+
     /**
      * Upload a video
      */
@@ -51,7 +53,8 @@ class VideoController extends Controller
                 $sThumbnailPath,
                 '',
                 $request->input('cloudflare_video_id'),
-                json_decode($request->input('video_json_data'), true)
+                json_decode($request->input('video_json_data'), true),
+                ""
             );
 
             // Return a response with the video details
@@ -62,6 +65,147 @@ class VideoController extends Controller
             ], 200);
         } catch (Exception $e) {
             return response()->json(['error' => 'An error occurred while saving the video metadata: ' . $e->getMessage()], 500);
+        }
+    }
+
+    public function uploadVideo(Request $request)
+    {
+        // Validate the incoming request
+        $oValidator = Validator::make($request->all(), [
+            'video' => 'required|file|mimes:mp4,mov,ogg,qt,avi,flv,webm,3gp,mpeg,mpeg2,mpeg4,mkv,wmv,m4v,mxf,asf,vob,ts,tsv,mts,m2ts|max:2000000',
+            'title' => 'required|string|max:25500',
+            'description' => 'nullable|string',
+            'category_id' => 'required|integer'
+        ]);
+
+        if ($oValidator->fails()) {
+            return response()->json(['error' => $oValidator->errors()], 400);
+        }
+
+        try {
+            if (!$request->hasFile('video')) {
+                return response()->json([
+                    'error' => 'No file uploaded',
+                    'message' => "No file uploaded",
+                    'status' => 400
+                ], 400);
+            }
+
+            // 1) Store the original video
+            $sVideoPath = $request->file('video')->store('videos', 'public');
+
+            // If you have a thumbnail, store it too (if not, remove this):
+            $sThumbnailPath = $request->file('thumbnail')
+                ? $request->file('thumbnail')->store('thumbnails', 'public')
+                : null;
+
+            // 2) Create a unique subfolder for HLS output
+            // e.g. 'public/hls/<uuid>'
+            $lessonId = (string) Str::uuid();
+            $outputFolder = "hls/{$lessonId}";
+            $outputAbsolutePath = Storage::disk('public')->path($outputFolder);
+
+            if (!is_dir($outputAbsolutePath)) {
+                mkdir($outputAbsolutePath, 0775, true);
+            }
+
+            // 3) Build the ffmpeg command
+            // Example: ffmpeg -i {videoPath} -codec:v libx264 -codec:a aac -hls_time 10 -hls_playlist_type vod -hls_segment_filename "outputFolder/segment%03d.ts" -start_number 0 {outputFolder}/index.m3u8
+
+            // Input file (absolute path)
+            $videoAbsolutePath = Storage::disk('public')->path($sVideoPath);
+
+            // HLS output (index.m3u8)
+            $hlsFile = "{$outputAbsolutePath}/index.m3u8";
+            // Segment pattern
+            $segmentPattern = "{$outputAbsolutePath}/segment%03d.ts";
+
+            // We'll use Symfony Process for better control, but you could use exec()
+            $command = [
+                'ffmpeg',
+                '-i',
+                $videoAbsolutePath,        // Input video file
+                '-preset',
+                'fast',               // Faster encoding while maintaining quality
+                '-g',
+                '48',                      // GOP size (should be ~2x framerate, e.g., 24 FPS → GOP 48)
+                '-sc_threshold',
+                '0',             // Disable scene change detection for better segment consistency
+                '-c:v',
+                'libx264',               // Use H.264 video codec
+                '-b:v',
+                '2000k',                 // Set video bitrate to 2 Mbps (adjust as needed)
+                '-c:a',
+                'aac',                   // Use AAC for audio encoding
+                '-b:a',
+                '128k',                  // Audio bitrate of 128 kbps
+                '-ac',
+                '2',                       // Stereo audio
+                '-ar',
+                '44100',                   // Set audio sample rate
+                '-f',
+                'hls',                     // Output format: HLS
+                '-hls_time',
+                '6',                 // 6-second segments (optimal for streaming)
+                '-hls_list_size',
+                '0',            // Ensure the playlist contains all segments
+                '-hls_flags',
+                'independent_segments', // Better segment independence for fast seeking
+                '-hls_segment_type',
+                'mpegts',    // Use MPEG-TS segment type
+                '-hls_segment_filename',
+                $segmentPattern, // Segment pattern
+                '-master_pl_name',
+                'master.m3u8', // Master playlist name
+                '-hls_playlist_type',
+                'vod',      // VOD type (ensures complete playlist availability)
+                '-start_number',
+                '0',             // Start numbering from 0
+                $hlsFile                          // Output HLS playlist file (e.g., output.m3u8)
+            ];
+
+
+            $process = new Process($command);
+            $process->setTimeout(3600); // e.g., 1 hour. Adjust as needed for big files.
+
+            $process->run();
+
+            if (!$process->isSuccessful()) {
+                // If FFmpeg fails
+                return response()->json([
+                    'error' => 'FFmpeg failed to convert video to HLS',
+                    'ffmpeg_output' => $process->getErrorOutput()
+                ], 500);
+            }
+
+            // 4) The final M3U8 path will be "public/hls/<uuid>/index.m3u8"
+            // We'll store it in the DB as something like 'hls/<uuid>/index.m3u8'
+            $hlsRelativePath = "{$outputFolder}/index.m3u8";
+
+            // 5) Create the video record in DB
+            $videoModel = new Video;
+            $video = $videoModel->addVideoDetails(
+                $request->input('category_id'),
+                $request->input('title'),
+                $request->input('description'),
+                $sVideoPath,        // Original MP4 path
+                $sThumbnailPath,    // Optional thumbnail path
+                '',
+                "",
+                "",
+                $hlsRelativePath    // The M3U8 file (hls_path)
+            );
+
+            return response()->json([
+                'message' => "Video uploaded & converted to HLS successfully!",
+                'body' => $video,
+                'status' => 200,
+            ], 200);
+
+        } catch (Exception $e) {
+            return response()->json([
+                'error' => 'An error occurred while uploading the video: ' . $e->getMessage()
+            ], 500);
         }
     }
 
@@ -86,6 +230,12 @@ class VideoController extends Controller
 
                 // Assuming the videos are stored in the 'public' disk
                 $video->video_url = Storage::disk('public')->url($video->path);
+
+                if (!empty($video->hls_path) && Storage::disk('public')->exists($video->hls_path)) {
+                    $video->hls_url = Storage::disk('public')->url($video->hls_path);
+                } else {
+                    $video->hls_url = null; // Set to null if not available
+                }
             }
             if ($videos) {
                 return response()->json([

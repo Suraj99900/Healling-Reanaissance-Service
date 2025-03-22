@@ -98,9 +98,9 @@
                         // Parse the JSON data to get Cloudflare HLS link
                         const oVideoData = JSON.parse(video.video_json_data);
                         const hlsUrl = oVideoData.playback?.hls || oVideoData.preview;
-                        console.log(hlsUrl);
+                        console.log(video.hls_url);
                         
-                        initializeVideoPlayer(hlsUrl);
+                        initializeVideoPlayer(video.hls_url);
                     } else {
                         $("#alertMessage")
                             .removeClass("d-none alert-success")
