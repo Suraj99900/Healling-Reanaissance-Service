@@ -11,7 +11,7 @@ use Illuminate\Support\Str;
 
 class VideoController extends Controller
 {
-
+    
     public function index()
     {
         return view('video-management', [
@@ -20,7 +20,7 @@ class VideoController extends Controller
             'cloudflareEmail' => env('CLOUDFLARE_EMAIL')
         ]);
     }
-
+    
     /**
      * Upload a video
      */
@@ -95,13 +95,13 @@ class VideoController extends Controller
             $sVideoPath = $request->file('video')->store('videos', 'public');
 
             // If you have a thumbnail, store it too (if not, remove this):
-            $sThumbnailPath = $request->file('thumbnail')
+            $sThumbnailPath = $request->file('thumbnail') 
                 ? $request->file('thumbnail')->store('thumbnails', 'public')
                 : null;
 
             // 2) Create a unique subfolder for HLS output
             // e.g. 'public/hls/<uuid>'
-            $lessonId = (string) Str::uuid();
+            $lessonId = (string) Str::uuid(); 
             $outputFolder = "hls/{$lessonId}";
             $outputAbsolutePath = Storage::disk('public')->path($outputFolder);
 
@@ -123,47 +123,15 @@ class VideoController extends Controller
             // We'll use Symfony Process for better control, but you could use exec()
             $command = [
                 'ffmpeg',
-                '-i',
-                $videoAbsolutePath,        // Input video file
-                '-preset',
-                'fast',               // Faster encoding while maintaining quality
-                '-g',
-                '48',                      // GOP size (should be ~2x framerate, e.g., 24 FPS → GOP 48)
-                '-sc_threshold',
-                '0',             // Disable scene change detection for better segment consistency
-                '-c:v',
-                'libx264',               // Use H.264 video codec
-                '-b:v',
-                '2000k',                 // Set video bitrate to 2 Mbps (adjust as needed)
-                '-c:a',
-                'aac',                   // Use AAC for audio encoding
-                '-b:a',
-                '128k',                  // Audio bitrate of 128 kbps
-                '-ac',
-                '2',                       // Stereo audio
-                '-ar',
-                '44100',                   // Set audio sample rate
-                '-f',
-                'hls',                     // Output format: HLS
-                '-hls_time',
-                '6',                 // 6-second segments (optimal for streaming)
-                '-hls_list_size',
-                '0',            // Ensure the playlist contains all segments
-                '-hls_flags',
-                'independent_segments', // Better segment independence for fast seeking
-                '-hls_segment_type',
-                'mpegts',    // Use MPEG-TS segment type
-                '-hls_segment_filename',
-                $segmentPattern, // Segment pattern
-                '-master_pl_name',
-                'master.m3u8', // Master playlist name
-                '-hls_playlist_type',
-                'vod',      // VOD type (ensures complete playlist availability)
-                '-start_number',
-                '0',             // Start numbering from 0
-                $hlsFile                          // Output HLS playlist file (e.g., output.m3u8)
+                '-i', $videoAbsolutePath,
+                '-codec:v', 'libx264',
+                '-codec:a', 'aac',
+                '-hls_time', '10',
+                '-hls_playlist_type', 'vod',
+                '-hls_segment_filename', $segmentPattern,
+                '-start_number', '0',
+                $hlsFile
             ];
-
 
             $process = new Process($command);
             $process->setTimeout(3600); // e.g., 1 hour. Adjust as needed for big files.
@@ -198,8 +166,8 @@ class VideoController extends Controller
 
             return response()->json([
                 'message' => "Video uploaded & converted to HLS successfully!",
-                'body' => $video,
-                'status' => 200,
+                'body'    => $video,
+                'status'  => 200,
             ], 200);
 
         } catch (Exception $e) {
