@@ -230,7 +230,7 @@
                 {
                     data: 'hls_path',
                     render: (data) => {
-                        if (data && data !== 'null' && data.trim() !== '') {
+                        if (data != '' || data != null) {
                             try {
                                 let aData = JSON.parse(data);
                                 if (aData.preview) {
