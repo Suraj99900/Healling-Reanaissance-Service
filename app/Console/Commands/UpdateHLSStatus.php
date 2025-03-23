@@ -31,14 +31,12 @@ class UpdateHLSStatus extends Command
                 // Check if hls_path is not null and not blank
                 $hlsPathValid = !empty($video->hls_path) && $video->hls_path !== null;
 
-                if ($hlsPathValid) {
-                    // Directly update the database using raw query
-                    DB::statement("UPDATE wellness_service.videos SET is_converted_hls_video = 1 WHERE id = ?", [$video->id]);
+                // Update the is_converted_hls_video column
+                DB::table('wellness_service.videos')
+                    ->where('id', $video->id)
+                    ->update(['is_converted_hls_video' => $hlsPathValid ? 1 : 0]);
 
-                    $this->info("✅ Updated Video ID: {$video->id} - HLS is ready.");
-                } else {
-                    DB::statement("UPDATE wellness_service.videos SET is_converted_hls_video = 0 WHERE id = ?", [$video->id]);
-                }
+                $this->info("✅ Updated Video ID: {$video->id} - HLS Status: " . ($hlsPathValid ? 'Ready' : 'Pending'));
             }
 
             $this->info('✅ HLS status update process completed.');
