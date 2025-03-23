@@ -230,12 +230,12 @@
                 {
                     data: 'hls_path',
                     render: (data) => {
+                        console.log(data != '' || data != null);
+                        
                         if (data != '' || data != null) {
                             try {
-                                let aData = JSON.parse(data);
-                                if (aData.preview) {
-                                    return `<a href="${aData.preview}" target="_blank">Video is ready to watch</a>`;
-                                }
+                                return  `<span class="text-primary">Video is ready to watch</span>`;
+                                
                             } catch (e) {
                                 console.error("Error parsing hls_path JSON:", e);
                             }
