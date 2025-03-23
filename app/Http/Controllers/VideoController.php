@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Jobs\ConvertVideoToHLS;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Video;
@@ -11,7 +12,7 @@ use Illuminate\Support\Str;
 
 class VideoController extends Controller
 {
-    
+
     public function index()
     {
         return view('video-management', [
@@ -20,7 +21,7 @@ class VideoController extends Controller
             'cloudflareEmail' => env('CLOUDFLARE_EMAIL')
         ]);
     }
-    
+
     /**
      * Upload a video
      */
@@ -68,114 +69,91 @@ class VideoController extends Controller
         }
     }
 
-    public function uploadVideo(Request $request)
+    public function uploadChunk(Request $request)
     {
-        // Validate the incoming request
-        $oValidator = Validator::make($request->all(), [
-            'video' => 'required|file|mimes:mp4,mov,ogg,qt,avi,flv,webm,3gp,mpeg,mpeg2,mpeg4,mkv,wmv,m4v,mxf,asf,vob,ts,tsv,mts,m2ts|max:2000000',
-            'title' => 'required|string|max:25500',
-            'description' => 'nullable|string',
-            'category_id' => 'required|integer'
-        ]);
-
-        if ($oValidator->fails()) {
-            return response()->json(['error' => $oValidator->errors()], 400);
-        }
-
         try {
-            if (!$request->hasFile('video')) {
+            $validator = Validator::make($request->all(), [
+                'video' => 'required|file',
+                'title' => 'required|string|max:255',
+                'description' => 'nullable|string',
+                'category_id' => 'required|integer',
+                'chunk_index' => 'required|integer',
+                'total_chunks' => 'required|integer',
+                'filename' => 'required|string',
+                'thumbnail' => 'required|file|mimes:jpeg,png,jpg,gif,svg|max:5048'
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json(['error' => $validator->errors()], 400);
+            }
+
+            // Get request data
+            $file = $request->file('video');
+            $chunkIndex = $request->input('chunk_index');
+            $totalChunks = $request->input('total_chunks');
+            $originalFilename = pathinfo($request->input('filename'), PATHINFO_FILENAME);
+            $timestamp = now()->format('Ymd_His'); // Format: YYYYMMDD_HHMMSS
+
+            // Store chunks in temp directory
+            $tempDir = storage_path("app/public/videos/temp/");
+            if (!file_exists($tempDir)) {
+                mkdir($tempDir, 0777, true);
+            }
+
+            $chunkPath = "{$tempDir}{$originalFilename}.part{$chunkIndex}";
+
+            // ✅ Use move() instead of file_put_contents()
+            $file->move($tempDir, "{$originalFilename}.part{$chunkIndex}");
+
+            // ✅ Ensure file is saved before reading
+            sleep(1);
+            if (!file_exists($chunkPath)) {
+                return response()->json(['error' => "Chunk file not found: $chunkPath"], 500);
+            }
+
+            // Check if all chunks are uploaded
+            if ($chunkIndex + 1 == $totalChunks) {
+                $finalFilename = "{$originalFilename}_{$timestamp}.mp4";
+                $finalPath = storage_path("app/public/videos/{$finalFilename}");
+                $output = fopen($finalPath, 'wb');
+
+                for ($i = 0; $i < $totalChunks; $i++) {
+                    $chunkFile = "{$tempDir}{$originalFilename}.part{$i}";
+                    fwrite($output, file_get_contents($chunkFile));
+                    unlink($chunkFile); // Remove processed chunk
+                }
+                fclose($output);
+
+                // Store thumbnail
+                $thumbnailPath = $request->file('thumbnail')->store('thumbnails', 'public');
+
+                // Save to database
+                $video = Video::create([
+                    'category_id' => $request->input('category_id'),
+                    'title' => $request->input('title'),
+                    'description' => $request->input('description'),
+                    'path' => "videos/{$finalFilename}",
+                    'hls_path' => null,
+                    'is_converted_hls_video' => false,
+                    'thumbnail' => $thumbnailPath,
+                ]);
+
+                // Dispatch background job for HLS conversion
+                dispatch(new ConvertVideoToHLS($video));
+
                 return response()->json([
-                    'error' => 'No file uploaded',
-                    'message' => "No file uploaded",
-                    'status' => 400
-                ], 400);
+                    'message' => "Video uploaded successfully! HLS conversion in progress.",
+                    'video' => $video,
+                ], 200);
             }
 
-            // 1) Store the original video
-            $sVideoPath = $request->file('video')->store('videos', 'public');
-
-            // If you have a thumbnail, store it too (if not, remove this):
-            $sThumbnailPath = $request->file('thumbnail') 
-                ? $request->file('thumbnail')->store('thumbnails', 'public')
-                : null;
-
-            // 2) Create a unique subfolder for HLS output
-            // e.g. 'public/hls/<uuid>'
-            $lessonId = (string) Str::uuid(); 
-            $outputFolder = "hls/{$lessonId}";
-            $outputAbsolutePath = Storage::disk('public')->path($outputFolder);
-
-            if (!is_dir($outputAbsolutePath)) {
-                mkdir($outputAbsolutePath, 0775, true);
-            }
-
-            // 3) Build the ffmpeg command
-            // Example: ffmpeg -i {videoPath} -codec:v libx264 -codec:a aac -hls_time 10 -hls_playlist_type vod -hls_segment_filename "outputFolder/segment%03d.ts" -start_number 0 {outputFolder}/index.m3u8
-
-            // Input file (absolute path)
-            $videoAbsolutePath = Storage::disk('public')->path($sVideoPath);
-
-            // HLS output (index.m3u8)
-            $hlsFile = "{$outputAbsolutePath}/index.m3u8";
-            // Segment pattern
-            $segmentPattern = "{$outputAbsolutePath}/segment%03d.ts";
-
-            // We'll use Symfony Process for better control, but you could use exec()
-            $command = [
-                'ffmpeg',
-                '-i', $videoAbsolutePath,
-                '-codec:v', 'libx264',
-                '-codec:a', 'aac',
-                '-hls_time', '10',
-                '-hls_playlist_type', 'vod',
-                '-hls_segment_filename', $segmentPattern,
-                '-start_number', '0',
-                $hlsFile
-            ];
-
-            $process = new Process($command);
-            $process->setTimeout(3600); // e.g., 1 hour. Adjust as needed for big files.
-
-            $process->run();
-
-            if (!$process->isSuccessful()) {
-                // If FFmpeg fails
-                return response()->json([
-                    'error' => 'FFmpeg failed to convert video to HLS',
-                    'ffmpeg_output' => $process->getErrorOutput()
-                ], 500);
-            }
-
-            // 4) The final M3U8 path will be "public/hls/<uuid>/index.m3u8"
-            // We'll store it in the DB as something like 'hls/<uuid>/index.m3u8'
-            $hlsRelativePath = "{$outputFolder}/index.m3u8";
-
-            // 5) Create the video record in DB
-            $videoModel = new Video;
-            $video = $videoModel->addVideoDetails(
-                $request->input('category_id'),
-                $request->input('title'),
-                $request->input('description'),
-                $sVideoPath,        // Original MP4 path
-                $sThumbnailPath,    // Optional thumbnail path
-                '',
-                "",
-                "",
-                $hlsRelativePath    // The M3U8 file (hls_path)
-            );
-
-            return response()->json([
-                'message' => "Video uploaded & converted to HLS successfully!",
-                'body'    => $video,
-                'status'  => 200,
-            ], 200);
-
+            return response()->json(['message' => 'Chunk uploaded successfully.'], 200);
         } catch (Exception $e) {
-            return response()->json([
-                'error' => 'An error occurred while uploading the video: ' . $e->getMessage()
-            ], 500);
+            return response()->json(['error' => 'An error occurred: ' . $e->getMessage()], 500);
         }
     }
+
+
 
 
     /**

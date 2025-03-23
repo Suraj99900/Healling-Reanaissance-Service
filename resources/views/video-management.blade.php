@@ -198,6 +198,8 @@
 
 
 @include('CDN_Footer')
+<script src="https://cdn.jsdelivr.net/npm/tus-js-client@latest/dist/tus.min.js"></script>
+
 <!-- jQuery, DataTables, and Bootstrap JS -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
@@ -335,108 +337,194 @@
         });
 
         // Handle form submission for adding video
-        $('#videoForm').on('submit', async function (e) {
+        // $('#videoForm').on('submit', async function (e) {
+        //     e.preventDefault();
+        //     $('.progress-indicator').show();
+        //     let progressBar = $('.progress-bar');
+
+        //     try {
+        //         const videoFile = $('#videoFile')[0].files[0];
+        //         const accountId = '{{ $cloudflareAccountId }}';
+        //         const apiToken = '{{ $cloudflareApiToken }}';
+
+        //         // Initialize tus upload
+        //         const upload = new tus.Upload(videoFile, {
+        //             endpoint: `https://api.cloudflare.com/client/v4/accounts/${accountId}/stream`,
+        //             chunkSize: 5 * 1024 * 1024, // Set chunk size to 5 MB
+        //             retryDelays: [0, 3000, 5000, 10000, 20000],
+        //             metadata: {
+        //                 name: videoFile.name,
+        //                 filetype: videoFile.type
+        //             },
+        //             headers: {
+        //                 'Authorization': `Bearer ${apiToken}`,
+        //             },
+        //             onError: function (error) {
+        //                 console.log('Failed upload:', error);
+        //                 $('.progress-indicator').hide();
+        //                 alert('Error uploading video: ' + error.message);
+        //             },
+        //             onProgress: function (bytesUploaded, bytesTotal) {
+        //                 const percentage = ((bytesUploaded / bytesTotal) * 100).toFixed(2);
+        //                 progressBar.css('width', percentage + '%').text(percentage + '%');
+        //             },
+        //             onSuccess: async function () {
+        //                 // Parse the Cloudflare Stream video ID from the TUS upload URL
+        //                 const url = new URL(upload.url);
+        //                 const cloudflareVideoId = url.pathname.split('/').pop();
+
+        //                 // Fetch stream details from Cloudflare
+        //                 $.ajax({
+        //                     url: `https://api.cloudflare.com/client/v4/accounts/${accountId}/stream/${cloudflareVideoId}`,
+        //                     method: 'GET',
+        //                     headers: {
+        //                         'Authorization': `Bearer ${apiToken}`
+        //                     },
+        //                     success: function (streamDetails) {
+        //                         // Build FormData for the rest of the submission
+        //                         const formData = new FormData();
+        //                         formData.append('title', $('#title').val());
+        //                         formData.append('description', $('#description').val());
+        //                         formData.append('category_id', $('#category_id').val());
+        //                         formData.append('cloudflare_video_id', cloudflareVideoId);
+        //                         formData.append('video_json_data', JSON.stringify(streamDetails.result));
+        //                         formData.append('thumbnail', $('#thumbnailFile')[0].files[0]);
+
+        //                         // Decide whether to create or update
+        //                         const videoId = $('#videoId').val();
+        //                         const url = videoId ? `/api/video/${videoId}` : '/api/video';
+        //                         const method = videoId ? 'PUT' : 'POST';
+
+        //                         // Save the data to your backend
+        //                         $.ajax({
+        //                             url: url,
+        //                             method: method,
+        //                             data: formData,
+        //                             processData: false,
+        //                             contentType: false,
+        //                             success: function (response) {
+        //                                 $('.progress-indicator').hide();
+
+        //                                 // Handle attachments
+        //                                 const newVideoId = response.body.id;
+        //                                 handleAttachments(newVideoId);
+
+        //                                 // Reset form and close modal
+        //                                 $('#videoForm')[0].reset();
+        //                                 const offcanvasEl = document.getElementById('videoOffcanvas');
+        //                                 const offcanvas = bootstrap.Offcanvas.getInstance(offcanvasEl);
+        //                                 offcanvas.hide();
+        //                                 table.ajax.reload();
+        //                                 alert("Video saved successfully!");
+        //                             },
+        //                             error: function (xhr, status, error) {
+        //                                 $('.progress-indicator').hide();
+        //                                 alert("Error saving video details: " + error);
+        //                             }
+        //                         });
+        //                     },
+        //                     error: function (xhr, status, error) {
+        //                         console.log('Failed to fetch stream details:', error);
+        //                         $('.progress-indicator').hide();
+        //                         alert('Error fetching stream details: ' + error.message);
+        //                     }
+        //                 });
+        //             }
+        //         });
+
+        //         // Start the upload
+        //         upload.start();
+
+        //     } catch (error) {
+        //         $('.progress-indicator').hide();
+        //         alert("Error initializing upload: " + error.message);
+        //     }
+        // });
+
+
+        $('#videoForm').on('submit', function (e) {
             e.preventDefault();
             $('.progress-indicator').show();
             let progressBar = $('.progress-bar');
 
-            try {
-                const videoFile = $('#videoFile')[0].files[0];
-                const accountId = '{{ $cloudflareAccountId }}';
-                const apiToken = '{{ $cloudflareApiToken }}';
+            // Get form values
+            const title = $('#title').val();
+            const description = $('#description').val();
+            const categoryId = $('#category_id').val();
+            const thumbnailFile = $('#thumbnailFile')[0].files[0];
+            const videoFile = $('#videoFile')[0].files[0];
 
-                // Initialize tus upload
-                const upload = new tus.Upload(videoFile, {
-                    endpoint: `https://api.cloudflare.com/client/v4/accounts/${accountId}/stream`,
-                    chunkSize: 5 * 1024 * 1024, // Set chunk size to 5 MB
-                    retryDelays: [0, 3000, 5000, 10000, 20000],
-                    metadata: {
-                        name: videoFile.name,
-                        filetype: videoFile.type
+            if (!videoFile) {
+                alert("Please select a video file.");
+                return;
+            }
+
+            const chunkSize = 5 * 1024 * 1024; // 5MB chunks
+            const totalChunks = Math.ceil(videoFile.size / chunkSize);
+            let chunkIndex = 0;
+
+            function uploadChunk() {
+                if (chunkIndex >= totalChunks) {
+                    console.log("All chunks uploaded successfully!");
+                    return;
+                }
+
+                let start = chunkIndex * chunkSize;
+                let end = Math.min(start + chunkSize, videoFile.size);
+                let chunk = videoFile.slice(start, end);
+
+                let formData = new FormData();
+                formData.append('video', chunk);
+                formData.append('chunk_index', chunkIndex);
+                formData.append('total_chunks', totalChunks);
+                formData.append('filename', videoFile.name);
+                formData.append('title', title);
+                formData.append('description', description);
+                formData.append('category_id', categoryId);
+                formData.append('thumbnail', thumbnailFile);
+
+                $.ajax({
+                    url: "/api/uploadChunk",
+                    method: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        let percentage = ((chunkIndex + 1) / totalChunks) * 100;
+                        progressBar.css('width', percentage + '%').text(percentage.toFixed(2) + '%');
+
+                        console.log(`Chunk ${chunkIndex + 1}/${totalChunks} uploaded`);
+
+                        chunkIndex++;
+
+                        // ✅ Check here before calling uploadChunk()
+                        if (chunkIndex < totalChunks) {
+                            uploadChunk(); // Upload next chunk
+                        } else {
+                            console.log(response.video);
+                            console.log(response.video.id);
+
+                            handleAttachments(response.video.id); // Handle attachments
+                            alert("✅ All chunks uploaded successfully!");
+                            console.log("✅ All chunks uploaded successfully!");
+                            table.ajax.reload();
+                            $('.progress-indicator').hide();
+                            $('#videoForm')[0].reset();
+                            // Dispose existing Bootstrap instance (if any)
+                            const offcanvasEl = document.getElementById('videoOffcanvas');
+                            const offcanvas = bootstrap.Offcanvas.getInstance(offcanvasEl);
+                            offcanvas.hide();
+                        }
                     },
-                    headers: {
-                        'Authorization': `Bearer ${apiToken}`,
-                    },
-                    onError: function (error) {
-                        console.log('Failed upload:', error);
+                    error: function (xhr, status, error) {
                         $('.progress-indicator').hide();
-                        alert('Error uploading video: ' + error.message);
-                    },
-                    onProgress: function (bytesUploaded, bytesTotal) {
-                        const percentage = ((bytesUploaded / bytesTotal) * 100).toFixed(2);
-                        progressBar.css('width', percentage + '%').text(percentage + '%');
-                    },
-                    onSuccess: async function () {
-                        // Parse the Cloudflare Stream video ID from the TUS upload URL
-                        const url = new URL(upload.url);
-                        const cloudflareVideoId = url.pathname.split('/').pop();
-
-                        // Fetch stream details from Cloudflare
-                        $.ajax({
-                            url: `https://api.cloudflare.com/client/v4/accounts/${accountId}/stream/${cloudflareVideoId}`,
-                            method: 'GET',
-                            headers: {
-                                'Authorization': `Bearer ${apiToken}`
-                            },
-                            success: function (streamDetails) {
-                                // Build FormData for the rest of the submission
-                                const formData = new FormData();
-                                formData.append('title', $('#title').val());
-                                formData.append('description', $('#description').val());
-                                formData.append('category_id', $('#category_id').val());
-                                formData.append('cloudflare_video_id', cloudflareVideoId);
-                                formData.append('video_json_data', JSON.stringify(streamDetails.result));
-                                formData.append('thumbnail', $('#thumbnailFile')[0].files[0]);
-
-                                // Decide whether to create or update
-                                const videoId = $('#videoId').val();
-                                const url = videoId ? `/api/video/${videoId}` : '/api/video';
-                                const method = videoId ? 'PUT' : 'POST';
-
-                                // Save the data to your backend
-                                $.ajax({
-                                    url: url,
-                                    method: method,
-                                    data: formData,
-                                    processData: false,
-                                    contentType: false,
-                                    success: function (response) {
-                                        $('.progress-indicator').hide();
-
-                                        // Handle attachments
-                                        const newVideoId = response.body.id;
-                                        handleAttachments(newVideoId);
-
-                                        // Reset form and close modal
-                                        $('#videoForm')[0].reset();
-                                        const offcanvasEl = document.getElementById('videoOffcanvas');
-                                        const offcanvas = bootstrap.Offcanvas.getInstance(offcanvasEl);
-                                        offcanvas.hide();
-                                        table.ajax.reload();
-                                        alert("Video saved successfully!");
-                                    },
-                                    error: function (xhr, status, error) {
-                                        $('.progress-indicator').hide();
-                                        alert("Error saving video details: " + error);
-                                    }
-                                });
-                            },
-                            error: function (xhr, status, error) {
-                                console.log('Failed to fetch stream details:', error);
-                                $('.progress-indicator').hide();
-                                alert('Error fetching stream details: ' + error.message);
-                            }
-                        });
+                        alert("Error uploading chunk: " + error);
+                        console.error(xhr.responseText);
                     }
                 });
-
-                // Start the upload
-                upload.start();
-
-            } catch (error) {
-                $('.progress-indicator').hide();
-                alert("Error initializing upload: " + error.message);
             }
+
+            uploadChunk(); // Start uploading chunks
         });
 
         // Helper function to handle attachments

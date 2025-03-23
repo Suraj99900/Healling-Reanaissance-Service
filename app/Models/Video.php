@@ -173,6 +173,7 @@ class Video extends Model
                 ->where('A.deleted', 0)
                 ->where('B.status', 1)
                 ->where('B.deleted', 0)
+                ->orderBy('A.added_on', 'DESC')
                 ->get();
 
             return $oResult;

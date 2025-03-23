@@ -15,6 +15,9 @@ return new class extends Migration {
                 $table->string('hls_path')->nullable()->after('video_json_data');
             });
         }
+        Schema::table('videos', function (Blueprint $table) {
+            $table->boolean('is_converted_hls_video')->default(0)->after('hls_path');
+        });
     }
 
     /**
@@ -27,5 +30,9 @@ return new class extends Migration {
                 $table->dropColumn('hls_path');
             });
         }
+
+        Schema::table('videos', function (Blueprint $table) {
+            $table->dropColumn('is_converted_hls_video');
+        });
     }
 };

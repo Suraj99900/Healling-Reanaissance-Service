@@ -39,7 +39,7 @@ Route::post('email', [EmailController::class, 'generateMail']);
 
 // Video upload
 Route::post('video', [VideoController::class, 'upload']);
-Route::post('video/stream/upload', [VideoController::class, 'uploadVideo']);
+Route::post('uploadChunk', [VideoController::class, 'uploadChunk']);
 Route::get('video/{id}', [VideoController::class, 'fetchById']);
 Route::get('videos', [VideoController::class, 'fetchAll']);
 Route::get('videos-category/{id}', [VideoController::class, 'fetchAllVideoDataByCategoryId']);
