@@ -32,7 +32,12 @@ class ConvertVideoToHLS implements ShouldQueue
      */
     public function handle(): void
     {
-        $video = $this->video;
+        $video = Video::find($this->video->id); // Fetch fresh instance
+
+        if (!$video) {
+            \Log::error("Video not found for ID: {$this->video->id}");
+            return;
+        }
 
         // Generate unique folder for HLS output
         $lessonId = (string) Str::uuid();
@@ -116,11 +121,12 @@ class ConvertVideoToHLS implements ShouldQueue
             // **Ensure fresh instance before update**
             // **Ensure fresh instance before update**
             $video->refresh();
-            $video->update([
-                'hls_path' => "{$outputFolder}/index.m3u8",
-                'is_converted_hls_video' => true
-            ]);
-            $video->save();
+            if ($video->id === $this->video->id) {
+                $video->update([
+                    'hls_path' => "{$outputFolder}/index.m3u8",
+                    'is_converted_hls_video' => true
+                ]);
+            }
         } catch (ProcessFailedException $exception) {
             \Log::error("HLS Conversion Failed for Video ID: {$video->id}. Error: " . $exception->getMessage());
         }
