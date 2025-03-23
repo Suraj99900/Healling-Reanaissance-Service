@@ -18,13 +18,13 @@ class ConvertPendingVideos extends Command
                 ->orWhere('is_converted_hls_video', false);
         })
             ->where(function ($query) {
-                $query->whereNull('hls_path')->orWhere('hls_path', ''); // Check for NULL or empty string
+                $query->whereNull('hls_path')->orWhere('hls_path', '');
             })
-            ->whereNotNull('path') // Ensure path is NOT NULL
-            ->where('path', '!=', '') // Ensure path is NOT empty
+            ->whereNotNull('path')
+            ->where('path', '!=', '')
             ->where('status', 1)
             ->where('deleted', 0)
-            ->get();
+            ->first();
 
         if ($videos->isEmpty()) {
             $this->info('No videos found for conversion.');

@@ -113,7 +113,7 @@ class ConvertVideoToHLS implements ShouldQueue
         ];
 
         $process = new Process($command);
-        $process->setTimeout(3600); // 1-hour timeout
+        $process->setTimeout(9600); // 1-hour timeout
 
         try {
             $process->mustRun();
