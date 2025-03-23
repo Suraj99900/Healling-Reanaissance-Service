@@ -17,7 +17,7 @@ class UpdateHLSStatus extends Command
 
         try {
             // Fetch all videos where status = 1, deleted = 0
-            $videos = DB::table('wellness_service.videos')
+            $videos = DB::table('videos')
                 ->where('status', 1)
                 ->where('deleted', 0)
                 ->get();
@@ -32,7 +32,7 @@ class UpdateHLSStatus extends Command
                 $hlsPathValid = !empty($video->hls_path) && $video->hls_path !== null;
 
                 // Update the is_converted_hls_video column
-                DB::table('wellness_service.videos')
+                DB::table('videos')
                     ->where('id', $video->id)
                     ->update(['is_converted_hls_video' => $hlsPathValid ? 1 : 0]);
 
