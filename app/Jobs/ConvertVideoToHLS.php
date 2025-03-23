@@ -118,17 +118,41 @@ class ConvertVideoToHLS implements ShouldQueue
         try {
             $process->mustRun();
 
-            // **Ensure fresh instance before update**
-            // **Ensure fresh instance before update**
+            // ✅ Fetch the video duration after conversion
+            $videoDuration = $this->getVideoDuration($videoAbsolutePath);
+
+            // ✅ Ensure fresh instance before update
             $video->refresh();
-            if ($video->id === $this->video->id) {
-                $video->update([
-                    'hls_path' => "{$outputFolder}/index.m3u8",
-                    'is_converted_hls_video' => true
-                ]);
-            }
+            $video->update([
+                'hls_path' => "{$outputFolder}/index.m3u8",
+                'is_converted_hls_video' => true,
+                'duration' => $videoDuration, // ✅ Update duration in DB
+            ]);
         } catch (ProcessFailedException $exception) {
             \Log::error("HLS Conversion Failed for Video ID: {$video->id}. Error: " . $exception->getMessage());
+        }
+    }
+
+    /**
+     * Get the duration of the video using FFmpeg
+     */
+    private function getVideoDuration($filePath)
+    {
+        try {
+            $cmd = "ffmpeg -i " . escapeshellarg($filePath) . " 2>&1";
+            $output = shell_exec($cmd);
+
+            if (preg_match('/Duration: (\d+):(\d+):(\d+\.\d+)/', $output, $matches)) {
+                $hours = (int) $matches[1];
+                $minutes = (int) $matches[2];
+                $seconds = (float) $matches[3];
+                return ($hours * 3600) + ($minutes * 60) + $seconds;
+            }
+
+            return null; // Return null if duration is not found
+        } catch (\Exception $e) {
+            \Log::error("Error getting video duration: " . $e->getMessage());
+            return null;
         }
     }
 }
