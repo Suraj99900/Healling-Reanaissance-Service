@@ -57,60 +57,45 @@ class ConvertVideoToHLS implements ShouldQueue
         // FFmpeg Command Optimized for 720p & Fast Encoding
         $command = [
             'ffmpeg',
-            '-i',
-            $videoAbsolutePath, // Input file
-
-            // Force Single-Core Processing for DigitalOcean 1 vCPU
-            '-threads',
-            '1', // Single-threaded for single CPU
-            '-preset',
-            'ultrafast', // Fastest preset (lower quality but high speed)
-            '-tune',
-            'zerolatency', // Optimized for low latency
-
-            // Convert to 720p Resolution
-            '-vf',
-            'scale=-2:720', // Maintain aspect ratio while resizing to 720p
-
-            // Video Encoding - Fast Processing
-            '-codec:v',
-            'libx264',
-            '-b:v',
-            '1500k', // Lower bitrate for faster encoding
-            '-maxrate',
-            '1800k', // Peak bitrate control
-            '-bufsize',
-            '3000k', // Reduced buffer for efficiency
-            '-crf',
-            '23', // Balanced quality (lower = better, but slower)
-            '-g',
-            '48', // GOP size (affects keyframe interval)
-            '-keyint_min',
-            '48',
-
-            // Audio Encoding
-            '-codec:a',
-            'aac',
-            '-b:a',
-            '96k', // Lower bitrate to reduce CPU usage
-
-            // HLS Options
-            '-hls_time',
-            '6', // Shorter segment times for better playback experience
-            '-hls_playlist_type',
-            'vod',
-            '-hls_segment_filename',
-            $segmentPattern, // Segment filename format
-            '-start_number',
-            '0',
-
-            // Optimize for Streaming
-            '-movflags',
-            '+faststart', // Enables progressive download
-
+            '-i', $videoAbsolutePath, // Input file
+        
+            // Single-Core Processing (Limit CPU Usage)
+            '-threads', '1',  // Force single-threaded processing
+        
+            // Fast Encoding
+            '-preset', 'superfast', // Slightly better than 'ultrafast' but still fast
+            '-tune', 'zerolatency', // Optimize for real-time processing
+        
+            // Resize to 720p (Maintain Aspect Ratio)
+            '-vf', 'scale=-2:720',
+        
+            // Efficient Video Encoding
+            '-codec:v', 'libx264',
+            '-b:v', '1000k',  // Lower bitrate to reduce CPU and storage usage
+            '-maxrate', '1200k',  // Peak bitrate control
+            '-bufsize', '2000k',  // Reduce memory usage
+            '-crf', '25',  // Adjust quality (higher = lower quality, but faster)
+            '-g', '50', // GOP size (adjust for better keyframe placement)
+            '-keyint_min', '50',
+        
+            // Lower Audio Processing Load
+            '-codec:a', 'aac',
+            '-b:a', '64k', // Lower bitrate to save CPU & storage
+            '-ac', '1', // Convert to mono (reduces processing)
+        
+            // HLS Streaming Settings
+            '-hls_time', '15', // Slightly longer segments to reduce CPU overhead
+            '-hls_playlist_type', 'vod',
+            '-hls_segment_filename', $segmentPattern, // HLS Segment naming
+            '-start_number', '0',
+        
+            // Optimize for Low Bandwidth & Storage
+            '-movflags', '+faststart',
+        
             // Output File
             $hlsFile
         ];
+        
 
         $process = new Process($command);
         $process->setTimeout(9600); // 1-hour timeout
