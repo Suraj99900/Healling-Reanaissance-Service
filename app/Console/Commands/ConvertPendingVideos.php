@@ -13,7 +13,12 @@ class ConvertPendingVideos extends Command
 
     public function handle()
     {
-        $videos = Video::whereNull('is_converted_hls_video')->orWhere('is_converted_hls_video', false)->whereNull('hls_path')
+        $videos = Video::where(function ($query) {
+            $query->whereNull('is_converted_hls_video')
+                ->orWhere('is_converted_hls_video', false);
+        })
+            ->whereNotNull('hls_path')
+            ->whereNotNull('path')
             ->get();
 
         if ($videos->isEmpty()) {
