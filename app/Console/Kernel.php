@@ -14,6 +14,7 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')->hourly();
         $schedule->command('convert:pending-videos')->everyFiveMinutes()->withoutOverlapping();
+        $schedule->command('video:update-hls-status')->everyFiveMinutes();
     }
 
     /**

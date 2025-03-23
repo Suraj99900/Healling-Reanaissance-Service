@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\Video;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -120,11 +121,15 @@ class ConvertVideoToHLS implements ShouldQueue
 
             // **Ensure fresh instance before update**
             // **Ensure fresh instance before update**
-            $video->refresh();
-            if ($video->id === $this->video->id) {
-                $video->update([
-                    'hls_path' => "{$outputFolder}/index.m3u8",
-                    'is_converted_hls_video' => true
+            $videoId = $this->video->id;
+
+            // Refresh the video data
+            $video = DB::table('wellness_service.videos')->where('id', $videoId)->first();
+            
+            if ($video && $video->id === $videoId) {
+                DB::statement("UPDATE wellness_service.videos SET hls_path = ?, is_converted_hls_video = 1 WHERE id = ?", [
+                    "{$outputFolder}/index.m3u8",
+                    $videoId
                 ]);
             }
         } catch (ProcessFailedException $exception) {
