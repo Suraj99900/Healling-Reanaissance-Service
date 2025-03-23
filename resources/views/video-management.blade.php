@@ -230,17 +230,16 @@
                 {
                     data: 'hls_path',
                     render: (data) => {
-                        console.log(data != '' || data != null);
+                        console.log(data != '' && data != null);
                         
-                        if (data != '' || data != null) {
-                            try {
+                        if (data != '' && data != null) {
                                 return  `<span class="text-primary">Video is ready to watch</span>`;
                                 
-                            } catch (e) {
-                                console.error("Error parsing hls_path JSON:", e);
-                            }
+                           
+                        }else{
+                            return `<span class="text-warning">Processing... Please wait</span>`;
                         }
-                        return `<span class="text-warning">Processing... Please wait</span>`;
+                       
                     }
                 },
                 {
