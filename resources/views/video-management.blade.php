@@ -228,27 +228,27 @@
                     }
                 },
                 {
-                    data: 'video_json_data',
-                    render: (data, type, row, meta) => {
-                        var aData = JSON.parse(data);
-
-
-                        if (aData != null) {
-                            const previewUrl = aData.preview;
-                            // Return the anchor tag with the preview URL
-                            return `<a href="${previewUrl}" target="_blank">View Video</a>`;
-                        } else {
-                            // Return a placeholder or a message indicating no preview is available
-                            return 'No preview available';
+                    data: 'hls_path',
+                    render: (data) => {
+                        if (data && data !== 'null' && data.trim() !== '') {
+                            try {
+                                let aData = JSON.parse(data);
+                                if (aData.preview) {
+                                    return `<a href="${aData.preview}" target="_blank">Video is ready to watch</a>`;
+                                }
+                            } catch (e) {
+                                console.error("Error parsing hls_path JSON:", e);
+                            }
                         }
+                        return `<span class="text-warning">Processing... Please wait</span>`;
                     }
                 },
                 {
                     data: 'id',
                     render: (data) => `
-                                        <button class="btnWAN btn-info btn-sm edit-video" data-id="${data}">Edit</button>
-                                        <button class="btnWAN btn-danger btn-sm delete-video" data-id="${data}">Delete</button>
-                                    `
+                <button class="btnWAN btn-info btn-sm edit-video" data-id="${data}">Edit</button>
+                <button class="btnWAN btn-danger btn-sm delete-video" data-id="${data}">Delete</button>
+            `
                 }
             ]
         });
