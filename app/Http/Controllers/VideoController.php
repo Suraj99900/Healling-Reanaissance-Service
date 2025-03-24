@@ -139,7 +139,7 @@ class VideoController extends Controller
                 ]);
 
                 // Dispatch background job for HLS conversion
-                dispatch(new ConvertVideoToHLS($video));
+                // dispatch(new ConvertVideoToHLS($video));   ##  off due to overload 
 
                 return response()->json([
                     'message' => "Video uploaded successfully! HLS conversion in progress.",
