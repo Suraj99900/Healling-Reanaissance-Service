@@ -11,6 +11,8 @@ class UpdateHLSStatus extends Command
     protected $signature = 'video:update-hls-status';
     protected $description = 'Update HLS status for videos';
 
+    public $timeout = 5400;
+
     public function handle()
     {
         Log::info('✅ UpdateHLSStatus command started.');

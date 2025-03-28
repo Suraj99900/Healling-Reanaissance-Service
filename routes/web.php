@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\PrivacyPolicyController;
 use App\Http\Controllers\SessionManagerController;
 use App\Http\Controllers\UserCategoryAccessController;
 use App\Http\Controllers\UserController;
@@ -77,3 +78,6 @@ Route::get('videos/videos-player/{videoId}', function () {
 
     return view('video-player', compact('videoId'));
 });
+
+
+Route::get('/privacy-policy', [PrivacyPolicyController::class, 'show'])->name('privacy.policy');
