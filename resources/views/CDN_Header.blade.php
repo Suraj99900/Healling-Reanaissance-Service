@@ -94,6 +94,13 @@
         integrity="sha512-eNi58fWX0irIyO5I5CgiimkK92f9B0wAbAx1R4j7h2RbE7/CvoQzmIoiqFvxTPsyE2qT2SP5MWHQEAYE28eIQQ=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
 
+    <!-- Counter visitor -->
+
+    <script type="text/javascript" src="https://counter2.optistats.ovh/private/counter.js?c=lp2z344wnu5ecqmta9jmwyqxzggnmedg&down=async" async></script>
+    <noscript>
+        <a href="https://www.freecounterstat.com" title="visitor counter for website"><img src="https://counter2.optistats.ovh/private/freecounterstat.php?c=lp2z344wnu5ecqmta9jmwyqxzggnmedg" border="0" title="visitor counter for website" alt="visitor counter for website"></a>
+    </noscript>
+
     <!-- ICONSCOUT CDN -->
 
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
@@ -137,5 +144,6 @@
     <a href="{{ url('/privacy-policy') }}" class="privacy-policy-btn" title="Privacy Policy">
         <i class="fas fa-shield-alt"></i>
     </a>
+    <div id="sfclp2z344wnu5ecqmta9jmwyqxzggnmedg"></div>
 
     <!-- <canvas id="particles"></canvas> -->
