@@ -97,9 +97,6 @@
     <!-- Counter visitor -->
 
     <script type="text/javascript" src="https://counter2.optistats.ovh/private/counter.js?c=lp2z344wnu5ecqmta9jmwyqxzggnmedg&down=async" async></script>
-    <noscript>
-        <a href="https://www.freecounterstat.com" title="visitor counter for website"><img src="https://counter2.optistats.ovh/private/freecounterstat.php?c=lp2z344wnu5ecqmta9jmwyqxzggnmedg" border="0" title="visitor counter for website" alt="visitor counter for website"></a>
-    </noscript>
 
     <!-- ICONSCOUT CDN -->
 
@@ -145,5 +142,8 @@
         <i class="fas fa-shield-alt"></i>
     </a>
     <div id="sfclp2z344wnu5ecqmta9jmwyqxzggnmedg"></div>
+    <noscript>
+        <a href="https://www.freecounterstat.com" title="visitor counter for website"><img src="https://counter2.optistats.ovh/private/freecounterstat.php?c=lp2z344wnu5ecqmta9jmwyqxzggnmedg" border="0" title="visitor counter for website" alt="visitor counter for website"></a>
+    </noscript>
 
     <!-- <canvas id="particles"></canvas> -->
