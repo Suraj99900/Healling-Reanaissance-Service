@@ -139,10 +139,6 @@
         <i class="fas fa-shield-alt"></i>
     </a>
     <!-- hitwebcounter Code START -->
-    <a href="https://www.hitwebcounter.com" target="_blank">
-        <img src="https://hitwebcounter.com/counter/counter.php?page=20412899&style=0009&nbdigits=7&type=ip&initCount=0"
-            title="Counter Widget" Alt="Visit counter For Websites" border="0" />
-    </a>
-
+    <a href="https://www.freecounterstat.com" title="free website hit counters"><img src="https://counter2.optistats.ovh/private/freecounterstat.php?c=8u555uz5wjxmbr2m6dt3aasew1nsq4sa" border="0" title="free website hit counters" alt="free website hit counters"></a>
 
     <!-- <canvas id="particles"></canvas> -->
