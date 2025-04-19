@@ -138,7 +138,4 @@
     <a href="{{ url('/privacy-policy') }}" class="privacy-policy-btn" title="Privacy Policy">
         <i class="fas fa-shield-alt"></i>
     </a>
-    <!-- hitwebcounter Code START -->
-    <a href="https://www.freecounterstat.com" title="free website hit counters"><img src="https://counter2.optistats.ovh/private/freecounterstat.php?c=8u555uz5wjxmbr2m6dt3aasew1nsq4sa" border="0" title="free website hit counters" alt="free website hit counters"></a>
-
     <!-- <canvas id="particles"></canvas> -->
