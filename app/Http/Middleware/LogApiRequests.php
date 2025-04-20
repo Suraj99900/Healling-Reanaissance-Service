@@ -9,7 +9,6 @@ use App\Models\ApiLog;
 use Illuminate\Support\Str;
 
 use App\Models\SessionManager;
-use App\Http\Controllers\SessionManagerController;
 use Illuminate\Support\Facades\Session;
 
 class LogApiRequests
@@ -22,6 +21,7 @@ class LogApiRequests
     public function handle(Request $request, Closure $next): Response
     {
         // Generate or retrieve a unique visitor ID from the session
+        $sResData = " ";
         $sessionData = Session::all(); // Retrieve all session data
         if ((new SessionManager())->isLoggedIn()) {
             $uniqueVisitorId = $sessionData['iUserID'] ?? " ";
@@ -41,14 +41,24 @@ class LogApiRequests
             '104.248.218.35',
         ];
 
-        // Log the API request and response if the IP is not excluded
+        // Check if the response content type is JSON or plain text
+        $contentType = $response->headers->get('Content-Type');
+        $isStorableContent = $contentType && (str_contains($contentType, 'application/json') || str_contains($contentType, 'text/plain'));
+
+        if($isStorableContent){
+            $sResData = $response->getContent();
+        }else{
+            $sResData = " ";
+        }
+
+        // Log the API request and response if the IP is not excluded and content is storable
         if (!in_array($request->ip(), $excludedIps)) {
             ApiLog::create([
                 'unique_visitor_id' => $uniqueVisitorId,
                 'method' => $request->method(),
                 'endpoint' => $request->path(),
                 'request_payload' => json_encode($request->all()),
-                'response_payload' => $response->getContent(),
+                'response_payload' =>$sResData,
                 'status_code' => $response->getStatusCode(),
                 'ip_address' => $request->ip(),
             ]);
