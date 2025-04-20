@@ -33,16 +33,26 @@ class LogApiRequests
         // Proceed with the request and capture the response
         $response = $next($request);
 
-        // Log the API request and response
-        ApiLog::create([
-            'unique_visitor_id' => $uniqueVisitorId,
-            'method' => $request->method(),
-            'endpoint' => $request->path(),
-            'request_payload' => json_encode($request->all()),
-            'response_payload' => $response->getContent(),
-            'status_code' => $response->getStatusCode(),
-            'ip_address' => $request->ip(),
-        ]);
+        // List of IPs to exclude from logging
+        $excludedIps = [
+            '104.248.86.98',
+            '139.59.245.220',
+            '165.227.211.237',
+            '104.248.218.35',
+        ];
+
+        // Log the API request and response if the IP is not excluded
+        if (!in_array($request->ip(), $excludedIps)) {
+            ApiLog::create([
+                'unique_visitor_id' => $uniqueVisitorId,
+                'method' => $request->method(),
+                'endpoint' => $request->path(),
+                'request_payload' => json_encode($request->all()),
+                'response_payload' => $response->getContent(),
+                'status_code' => $response->getStatusCode(),
+                'ip_address' => $request->ip(),
+            ]);
+        }
 
         return $response;
     }
