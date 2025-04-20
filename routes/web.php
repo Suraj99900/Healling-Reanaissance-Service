@@ -23,17 +23,17 @@ Route::get('/login', action: function () {
 Route::get('/register', function () {
     return view('register');
 });
+Route::get('dashboard', [\App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
 
+// Route::get('dashboard', function () {
+//     $sessionData = Session::all(); // Retrieve all session data
 
-Route::get('dashboard', function () {
-    $sessionData = Session::all(); // Retrieve all session data
-
-    if ((new SessionManager())->isLoggedIn()) {
-        return view('dashboard')->with('sessionData', $sessionData);
-    } else {
-        return view('login');
-    }
-});
+//     if ((new SessionManager())->isLoggedIn()) {
+//         return view('dashboard')->with('sessionData', $sessionData);
+//     } else {
+//         return view('login');
+//     }
+// });
 
 Route::get('/forgotPasswordScreen', function () {
     return view('forgotPasswordScreen');
