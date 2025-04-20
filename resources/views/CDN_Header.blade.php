@@ -10,8 +10,8 @@
     <title>Life Healer Kavita - 10X Your Power of Manifestation</title>
 
     <!-- Favicon -->
-    <link rel="icon" href="https://lifehealerkavita.com/res/img/LifeHealer/appicon.png" type="image/x-icon">
-    <link rel="shortcut icon" href="https://lifehealerkavita.com/res/img/LifeHealer/appicon.png" type="image/x-icon">
+    <link rel="icon" href="{{ asset('/img/LifeHealer/appicon.png')}}" type="image/x-icon">
+    <link rel="shortcut icon" href="{{ asset('/img/LifeHealer/appicon.png')}}" type="image/x-icon">
 
     <!-- SEO Meta Tags -->
     <meta name="description"
@@ -25,7 +25,7 @@
     <meta property="og:title" content="Life Healer Kavita - 10X Your Power of Manifestation">
     <meta property="og:description"
         content="Life Healer offers holistic health solutions to achieve physical, mental, and spiritual wellness. Join us for a healthier you.">
-    <meta property="og:image" content="https://lifehealerkavita.com/res/img/LifeHealer/appicon.png">
+    <meta property="og:image" content="{{ asset('/img/LifeHealer/appicon.png')}}">
     <meta property="og:url" content="https://lifehealerkavita.com">
     <meta property="og:type" content="website">
 
@@ -34,9 +34,9 @@
     <meta name="twitter:title" content="Life Healer Kavita - 10X Your Power of Manifestation">
     <meta name="twitter:description"
         content="Life Healer offers holistic health solutions to achieve physical, mental, and spiritual wellness. Join us for a healthier you.">
-    <link rel="shortcut icon" href="https://lifehealerkavita.com/res/img/LifeHealer/appicon.png" type="image/x-icon"
+    <link rel="shortcut icon" href="{{ asset('/img/LifeHealer/appicon.png')}}" type="image/x-icon"
         id="ff_favicon" />
-    <meta name="twitter:image" content="https://lifehealerkavita.com/res/img/LifeHealer/appicon.png">
+    <meta name="twitter:image" content="{{ asset('/img/LifeHealer/appicon.png')}}">
 
     <link rel="canonical" href="https://lifehealerkavita.com" />
     <meta property="og:url" content="https://lifehealerkavita.com" />
