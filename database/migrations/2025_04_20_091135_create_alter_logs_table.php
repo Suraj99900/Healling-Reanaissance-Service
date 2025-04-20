@@ -15,7 +15,11 @@ return new class extends Migration
             $table->longText('response_payload')->nullable()->change();
             $table->longText('request_payload')->nullable()->change();
 
-            
+            // Add indexes
+            $table->index('endpoint');
+            $table->index('unique_visitor_id');
+            $table->index('ip_address');
+            $table->index('created_at');
         });
     }
 
@@ -25,8 +29,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('api_logs', function (Blueprint $table) {
-            $table->json('response_payload')->nullable()->change();
-            $table->json('request_payload')->nullable()->change();
+            Schema::dropIfExists('api_logs');;
         });
     }
 };

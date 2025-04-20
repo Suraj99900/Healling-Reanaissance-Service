@@ -8,6 +8,10 @@ use Symfony\Component\HttpFoundation\Response;
 use App\Models\ApiLog;
 use Illuminate\Support\Str;
 
+use App\Models\SessionManager;
+use App\Http\Controllers\SessionManagerController;
+use Illuminate\Support\Facades\Session;
+
 class LogApiRequests
 {
     /**
@@ -17,10 +21,13 @@ class LogApiRequests
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // Generate or retrieve a unique visitor ID
-        $uniqueVisitorId = $request->cookie('unique_visitor_id') ?? (string) Str::uuid();
-        if (!$request->cookie('unique_visitor_id')) {
-            cookie()->queue(cookie('unique_visitor_id', $uniqueVisitorId, 60 * 24 * 30)); // Store for 30 days
+        // Generate or retrieve a unique visitor ID from the session
+        $sessionData = Session::all(); // Retrieve all session data
+        if ((new SessionManager())->isLoggedIn()) {
+            $uniqueVisitorId = $sessionData['iUserID'] ?? " ";
+        } else {
+            // If not logged in, generate a new unique visitor ID
+            $uniqueVisitorId = "visitor_" . Str::random(10);
         }
 
         // Proceed with the request and capture the response

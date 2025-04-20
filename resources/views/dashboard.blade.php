@@ -86,35 +86,8 @@
                 </div>
             </div>
 
-            <!-- Dashboard Stats -->
-            <div class="row dashboard-stats">
-                <!-- Total Logs -->
-                <div class="col-md-4">
-                    <div class="card text-white bg-primary">
-                        <h5>Total API Logs</h5>
-                        <p>{{ $totalLogs }}</p>
-                    </div>
-                </div>
-
-                <!-- Unique Visitors -->
-                <div class="col-md-4">
-                    <div class="card text-white bg-success">
-                        <h5>Unique Visitors</h5>
-                        <p>{{ $uniqueVisitors }}</p>
-                    </div>
-                </div>
-
-                <!-- Total Page Hits -->
-                <div class="col-md-4">
-                    <div class="card text-white bg-warning">
-                        <h5>Total Page Hits</h5>
-                        <p>{{ $pageHits->sum('hits') }}</p>
-                    </div>
-                </div>
-            </div>
-
             <!-- Management Sections -->
-            <div class="row management-section">
+            <div class="row management-section my-4">
                 <h2 class="mb-4">Management Sections</h2>
                 <!-- User Management -->
                 <div class="col-md-3">
@@ -157,24 +130,103 @@
                 </div>
             </div>
 
-            <!-- Page Hits Table -->
+            <!-- Filter Form -->
+            <form method="GET" action="{{ route('dashboard') }}" class="mb-4">
+                <div class="row">
+                    <div class="col-md-4">
+                        <label for="start_date">Start Date</label>
+                        <input type="date" name="start_date" id="start_date" class="form-control"
+                            value="{{ request('start_date') }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="end_date">End Date</label>
+                        <input type="date" name="end_date" id="end_date" class="form-control"
+                            value="{{ request('end_date') }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="endpoint">Endpoint</label>
+                        <input type="text" name="endpoint" id="endpoint" class="form-control" placeholder="e.g., login"
+                            value="{{ request('endpoint') }}">
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <button type="submit" class="btn btn-primary">Filter</button>
+                    <a href="{{ route('dashboard') }}" class="btn btn-secondary">Reset</a>
+                </div>
+            </form>
+
+            <!-- Dashboard Stats -->
+            <div class="row dashboard-stats">
+                <!-- Total Logs -->
+                <div class="col-md-4">
+                    <div class="card text-white bg-primary">
+                        <h5>Total Screen Hits Count</h5>
+                        <p>{{ $totalLogs }}</p>
+                    </div>
+                </div>
+
+                <!-- Unique Visitors -->
+                <div class="col-md-4">
+                    <div class="card text-white bg-success">
+                        <h5>Unique Visitors</h5>
+                        <p>{{ $uniqueVisitors }}</p>
+                    </div>
+                </div>
+
+                <!-- Total Page Hits -->
+                <div class="col-md-4">
+                    <div class="card text-white bg-warning">
+                        <h5>Total Page Hits</h5>
+                        <p>{{ $pageHits->sum('hits') }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- API-Specific Stats -->
+            <div class="row dashboard-stats">
+                <!-- Login API Count -->
+                <div class="col-md-4">
+                    <div class="card text-white bg-info">
+                        <h5>Login Screen Hits Count</h5>
+                        <p>{{ $loginApiCount }}</p>
+                    </div>
+                </div>
+
+                <!-- Video API Count -->
+                <div class="col-md-4">
+                    <div class="card text-white bg-secondary">
+                        <h5>Video Screen Hits Count </h5>
+                        <p>{{ $videoApiCount }}</p>
+                    </div>
+                </div>
+
+                <!-- Dashboard API Count -->
+                <div class="col-md-4">
+                    <div class="card text-white bg-dark">
+                        <h5>Dashboard Screen Hits Count</h5>
+                        <p>{{ $dashboardApiCount }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- API-Wise Count Table -->
             <div class="card log-table mt-4">
                 <div class="card-header">
-                    <h5>Page Hits</h5>
+                    <h5 style="color: black;">Top 10 Page Hits</h5>
                 </div>
                 <div class="card-body">
                     <table class="table table-striped">
                         <thead>
                             <tr>
-                                <th>Endpoint</th>
-                                <th>Hits</th>
+                                <th>API Endpoint</th>
+                                <th>Page Hits</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($pageHits as $hit)
+                            @foreach ($apiWiseCount as $api)
                                 <tr>
-                                    <td>{{ $hit->endpoint }}</td>
-                                    <td>{{ $hit->hits }}</td>
+                                    <td>{{ $api->endpoint }}</td>
+                                    <td>{{ $api->user_count }}</td>
                                 </tr>
                             @endforeach
                         </tbody>
