@@ -77,6 +77,9 @@
     <!-- DataTable CDN -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.css" />
 
+    <!-- Google Ads Link -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9834466189010207" crossorigin="anonymous"></script>
+
     <!-- razorpay CDN -->
     <script src="{{ asset('tinymce/tinymce.min.js') }}"></script>
 
