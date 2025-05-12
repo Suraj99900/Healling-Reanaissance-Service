@@ -110,7 +110,7 @@
     <link rel="stylesheet" href="{{asset('css/variables5.css')}}" class="alternate-style" title="color-5" disabled>
     <link rel="stylesheet" href="{{asset('css/style-switcher.css')}}">
     <link rel="stylesheet" href="{{asset('css/nav-style.css')}}">
-    <title>Smartpoly</title>
+
 </head>
 
 <body class="dark">

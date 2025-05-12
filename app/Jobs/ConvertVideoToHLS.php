@@ -66,8 +66,8 @@ class ConvertVideoToHLS implements ShouldQueue
             '-preset', 'superfast', // Slightly better than 'ultrafast' but still fast
             '-tune', 'zerolatency', // Optimize for real-time processing
         
-            // Resize to 720p (Maintain Aspect Ratio)
-            '-vf', 'scale=-2:720',
+             // Remove Watermark + Resize to 720p
+            '-vf', 'delogo=x=10:y=10:w=100:h=40,scale=-2:720',
         
             // Efficient Video Encoding
             '-codec:v', 'libx264',
