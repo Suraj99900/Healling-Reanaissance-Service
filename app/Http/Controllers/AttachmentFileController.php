@@ -25,7 +25,7 @@ class AttachmentFileController extends Controller
 
         try {
             if ($request->hasFile('attachment')) {
-                 $uploaded = $request->file('attachment');
+                $uploaded = $request->file('attachment');
                 // Store the uploaded video file in the 'public' disk
                 $path = Storage::disk('spaces')->putFile('attachments', $uploaded, 'public');
                 $sAttachmentUrl = Storage::disk('spaces')->url($path);
@@ -61,7 +61,7 @@ class AttachmentFileController extends Controller
         try {
             $oAttachment = (new Attachment)->removedAttchment($id);
             if (is_object($oAttachment) && isset($oAttachment->attachment_path)) {
-                 // Delete from Spaces
+                // Delete from Spaces
                 Storage::disk('spaces')->delete($oAttachment->attachment_path);
                 return response()->json([
                     'message' => "attchment deleted successfully!",
@@ -75,14 +75,21 @@ class AttachmentFileController extends Controller
         }
     }
 
- public function fetchAllAttachmentDataByVideoId($videoId)
+    public function fetchAllAttachmentDataByVideoId($videoId)
     {
         try {
             $attachments = (new Attachment)->fetchAttchmentByVideoId($videoId);
 
             foreach ($attachments as $att) {
                 if ($att->attachment_path && Storage::disk('spaces')->exists($att->attachment_path)) {
-                    $att->attachment_url = Storage::disk('spaces')->url($att->attachment_path);
+                    // Copy file from Spaces to local storage if not already present
+                    $localPath = 'attachments/' . basename($att->attachment_path);
+                    if (!Storage::disk('public')->exists($localPath)) {
+                        $fileContent = Storage::disk('spaces')->get($att->attachment_path);
+                        Storage::disk('public')->put($localPath, $fileContent);
+                    }
+                    // Generate local download URL
+                    $att->attachment_url = asset('storage/' . $localPath);
                 } else {
                     $att->attachment_url = null; // or a default placeholder URL
                 }
@@ -90,8 +97,8 @@ class AttachmentFileController extends Controller
 
             return response()->json([
                 'message' => 'Attachments fetched successfully!',
-                'body'    => $attachments,
-                'status'  => 200,
+                'body' => $attachments,
+                'status' => 200,
             ], 200);
 
         } catch (Exception $e) {
