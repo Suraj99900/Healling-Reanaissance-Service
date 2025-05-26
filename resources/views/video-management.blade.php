@@ -209,48 +209,61 @@
 
 <script>
     $(document).ready(function () {
-        // Initialize DataTable
-        let table = $('#videoTable').DataTable({
-            ajax: {
-                url: '/api/videos',
-                dataSrc: 'body'
-            },
-            columns: [
-                { data: null, render: (data, type, row, meta) => meta.row + 1 }, // Serial No.
-                { data: 'title' },
-                { data: 'name' },
-                {
-                    data: 'thumbnail',
-                    render: (data) => {
-                        let baseUrl = window.location.origin;
-                        let fullThumbnailUrl = `${baseUrl}/storage/${data}`;
-                        return `<img src="${fullThumbnailUrl}" alt="Thumbnail" width="50px">`;
-                    }
+        $(document).ready(function () {
+            // Initialize DataTable
+            const table = $('#videoTable').DataTable({
+                ajax: {
+                    url: '/api/videos',
+                    dataSrc: 'body'
                 },
-                {
-                    data: 'hls_path',
-                    render: (data) => {
-                        console.log(data != '' && data != null);
-                        
-                        if (data != '' && data != null) {
-                                return  `<span class="text-primary">Video is ready to watch</span>`;
-                                
-                           
-                        }else{
-                            return `<span class="text-warning">Processing... Please wait</span>`;
+                columns: [
+                    {
+                        data: null,
+                        render: (data, type, row, meta) => meta.row + 1, // Serial number
+                        title: "#"
+                    },
+                    { data: 'title', title: "Title" },
+                    { data: 'name', title: "Uploader" },
+                    {
+                        data: 'thumbnail_url',
+                        title: "thumbnail_url",
+                        render: (data) => {
+                            // Serve image through Laravel proxy route to bypass CORS/COEP
+                            return `<img src="${data}" crossorigin="anonymous" alt="Thumbnail" width="50" height="auto" loading="lazy" style="border-radius: 4px;">`;
                         }
-                       
+                    },
+                    {
+                        data: 'hls_path',
+                        title: "Status",
+                        render: (data) => {
+                            if (data && data.trim() !== '') {
+                                return `<span class="text-primary">Video is ready to watch</span>`;
+                            } else {
+                                return `<span class="text-warning">Processing... Please wait</span>`;
+                            }
+                        }
+                    },
+                    {
+                        data: 'id',
+                        title: "Actions",
+                        orderable: false,
+                        searchable: false,
+                        render: (data) => `
+                    <button class="btnWAN btn-info btn-sm edit-video" data-id="${data}">Edit</button>
+                    <button class="btnWAN btn-danger btn-sm delete-video" data-id="${data}">Delete</button>
+                `
                     }
-                },
-                {
-                    data: 'id',
-                    render: (data) => `
-                <button class="btnWAN btn-info btn-sm edit-video" data-id="${data}">Edit</button>
-                <button class="btnWAN btn-danger btn-sm delete-video" data-id="${data}">Delete</button>
-            `
+                ],
+                responsive: true,
+                pageLength: 10,
+                autoWidth: false,
+                language: {
+                    emptyTable: "No videos found.",
+                    processing: "Loading..."
                 }
-            ]
+            });
         });
+
 
         // Open offcanvas for adding video
         $('#addVideoBtn').on('click', function () {

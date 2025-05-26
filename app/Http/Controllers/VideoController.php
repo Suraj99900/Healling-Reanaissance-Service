@@ -69,6 +69,10 @@ class VideoController extends Controller
         }
     }
 
+
+    /**
+     * Upload video in chunks
+     */
     public function uploadChunk(Request $request)
     {
         try {
@@ -80,54 +84,61 @@ class VideoController extends Controller
                 'chunk_index' => 'required|integer',
                 'total_chunks' => 'required|integer',
                 'filename' => 'required|string',
-                'thumbnail' => 'required|file|mimes:jpeg,png,jpg,gif,svg|max:5048'
+                'thumbnail' => 'required|file|mimes:jpeg,png,jpg,gif,svg|max:5048',
             ]);
 
             if ($validator->fails()) {
                 return response()->json(['error' => $validator->errors()], 400);
             }
 
-            // Get request data
+            // Prepare chunk storage
             $file = $request->file('video');
             $chunkIndex = $request->input('chunk_index');
             $totalChunks = $request->input('total_chunks');
-            $originalFilename = pathinfo($request->input('filename'), PATHINFO_FILENAME);
-            $timestamp = now()->format('Ymd_His'); // Format: YYYYMMDD_HHMMSS
+            $orig = pathinfo($request->input('filename'), PATHINFO_FILENAME);
+            $timestamp = now()->format('Ymd_His');
 
-            // Store chunks in temp directory
             $tempDir = storage_path("app/public/videos/temp/");
             if (!file_exists($tempDir)) {
                 mkdir($tempDir, 0777, true);
             }
 
-            $chunkPath = "{$tempDir}{$originalFilename}.part{$chunkIndex}";
+            // Move uploaded chunk to temp folder
+            $chunkName = "{$orig}.part{$chunkIndex}";
+            $file->move($tempDir, $chunkName);
 
-            // ✅ Use move() instead of file_put_contents()
-            $file->move($tempDir, "{$originalFilename}.part{$chunkIndex}");
-
-            // ✅ Ensure file is saved before reading
-            sleep(1);
+            $chunkPath = "{$tempDir}{$chunkName}";
             if (!file_exists($chunkPath)) {
                 return response()->json(['error' => "Chunk file not found: $chunkPath"], 500);
             }
 
-            // Check if all chunks are uploaded
+            // If last chunk, assemble and upload
             if ($chunkIndex + 1 == $totalChunks) {
-                $finalFilename = "{$originalFilename}_{$timestamp}.mp4";
-                $finalPath = storage_path("app/public/videos/{$finalFilename}");
-                $output = fopen($finalPath, 'wb');
+                $finalFilename = "{$orig}_{$timestamp}.mp4";
+                $finalLocalPath = storage_path("app/public/videos/{$finalFilename}");
+                $out = fopen($finalLocalPath, 'wb');
 
+                // Concatenate parts
                 for ($i = 0; $i < $totalChunks; $i++) {
-                    $chunkFile = "{$tempDir}{$originalFilename}.part{$i}";
-                    fwrite($output, file_get_contents($chunkFile));
-                    unlink($chunkFile); // Remove processed chunk
+                    $partPath = "{$tempDir}{$orig}.part{$i}";
+                    fwrite($out, file_get_contents($partPath));
+                    unlink($partPath);
                 }
-                fclose($output);
+                fclose($out);
 
-                // Store thumbnail
-                $thumbnailPath = $request->file('thumbnail')->store('thumbnails', 'public');
+                // Upload final video via stream to DigitalOcean Spaces
+                $videoStream = fopen($finalLocalPath, 'r');
+                Storage::disk('spaces')->put("videos/{$finalFilename}", $videoStream, 'public');
+                fclose($videoStream);
 
-                // Save to database
+                // Remove local assembled file
+                unlink($finalLocalPath);
+
+                // Upload thumbnail (still an UploadedFile)
+                $thumbPath = Storage::disk('spaces')
+                    ->putFile('thumbnails', $request->file('thumbnail'), 'public');
+
+                // Create DB record
                 $video = Video::create([
                     'category_id' => $request->input('category_id'),
                     'title' => $request->input('title'),
@@ -135,11 +146,11 @@ class VideoController extends Controller
                     'path' => "videos/{$finalFilename}",
                     'hls_path' => null,
                     'is_converted_hls_video' => false,
-                    'thumbnail' => $thumbnailPath,
+                    'thumbnail' => $thumbPath,
                 ]);
 
-                // Dispatch background job for HLS conversion
-                // dispatch(new ConvertVideoToHLS($video));   ##  off due to overload 
+                // Optionally dispatch HLS conversion:
+                // dispatch(new ConvertVideoToHLS($video));
 
                 return response()->json([
                     'message' => "Video uploaded successfully! HLS conversion in progress.",
@@ -154,10 +165,8 @@ class VideoController extends Controller
     }
 
 
-
-
     /**
-     * Fetch a video by ID
+     * Fetch by ID
      */
     public function fetchById($id)
     {
@@ -165,40 +174,33 @@ class VideoController extends Controller
             $videos = (new Video)->fetchVideoById($id);
 
             foreach ($videos as &$video) {
-                $thumbnailPath = $video->thumbnail;
-                if (!$thumbnailPath || !Storage::disk('public')->exists($thumbnailPath)) {
-                    // If thumbnail does not exist, set a default URL
-                    $video->thumbnail_url = "https://suraj99900.github.io/myprotfolio.github.io/img/gallery_1.jpg";
-                } else {
-                    // Generate the proper URL for the thumbnail stored in the 'public' disk
-                    $video->thumbnail_url = Storage::disk('public')->url($thumbnailPath);
-                }
+                $video->thumbnail_url = $video->thumbnail
+                    ? Storage::disk('spaces')->url($video->thumbnail)
+                    : 'https://suraj99900.github.io/myprotfolio.github.io/img/gallery_1.jpg';
 
-                // Assuming the videos are stored in the 'public' disk
-                $video->video_url = Storage::disk('public')->url($video->path);
+                $video->video_url = Storage::disk('spaces')->temporaryUrl($video->path,now()->addMinutes(360));
 
-                if (!empty($video->hls_path) && Storage::disk('public')->exists($video->hls_path)) {
-                    $video->hls_url = Storage::disk('public')->url($video->hls_path);
-                } else {
-                    $video->hls_url = null; // Set to null if not available
-                }
+               $video->hls_url = $video->hls_path
+                    ? Storage::disk('spaces')->temporaryUrl(
+                        $video->hls_path, now()->addMinutes(360)
+                    )
+                    : null;
+
+                
             }
-            if ($videos) {
-                return response()->json([
-                    'message' => "Video fetched successfully!",
-                    'body' => $videos,
-                    'status' => 200,
-                ], 200);
-            } else {
-                return response()->json(['error' => 'Video not found'], 404);
-            }
+
+            return response()->json([
+                'message' => "Video fetched successfully!",
+                'body' => $videos,
+                'status' => 200,
+            ], 200);
         } catch (Exception $e) {
             return response()->json(['error' => 'An error occurred while fetching the video: ' . $e->getMessage()], 500);
         }
     }
 
     /**
-     * Fetch all videos
+     * Fetch all
      */
     public function fetchAll()
     {
@@ -206,17 +208,26 @@ class VideoController extends Controller
             $videos = (new Video)->fetchAllVideos();
 
             foreach ($videos as &$video) {
-                $thumbnailPath = $video->thumbnail;
-                if (!$thumbnailPath || !Storage::disk('public')->exists($thumbnailPath)) {
-                    // If thumbnail does not exist, set a default URL
-                    $video->thumbnail_url = "https://suraj99900.github.io/myprotfolio.github.io/img/gallery_1.jpg";
+
+                // THUMBNAIL
+                if (
+                    !empty($video->thumbnail)
+                    && Storage::disk('spaces')->exists($video->thumbnail)
+                ) {
+                    $video->thumbnail_url = Storage::disk('spaces')->temporaryUrl($video->thumbnail, now()->addMinutes(360));
                 } else {
-                    // Generate the proper URL for the thumbnail stored in the 'public' disk
-                    $video->thumbnail_url = Storage::disk('public')->url($thumbnailPath);
+                    $video->thumbnail_url = 'https://suraj99900.github.io/myprotfolio.github.io/img/gallery_1.jpg';
                 }
 
-                // Assuming the videos are stored in the 'public' disk
-                $video->video_url = Storage::disk('public')->url($video->path);
+                // VIDEO
+                if (
+                    !empty($video->path)
+                    && Storage::disk('spaces')->exists($video->path)
+                ) {
+                    $video->video_url = Storage::disk('spaces')->temporaryUrl($video->path,now()->addMinutes(360));
+                } else {
+                    $video->video_url = null;  // or a default/fallback URL
+                }
             }
 
             return response()->json([
@@ -224,10 +235,15 @@ class VideoController extends Controller
                 'body' => $videos,
                 'status' => 200,
             ], 200);
+
         } catch (Exception $e) {
-            return response()->json(['error' => 'An error occurred while fetching videos: ' . $e->getMessage()], 500);
+            return response()->json([
+                'error' => 'An error occurred while fetching videos: '
+                    . $e->getMessage()
+            ], 500);
         }
     }
+
 
 
 
@@ -260,16 +276,16 @@ class VideoController extends Controller
 
             foreach ($videos as &$video) {
                 $thumbnailPath = $video->thumbnail;
-                if (!$thumbnailPath || !Storage::disk('public')->exists($thumbnailPath)) {
+                if (!$thumbnailPath || !Storage::disk('spaces')->exists($thumbnailPath)) {
                     // If thumbnail does not exist, set a default URL
                     $video->thumbnail_url = "https://suraj99900.github.io/myprotfolio.github.io/img/gallery_1.jpg";
                 } else {
                     // Generate the proper URL for the thumbnail stored in the 'public' disk
-                    $video->thumbnail_url = Storage::disk('public')->url($thumbnailPath);
+                    $video->thumbnail_url = Storage::disk('spaces')->temporaryUrl($video->thumbnailPath, now()->addMinutes(360));
                 }
 
                 // Assuming the videos are stored in the 'public' disk
-                $video->video_url = Storage::disk('public')->url($video->path);
+                $video->video_url = Storage::disk('spaces')->temporaryUrl($video->path, now()->addMinutes(360));
             }
 
             return response()->json([
@@ -290,16 +306,16 @@ class VideoController extends Controller
 
             foreach ($videos as &$video) {
                 $thumbnailPath = $video->thumbnail;
-                if (!$thumbnailPath || !Storage::disk('public')->exists($thumbnailPath)) {
+                if (!$thumbnailPath || !Storage::disk('spaces')->exists($thumbnailPath)) {
                     // If thumbnail does not exist, set a default URL
                     $video->thumbnail_url = "https://suraj99900.github.io/myprotfolio.github.io/img/gallery_1.jpg";
                 } else {
                     // Generate the proper URL for the thumbnail stored in the 'public' disk
-                    $video->thumbnail_url = Storage::disk('public')->url($thumbnailPath);
+                    $video->thumbnail_url = Storage::disk('spaces')->temporaryUrl($thumbnailPath, now()->addMinutes(360));
                 }
 
                 // Assuming the videos are stored in the 'public' disk
-                $video->video_url = Storage::disk('public')->url($video->path);
+                $video->video_url = Storage::disk('spaces')->temporaryUrl($video->path, now()->addMinutes(360));
             }
 
             return response()->json([
@@ -363,7 +379,7 @@ class VideoController extends Controller
                 return response()->json(['error' => 'Video not found'], 404);
             }
 
-            $path = Storage::disk('public')->path($video->path);
+            $path = Storage::disk('spaces')->path($video->path);
             if (!file_exists($path)) {
                 return response()->json(['error' => 'Video file not found'], 404);
             }
@@ -393,7 +409,7 @@ class VideoController extends Controller
             }
 
             $thumbnailPath = $video->thumbnail; // Assuming the column name in the database is `thumbnail_path`
-            if (!$thumbnailPath || !Storage::disk('public')->exists($thumbnailPath)) {
+            if (!$thumbnailPath || !Storage::disk('spaces')->exists($thumbnailPath)) {
                 return response()->json([
                     'message' => 'Thumbnail URL fetched successfully!',
                     'thumbnail_url' => "https://suraj99900.github.io/myprotfolio.github.io/img/gallery_1.jpg",
@@ -402,7 +418,7 @@ class VideoController extends Controller
             }
 
             // Generate the proper URL for the thumbnail stored in the 'public' disk
-            $thumbnailUrl = Storage::disk('public')->url($thumbnailPath);
+            $thumbnailUrl = Storage::disk('spaces')->temporaryUrl($thumbnailPath, now()->addMinutes(360));
 
             return response()->json([
                 'message' => 'Thumbnail URL fetched successfully!',

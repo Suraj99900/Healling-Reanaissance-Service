@@ -25,14 +25,15 @@ class AttachmentFileController extends Controller
 
         try {
             if ($request->hasFile('attachment')) {
+                 $uploaded = $request->file('attachment');
                 // Store the uploaded video file in the 'public' disk
-                $sAttachmentPath = $request->file('attachment')->store('attachment', 'public');
-                $sAttachmentUrl = Storage::disk('public')->url($sAttachmentPath);
+                $path = Storage::disk('spaces')->putFile('attachments', $uploaded, 'public');
+                $sAttachmentUrl = Storage::disk('spaces')->url($path);
                 // Create a new video record in the database
                 $oAttachment = (new Attachment)->addAttchment(
                     $request->input('video_id'),
                     $request->input('attachment_name'),
-                    $sAttachmentPath,
+                    $path,
                     $sAttachmentUrl
                 );
 
@@ -59,7 +60,9 @@ class AttachmentFileController extends Controller
     {
         try {
             $oAttachment = (new Attachment)->removedAttchment($id);
-            if ($oAttachment) {
+            if (is_object($oAttachment) && isset($oAttachment->attachment_path)) {
+                 // Delete from Spaces
+                Storage::disk('spaces')->delete($oAttachment->attachment_path);
                 return response()->json([
                     'message' => "attchment deleted successfully!",
                     'status' => 200,
@@ -72,31 +75,27 @@ class AttachmentFileController extends Controller
         }
     }
 
-    public function fetchAllAttachmentDataByVideoId($id)
+ public function fetchAllAttachmentDataByVideoId($videoId)
     {
         try {
-            $oAttachment = (new Attachment)->fetchAttchmentByVideoId($id);
-            foreach ($oAttachment as &$oAttachmentElement) {
-                $oAttachmentPath = $oAttachmentElement->attachment_path;
-                if (!$oAttachmentPath || !Storage::disk('public')->exists($oAttachmentPath)) {
-                    // If thumbnail does not exist, set a default URL
-                    $oAttachmentElement->attachment_url = "https://suraj99900.github.io/myprotfolio.github.io/img/gallery_1.jpg";
+            $attachments = (new Attachment)->fetchAttchmentByVideoId($videoId);
+
+            foreach ($attachments as $att) {
+                if ($att->attachment_path && Storage::disk('spaces')->exists($att->attachment_path)) {
+                    $att->attachment_url = Storage::disk('spaces')->url($att->attachment_path);
                 } else {
-                    // Generate the proper URL for the thumbnail stored in the 'public' disk
-                    $oAttachmentElement->attachment_url = Storage::disk('public')->url($oAttachmentPath);
+                    $att->attachment_url = null; // or a default placeholder URL
                 }
             }
-            if ($oAttachment) {
-                return response()->json([
-                    'message' => "Fetch attchment successfully!",
-                    'body' => $oAttachment,
-                    'status' => 200,
-                ], 200);
-            } else {
-                return response()->json(['error' => 'Attchment not found or cannot be deleted'], 404);
-            }
+
+            return response()->json([
+                'message' => 'Attachments fetched successfully!',
+                'body'    => $attachments,
+                'status'  => 200,
+            ], 200);
+
         } catch (Exception $e) {
-            return response()->json(['error' => 'An error occurred while fetching the attchment: ' . $e->getMessage()], 500);
+            return response()->json(['error' => 'An error occurred while fetching attachments: ' . $e->getMessage()], 500);
         }
     }
 }

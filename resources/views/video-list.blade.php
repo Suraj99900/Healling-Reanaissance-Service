@@ -164,7 +164,7 @@
                          style="display: none;">
                         <div class="card h-100">
                             <div class="ratio ratio-16x9">
-                                <img src="${fullThumbnailUrl}" class="card-img-top" alt="${video.title}">
+                                <img src="${video.thumbnail_url}" crossorigin="anonymous" class="card-img-top" alt="${video.title}">
                             </div>
                             <div class="card-body">
                                 <h5 class="card-title">${video.title}</h5>

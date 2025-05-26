@@ -225,6 +225,7 @@
                         controls
                         preload="auto"
                         style="width: 100%; height: 100%;"
+                        crossorigin="anonymous"
                     >
                         <source src="${hlsUrl}" type="application/x-mpegURL">
                     </video>
