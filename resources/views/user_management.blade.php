@@ -126,6 +126,7 @@
 <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
 <script>
+    let table;
     $(document).ready(function () {
         function showAlert(message, type = 'success') {
             var alertHtml = `<div class="alert alert-${type} alert-message">${message}</div>`;
@@ -133,7 +134,7 @@
             setTimeout(() => $('#alertContainer').fadeOut(), 3000);
         }
 
-        var table = $('#userTable').DataTable({
+        table = $('#userTable').DataTable({
             responsive: true,
             ajax: { url: '/api/users', dataSrc: 'body' },
             columns: [
