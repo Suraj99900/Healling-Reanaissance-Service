@@ -274,7 +274,7 @@
                 let attachment_url = `${baseUrl}/storage/${attachment.attachment_path}`;
                 
                 const attachmentButton = `
-                        <button class="btnWAN btn-secondary mb-2" onclick="downloadFile('${attachment_url}')">
+                        <button class="btnWAN btn-secondary mb-2" onclick="downloadFile('${attachment.attachment_url}')">
                             ${attachment.attachment_name}
                         </button>
                     `;
