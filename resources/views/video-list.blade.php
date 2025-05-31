@@ -159,7 +159,7 @@
               </div>
               <div class="mt-4">
                 <a
-                  href="/videos-player/${video.id}"
+                  href="/videos/videos-player/${video.id}"
                   class="inline-flex items-center justify-center w-full bg-gradient-to-r from-pink-500 to-yellow-400 hover:from-pink-600 hover:to-yellow-500 text-white font-bold py-2 px-4 rounded-lg shadow transition"
                 >
                   View Video
