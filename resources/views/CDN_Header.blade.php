@@ -10,8 +10,8 @@
     <title>Life Healer Kavita - 10X Your Power of Manifestation</title>
 
     <!-- Favicon -->
-    <link rel="icon" href="{{ asset('/img/LifeHealer/appicon.png')}}" type="image/x-icon">
-    <link rel="shortcut icon" href="{{ asset('/img/LifeHealer/appicon.png')}}" type="image/x-icon">
+    <link rel="icon" href="{{ asset('/img/LifeHealer/logo_healer.png')}}" type="image/x-icon">
+    <link rel="shortcut icon" href="{{ asset('/img/LifeHealer/logo_healer.png')}}" type="image/x-icon">
 
     <!-- SEO Meta Tags -->
     <meta name="description"
@@ -25,7 +25,7 @@
     <meta property="og:title" content="Life Healer Kavita - 10X Your Power of Manifestation">
     <meta property="og:description"
         content="Life Healer offers holistic health solutions to achieve physical, mental, and spiritual wellness. Join us for a healthier you.">
-    <meta property="og:image" content="{{ asset('/img/LifeHealer/appicon.png')}}">
+    <meta property="og:image" content="{{ asset('/img/LifeHealer/logo_healer.png')}}">
     <meta property="og:url" content="https://lifehealerkavita.com">
     <meta property="og:type" content="website">
 
@@ -34,9 +34,9 @@
     <meta name="twitter:title" content="Life Healer Kavita - 10X Your Power of Manifestation">
     <meta name="twitter:description"
         content="Life Healer offers holistic health solutions to achieve physical, mental, and spiritual wellness. Join us for a healthier you.">
-    <link rel="shortcut icon" href="{{ asset('/img/LifeHealer/appicon.png')}}" type="image/x-icon"
+    <link rel="shortcut icon" href="{{ asset('/img/LifeHealer/logo_healer.png')}}" type="image/x-icon"
         id="ff_favicon" />
-    <meta name="twitter:image" content="{{ asset('/img/LifeHealer/appicon.png')}}">
+    <meta name="twitter:image" content="{{ asset('/img/LifeHealer/logo_healer.png')}}">
 
     <link rel="canonical" href="https://lifehealerkavita.com" />
     <meta property="og:url" content="https://lifehealerkavita.com" />
@@ -68,7 +68,7 @@
 
     <!-- CDNS -->
     <!-- Bootstrap 5 link -->
-    <link rel="stylesheet" href="{{ asset('css/cdn.jsdelivr.net_npm_bootstrap@5.3.2_dist_css_bootstrap.min.css')}}">
+    <!-- <link rel="stylesheet" href="{{ asset('css/cdn.jsdelivr.net_npm_bootstrap@5.3.2_dist_css_bootstrap.min.css')}}"> -->
     <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous"> -->
     <!-- ICONSCOUT CDN -->
 
@@ -87,21 +87,21 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" />
 
 
-    <script src="https://cdn.jsdelivr.net/npm/video.js@8.22.0/dist/video.min.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/video.js@8.22.0/dist/video-js.min.css" rel="stylesheet">
-    <script
+    <!-- <script src="https://cdn.jsdelivr.net/npm/video.js@8.22.0/dist/video.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/video.js@8.22.0/dist/video-js.min.css" rel="stylesheet"> -->
+    <!-- <script
         src="https://cdnjs.cloudflare.com/ajax/libs/videojs-resolution-switcher/0.4.2/videojs-resolution-switcher.min.js"
         integrity="sha512-EuEgpjZ307chaYi/ZWSMqoYbBFtlxY76b8q0UX8HAMThmGNrQ43y09w5DQE9q97FWjDSx2TISsIQcz6utqolRw=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <link rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/videojs-resolution-switcher/0.4.2/videojs-resolution-switcher.css"
         integrity="sha512-eNi58fWX0irIyO5I5CgiimkK92f9B0wAbAx1R4j7h2RbE7/CvoQzmIoiqFvxTPsyE2qT2SP5MWHQEAYE28eIQQ=="
-        crossorigin="anonymous" referrerpolicy="no-referrer" />
+        crossorigin="anonymous" referrerpolicy="no-referrer" /> -->
 
     <!-- Counter visitor -->
     <!-- ICONSCOUT CDN -->
 
-    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    <!-- <link rel="stylesheet" href="{{ asset('css/style.css') }}">
     <link rel="stylesheet" href="{{asset('css/variables1.css')}}">
     <link rel="stylesheet" href="{{asset('css/variables1.css')}}" class="alternate-style" title="color-1" disabled>
     <link rel="stylesheet" href="{{asset('css/variables2.css')}}" class="alternate-style" title="color-2" disabled>
@@ -109,11 +109,32 @@
     <link rel="stylesheet" href="{{asset('css/variables4.css')}}" class="alternate-style" title="color-4" disabled>
     <link rel="stylesheet" href="{{asset('css/variables5.css')}}" class="alternate-style" title="color-5" disabled>
     <link rel="stylesheet" href="{{asset('css/style-switcher.css')}}">
-    <link rel="stylesheet" href="{{asset('css/nav-style.css')}}">
+    <link rel="stylesheet" href="{{asset('css/nav-style.css')}}"> -->
+
+
+      <!-- ================================
+       T A I L W I N D   C S S   (CDN)
+       ================================ -->
+   @vite(['resources/css/app.css', 'resources/js/app.js'])
+   
+<script src="{{asset('js/jquery-3.7.1.min.js')}}"></script>
+  
+
+  <!-- Custom CSS Variables & Overrides -->
+  <style>
+    :root {
+      --brand-primary: theme('colors.brand-primary');
+      --brand-secondary: theme('colors.brand-secondary');
+      --brand-accent: theme('colors.brand-accent');
+      --text-light: theme('colors.text-light');
+      --text-dark: theme('colors.text-dark');
+    }
+
+  </style>
 
 </head>
 
-<body class="dark">
+<body class="bg-[var(--brand-secondary)] text-[var(--text-light)]">
 
     <style>
         .privacy-policy-btn {

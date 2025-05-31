@@ -81,3 +81,12 @@ Route::get('/user-category-access', [UserCategoryAccessController::class, 'getUs
 Route::post('/user-category-access', [UserCategoryAccessController::class, 'grantAccess']);
 Route::put('/user-category-access/{id}', [UserCategoryAccessController::class, 'updateAccess']);
 Route::delete('/user-category-access/{id}', [UserCategoryAccessController::class, 'deleteAccess']);
+
+Route::get('/test-s3-connection', function () {
+    try {
+        $files = Storage::disk('spaces')->files('/');
+        dd('✅ Connection successful!', $files);
+    } catch (\Exception $e) {
+        dd('❌ Connection failed:', $e->getMessage());
+    }
+});

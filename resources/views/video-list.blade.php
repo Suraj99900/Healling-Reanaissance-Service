@@ -1,200 +1,202 @@
+{{-- resources/views/videos-by-category.blade.php --}}
 @include('CDN_Header')
 @include('navbar')
 
-<style>
-  /* Card hover scale & box-shadow effect */
-  .video-card:hover {
-    transform: scale(1.02);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-  }
-  /* Smooth transition on hover */
-  .video-card {
-    transition: transform 0.3s, box-shadow 0.3s;
-  }
-</style>
 
 
 @php
     $sessionManager = new \App\Models\SessionManager();
-    $iUserId = $sessionManager->iUserID;
+    $iUserId   = $sessionManager->iUserID;
     $iUserType = $sessionManager->iUserType;
 @endphp
 
-<div class="main-content">
-    <section class="service section" id="service">
-        <div class="container">
-            <div class="row">
-                <div class="section-title padd-15">
-                    <h2> Videos</h2>
-                    <div id="alertMessage" class="alert d-none" role="alert"></div>
-                </div>
-            </div>
-            <div class="row">
-                @if ($iUserType == 1)
-                    <div class="col-12 p-3">
-                        <input type="text" id="searchInput" class="form-control mb-4" placeholder="Search Videos">
-                    </div>
-                @endif
-            </div>
-            <div class="row" id="videoList">
-                <!-- Videos will be dynamically inserted here -->
-            </div>
-        </div>
-    </section>
+<div class="min-h-screen bg-gradient-to-br from-purple-600 via-pink-400 to-yellow-300 text-gray-800 py-10">
+  <div class="container mx-auto px-4">
+
+    {{-- Header --}}
+    <div class="mb-8 text-center">
+      <h2 class="text-3xl font-extrabold text-white drop-shadow-lg mb-2">Videos</h2>
+      <div id="alertMessage" class="hidden bg-red-500 text-white px-4 py-2 rounded-lg"></div>
+    </div>
+
+    {{-- Search Input (Super-Admin only) --}}
+    @if ($iUserType == 1)
+      <div class="mb-8 flex justify-center">
+        <input
+          type="text"
+          id="searchInput"
+          class="w-full max-w-xl bg-white/80 backdrop-blur-md border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-400 shadow-lg"
+          placeholder="Search Videos"
+        />
+      </div>
+    @endif
+
+    {{-- Video Grid --}}
+    <div id="videoList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {{-- Dynamically injected cards --}}
+    </div>
+
+  </div>
 </div>
 
 @include('CDN_Footer')
 
 <script>
-    $(document).ready(function () {
-        const categoryId = {{ $categoryId ?? 'null' }};
-        const userType = "{{ $userType ?? '' }}";
+  $(document).ready(function () {
+    const categoryId = {{ $categoryId ?? 'null' }};
+    const userType   = "{{ $iUserType }}";
 
-        // Fetch videos and display them
-        if (categoryId) {
-            fetchVideosByCategoryId(categoryId);
-            fetchCategoryById(categoryId);
+    if (categoryId) {
+      fetchCategoryById(categoryId);
+      fetchVideosByCategoryId(categoryId);
+    }
+
+    if (userType == 1) {
+      $('#searchInput').on('input', function () {
+        const query = $(this).val();
+        searchVideos(query);
+      });
+    }
+
+    function fetchCategoryById(id) {
+      $.ajax({
+        url: `/api/video-category/${id}`,
+        method: "GET",
+        success(response) {
+          if (response.status == 200) {
+            // Update header title
+            $('h2').first().text(response.body.name);
+          } else {
+            showAlert(response.message);
+          }
+        },
+        error(xhr) {
+          let msg = "Failed to fetch category!";
+          if (xhr.responseJSON && xhr.responseJSON.error) {
+            msg = xhr.responseJSON.error;
+          }
+          showAlert(msg);
         }
+      });
+    }
 
-        // Search videos
-        $('#searchInput').on('input', function () {
-            const query = $(this).val();
-            searchVideos(query);
-        });
-
-        function fetchCategoryById(categoryId){
-            $.ajax({
-                url: `/api/video-category/${categoryId}`, // Adjust the endpoint as needed
-                method: "GET",
-                success: function (response) {
-                    if (response.status == 200) {
-                        $(".section-title h2").text(response.body.name);
-                    } else {
-                        $("#alertMessage")
-                            .removeClass("d-none alert-success")
-                            .addClass("alert-danger")
-                            .text(response.message);
-                    }
-                },
-                error: function (xhr) {
-                    let errorMessage = "Failed to fetch category!";
-                    if (xhr.responseJSON && xhr.responseJSON.error) {
-                        errorMessage = xhr.responseJSON.error;
-                    }
-                    $("#alertMessage")
-                        .removeClass("d-none alert-success")
-                        .addClass("alert-danger")
-                        .text(errorMessage);
-                }
-            });
+    function fetchVideosByCategoryId(id) {
+      $.ajax({
+        url: `/api/videos-category/${id}`,
+        method: "GET",
+        success(response) {
+          if (response.status == 200) {
+            displayVideos(response.body);
+          } else {
+            showAlert(response.message);
+          }
+        },
+        error(xhr) {
+          let msg = "Failed to fetch videos!";
+          if (xhr.responseJSON && xhr.responseJSON.error) {
+            msg = xhr.responseJSON.error;
+          }
+          showAlert(msg);
         }
+      });
+    }
 
-        function fetchVideosByCategoryId(categoryId) {
-            $.ajax({
-                url: `/api/videos-category/${categoryId}`, // Adjust the endpoint as needed
-                method: "GET",
-                success: function (response) {
-                    if (response.status == 200) {
-                        displayVideos(response.body);
-                    } else {
-                        $("#alertMessage")
-                            .removeClass("d-none alert-success")
-                            .addClass("alert-danger")
-                            .text(response.message);
-                    }
-                },
-                error: function (xhr) {
-                    let errorMessage = "Failed to fetch videos!";
-                    if (xhr.responseJSON && xhr.responseJSON.error) {
-                        errorMessage = xhr.responseJSON.error;
-                    }
-                    $("#alertMessage")
-                        .removeClass("d-none alert-success")
-                        .addClass("alert-danger")
-                        .text(errorMessage);
-                }
-            });
+    function searchVideos(query) {
+      $.ajax({
+        url: `/api/videos/search`,
+        method: "GET",
+        data: { title: query, category_id: categoryId },
+        success(response) {
+          if (response.status == 200) {
+            displayVideos(response.body);
+          } else {
+            showAlert(response.message);
+          }
+        },
+        error(xhr) {
+          let msg = "Failed to search videos!";
+          if (xhr.responseJSON && xhr.responseJSON.error) {
+            msg = xhr.responseJSON.error;
+          }
+          showAlert(msg);
         }
+      });
+    }
 
-        function searchVideos(query) {
-            $.ajax({
-                url: `/api/videos/search`, // Adjust the endpoint as needed
-                method: "GET",
-                data: { title: query },
-                success: function (response) {
-                    if (response.status == 200) {
-                        displayVideos(response.body);
-                    } else {
-                        $("#alertMessage")
-                            .removeClass("d-none alert-success")
-                            .addClass("alert-danger")
-                            .text(response.message);
-                    }
-                },
-                error: function (xhr) {
-                    let errorMessage = "Failed to search videos!";
-                    if (xhr.responseJSON && xhr.responseJSON.error) {
-                        errorMessage = xhr.responseJSON.error;
-                    }
-                    $("#alertMessage")
-                        .removeClass("d-none alert-success")
-                        .addClass("alert-danger")
-                        .text(errorMessage);
-                }
-            });
-        }
+    function displayVideos(videos) {
+      const videoList = $("#videoList");
+      videoList.empty();
 
-        function displayVideos(videos) {
-            const videoList = $("#videoList");
-            videoList.empty(); // Clear any existing videos
+      if (videos.length === 0) {
+        videoList.append(`
+          <div class="col-span-full text-center text-white/90">
+            <p>No videos found</p>
+          </div>
+        `);
+        return;
+      }
 
-            if (videos.length === 0) {
-                videoList.append('<div class="col-12"><p>No videos found</p></div>');
-                return;
-            }
+      videos.forEach((video, index) => {
+        const truncatedDesc = limitWords(video.description, 20);
+        const addedOn = new Date(video.added_on).toLocaleDateString();
 
-            // Stagger index for a small delay on each card
-            videos.forEach((video, index) => {
-                let baseUrl = window.location.origin;
-                let fullThumbnailUrl = `${baseUrl}/storage/${video.thumbnail}`;
+        // Each card applies Tailwind classes for frosted-glass + hover
+        const card = $(`
+          <div class="animate-delay delay-${index + 1} video-card bg-white/80 backdrop-blur-md rounded-lg shadow-lg overflow-hidden transform hover:scale-105 transition">
+            <div class="h-48 w-full bg-gray-200 relative">
+              <img
+                src="${video.thumbnail_url}"
+                alt="${video.title}"
+                class="object-cover w-full h-full"
+                crossorigin="anonymous"
+              />
+            </div>
+            <div class="p-4 flex flex-col justify-between h-56">
+              <div>
+                <h3 class="text-xl font-semibold text-gray-900 mb-2">${video.title}</h3>
+                <p class="text-gray-700 text-sm mb-2">${truncatedDesc}</p>
+                <p class="text-gray-500 text-xs">Uploaded: ${addedOn}</p>
+              </div>
+              <div class="mt-4">
+                <a
+                  href="/videos-player/${video.id}"
+                  class="inline-flex items-center justify-center w-full bg-gradient-to-r from-pink-500 to-yellow-400 hover:from-pink-600 hover:to-yellow-500 text-white font-bold py-2 px-4 rounded-lg shadow transition"
+                >
+                  View Video
+                </a>
+              </div>
+            </div>
+          </div>
+        `);
 
-                // Create a card with Animate.css classes
-                const videoCard = `
-                    <div class="col-lg-4 col-md-6 mb-4 animate__animated animate__fadeInUp video-card"
-                         style="display: none;">
-                        <div class="card h-100">
-                            <div class="ratio ratio-16x9">
-                                <img src="${video.thumbnail_url}" crossorigin="anonymous" class="card-img-top" alt="${video.title}">
-                            </div>
-                            <div class="card-body">
-                                <h5 class="card-title">${video.title}</h5>
-                                <p class="card-text">${limitWords(video.description, 20)}</p>
-                                <p class="card-text">
-                                    <small class="text-muted">
-                                        Uploaded on: ${new Date(video.added_on).toLocaleDateString()}
-                                    </small>
-                                </p>
-                                <a href="videos-player/${video.id}" class="btnWAN btn-primary">View Video</a>
-                            </div>
-                        </div>
-                    </div>
-                `;
+        videoList.append(card);
+      });
 
-                // Convert string to jQuery object
-                const $videoCard = $(videoCard);
+      // After appending, manually trigger fade-in
+      $('.animate-delay').each(function(i) {
+        $(this).css('animation-delay', `${ (i + 1) * 0.15 }s`);
+        $(this).addClass('animate__animated animate__fadeInUp');
+      });
+    }
 
-                // Append it hidden, then fade in with a small stagger
-                videoList.append($videoCard);
-                $videoCard.delay(index * 150).fadeIn(400);
-            });
-        }
+    function limitWords(text, limit) {
+      const words = text.trim().split(/\s+/);
+      if (words.length > limit) {
+        return words.slice(0, limit).join(" ") + "...";
+      }
+      return text;
+    }
 
-        function limitWords(text, limit) {
-            const words = text.split(" ");
-            if (words.length > limit) {
-                return words.slice(0, limit).join(" ") + "...";
-            }
-            return text;
-        }
-    });
+    function showAlert(message) {
+      const $alert = $("#alertMessage");
+      $alert.text(message).removeClass("hidden").addClass("block bg-red-500 text-white px-4 py-2 rounded-lg");
+      setTimeout(() => $alert.addClass("hidden").removeClass("block bg-red-500 text-white px-4 py-2 rounded-lg"), 3000);
+    }
+  });
 </script>
+
+{{-- Include Animate.css CDN for animations --}}
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+/>
