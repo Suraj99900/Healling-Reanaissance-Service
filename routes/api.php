@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\EnrollmentController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AppPostController;
@@ -90,3 +91,12 @@ Route::get('/test-s3-connection', function () {
         dd('❌ Connection failed:', $e->getMessage());
     }
 });
+
+
+Route::get('/enrollments', [EnrollmentController::class, 'listEnrollments'])->name('enrollment.list'); // List all
+Route::get('/enrollments/{id}', [EnrollmentController::class, 'showEnrollment'])->name('enrollment.show'); // View single
+
+Route::get('/enrollments/{id}/edit', [EnrollmentController::class, 'editEnrollment'])->name('enrollment.edit'); // Edit form
+Route::post('/enrollments/{id}/update', [EnrollmentController::class, 'updateEnrollment'])->name('enrollment.update'); // Update
+
+Route::delete('/enrollments/{id}', [EnrollmentController::class, 'deleteEnrollment'])->name('enrollment.delete'); // Delete

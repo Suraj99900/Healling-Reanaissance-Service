@@ -7,6 +7,8 @@
   .backdrop-blur-md {
     backdrop-filter: blur(12px);
   }
+
+  
 </style>
 
 <div class="min-h-screen bg-gradient-to-br from-purple-600 via-pink-400 to-yellow-300 text-gray-800">

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\EnrollmentController;
 use App\Http\Controllers\PrivacyPolicyController;
 use App\Http\Controllers\SessionManagerController;
 use App\Http\Controllers\UserCategoryAccessController;
@@ -39,6 +40,10 @@ Route::get('dashboard', [\App\Http\Controllers\DashboardController::class, 'inde
 Route::get('/forgotPasswordScreen', function () {
     return view('forgotPasswordScreen');
 });
+
+Route::get('/admin-enroll', function () {
+    return view('admin-enroll');
+})->name("enroll.management");
 
 Route::get('/user-access', [UserCategoryAccessController::class, 'index'])->name('access.management');
 
@@ -83,6 +88,9 @@ Route::get('videos/videos-player/{videoId}', function () {
 
 Route::get('/privacy-policy', [PrivacyPolicyController::class, 'show'])->name('privacy.policy');
 
+// Enrollment CRUD routes
+Route::get('/enroll', [EnrollmentController::class, 'showForm'])->name('enrollment.form'); // Show form
+Route::post('/enroll', [EnrollmentController::class, 'submit'])->name('enrollment.submit'); // Store new
 
 
 Route::get('/proxy-thumb', function (\Illuminate\Http\Request $request) {

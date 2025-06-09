@@ -8,18 +8,23 @@
 @endphp
 
 <style>
-    /* Frosted‐glass backdrop blur for cards */
     .backdrop-blur-md {
         backdrop-filter: blur(12px);
     }
+    .category-card-gradient {
+        background: linear-gradient(120deg, #ffffff 60%, #e3e8f7 100%);
+    }
+    .category-card-gradient-hover {
+        background: linear-gradient(120deg, #fbeffb 60%, #e3e8f7 100%);
+    }
 </style>
 
-<div class="min-h-screen bg-gradient-to-br from-purple-600 via-pink-400 to-yellow-300 text-gray-800 py-10">
+<div class="min-h-screen bg-gradient-to-br from-white via-pink-100 to-sky-100 text-gray-800 py-10">
     <div class="container mx-auto px-4">
 
         {{-- Page Header --}}
         <div class="mb-8 text-center">
-            <h2 class="text-3xl font-semibold text-white drop-shadow-lg">Category Videos</h2>
+            <h2 class="text-3xl font-semibold text-gray-800 drop-shadow-lg">Category Videos</h2>
         </div>
 
         {{-- Category Grid --}}
@@ -64,21 +69,21 @@
             categories.forEach(category => {
                 const truncatedDesc = limitWords(category.description, 20);
 
-                // Entire card is wrapped in <a> so clicking anywhere navigates
+                // Card with light white, pink, and sky blue gradient
                 const cardHtml = `
                     <a href="/videos/${category.id}"
-                        class="group block bg-gradient-to-r from-purple-500 to-pink-400 bg-opacity-80 backdrop-blur-md rounded-lg shadow-lg p-6 flex flex-col justify-between hover:shadow-2xl transition">
+                        class="group block category-card-gradient bg-opacity-90 backdrop-blur-md rounded-lg shadow-lg p-6 flex flex-col justify-between hover:category-card-gradient-hover hover:shadow-2xl transition border border-gray-200">
                         <div>
-                        <h3 class="text-xl font-bold text-white group-hover:text-yellow-200 transition-colors">
+                        <h3 class="text-xl font-bold text-gray-800 group-hover:text-sky-600 transition-colors">
                             ${category.name}
                         </h3>
-                        <p class="text-white/90 text-sm mt-2">
+                        <p class="text-gray-600 text-sm mt-2">
                             ${truncatedDesc}
                         </p>
                         </div>
                         <div class="mt-4 flex justify-end">
                         <span
-                            class="inline-flex items-center space-x-1 bg-white/30 hover:bg-white/50 text-white px-3 py-1 rounded-full text-sm transition">
+                            class="inline-flex items-center space-x-1 bg-sky-100 hover:bg-pink-100 text-sky-700 px-3 py-1 rounded-full text-sm transition border border-sky-200">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M9 5l7 7-7 7" />
@@ -93,17 +98,17 @@
         }
 
         function limitWords(text, limit) {
-            const words = text.trim().split(/\s+/);
+            const words = text ? text.trim().split(/\s+/) : [];
             if (words.length > limit) {
                 return words.slice(0, limit).join(" ") + "...";
             }
-            return text;
+            return text || '';
         }
 
         function showError(message) {
             const categoryGrid = $("#categoryGrid");
             categoryGrid.html(`
-        <div class="col-span-full text-center text-white/90">
+        <div class="col-span-full text-center text-gray-500">
           <p>${message}</p>
         </div>`);
         }

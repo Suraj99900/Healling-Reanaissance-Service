@@ -2,13 +2,21 @@
 @include('CDN_Header')
 @include('navbar')
 
-{{-- Video.js CSS --}}
-<link href="https://vjs.zencdn.net/7.18.1/video-js.css" rel="stylesheet" />
+<!-- {{-- Video.js CSS --}}
+<link href="https://vjs.zencdn.net/7.18.1/video-js.css" rel="stylesheet" /> -->
 
 <style>
-    /* Frosted‐glass backdrop blur */
     .backdrop-blur-md {
         backdrop-filter: blur(12px);
+    }
+    .player-bg {
+        background: linear-gradient(135deg, #f8fafc 0%, #e0e7ef 100%);
+    }
+    .card-gradient {
+        background: linear-gradient(120deg, #ffffff 60%, #e3e8f7 100%);
+    }
+    .card-border {
+        border: 1px solid #e5e7eb;
     }
 </style>
 
@@ -18,18 +26,18 @@
     $iUserType = $sessionManager->iUserType;
 @endphp
 
-<div class="min-h-screen bg-gradient-to-br from-purple-600 via-pink-400 to-yellow-300 text-gray-800 py-10">
+<div class="min-h-screen player-bg text-gray-800 py-10">
     <div class="container mx-auto px-4 space-y-8">
 
         {{-- Header --}}
         <div class="text-center">
-            <h2 id="videoTitle" class="text-3xl font-extrabold text-white drop-shadow-lg mb-2">Video Title</h2>
+            <h2 id="videoTitle" class="text-3xl font-extrabold text-gray-800 drop-shadow-lg mb-2">Video Title</h2>
             <div id="alertMessage" class="hidden bg-red-500 text-white px-4 py-2 rounded-lg mx-auto max-w-md"></div>
         </div>
 
         {{-- Video Player Container --}}
-        <div class="bg-white/60 backdrop-blur-md rounded-lg shadow-lg border border-white/20 overflow-hidden">
-            <div class="relative w-full pb-[56.25%]"> {{-- 16:9 Aspect Ratio --}}
+        <div class="card-gradient bg-opacity-90 backdrop-blur-md rounded-lg shadow-lg card-border overflow-hidden">
+            <div class="relative w-full pb-[56.25%]">
                 <video id="cloudflareVideo" class="video-js absolute top-0 left-0 w-full h-full" controls preload="auto"
                     crossorigin="anonymous">
                     <source src="" type="application/x-mpegURL" />
@@ -38,7 +46,7 @@
         </div>
 
         {{-- Description --}}
-        <div class="bg-white/60 backdrop-blur-md rounded-lg shadow-lg border border-white/20 p-6">
+        <div class="card-gradient bg-opacity-90 backdrop-blur-md rounded-lg shadow-lg card-border p-6">
             <h3 class="text-xl font-semibold text-gray-900 mb-2">Description</h3>
             <p id="videoDescription" class="text-gray-800 leading-relaxed">
                 Video description will be displayed here.
@@ -46,7 +54,7 @@
         </div>
 
         {{-- Attachments --}}
-        <div class="bg-white/60 backdrop-blur-md rounded-lg shadow-lg border border-white/20 p-6">
+        <div class="card-gradient bg-opacity-90 backdrop-blur-md rounded-lg shadow-lg card-border p-6">
             <h3 class="text-xl font-semibold text-gray-900 mb-4">Attachments</h3>
             <div id="attachmentsContainer" class="flex flex-wrap gap-4">
                 {{-- Dynamically inserted attachment buttons --}}
@@ -54,16 +62,16 @@
         </div>
 
         {{-- Comments Section --}}
-        <div class="bg-white/60 backdrop-blur-md rounded-lg shadow-lg border border-white/20 p-6">
+        <div class="card-gradient bg-opacity-90 backdrop-blur-md rounded-lg shadow-lg card-border p-6">
             <h3 class="text-xl font-semibold text-gray-900 mb-4">Comments</h3>
 
             {{-- Comment Input --}}
             <div class="flex flex-col md:flex-row gap-4 mb-6">
                 <input type="text" id="commentInput"
-                    class="flex-1 bg-white border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
+                    class="flex-1 bg-white border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-sky-400"
                     placeholder="Add a comment..." />
                 <button id="postCommentButton"
-                    class="inline-flex items-center justify-center space-x-2 bg-gradient-to-r from-pink-500 to-yellow-400 hover:from-pink-600 hover:to-yellow-500 text-white font-semibold px-6 py-2 rounded-lg shadow-lg transition">
+                    class="inline-flex items-center justify-center space-x-2 bg-gradient-to-r from-sky-400 to-pink-200 hover:from-sky-500 hover:to-pink-300 text-sky-900 font-semibold px-6 py-2 rounded-lg shadow-lg transition">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd"
                             d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
@@ -162,7 +170,6 @@
 
             player.src({ src: hlsUrl, type: 'application/x-mpegURL' });
             player.ready(function () {
-                // Handle any errors
                 player.on('error', function () {
                     console.error('Video.js error:', player.error());
                 });
@@ -201,7 +208,7 @@
                 const url = att.attachment_url || `${window.location.origin}/storage/${att.attachment_path}`;
                 const btn = $(`
           <button
-            class="inline-flex items-center space-x-2 bg-gradient-to-r from-purple-500 to-pink-400 hover:from-purple-600 hover:to-pink-500 text-white px-4 py-2 rounded-lg shadow transition"
+            class="inline-flex items-center space-x-2 bg-gradient-to-r from-sky-400 to-pink-200 hover:from-sky-500 hover:to-pink-300 text-sky-900 px-4 py-2 rounded-lg shadow transition"
             onclick="window.open('${url}', '_blank')"
           >
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -244,7 +251,7 @@
 
             comments.forEach(cmt => {
                 const card = $(`
-          <div class="bg-white/80 backdrop-blur-md rounded-lg shadow-md border border-white/20 p-4">
+          <div class="bg-white/90 backdrop-blur-md rounded-lg shadow-md card-border p-4">
             <div class="flex justify-between items-center mb-2">
               <h5 class="text-lg font-semibold text-gray-900">${cmt.user_name}</h5>
               <span class="text-gray-500 text-sm">${new Date(cmt.added_on).toLocaleString()}</span>

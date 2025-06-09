@@ -2,20 +2,27 @@
 @include('CDN_Header')
 @include('navbar')
 
-
-
 @php
     $sessionManager = new \App\Models\SessionManager();
     $iUserId   = $sessionManager->iUserID;
     $iUserType = $sessionManager->iUserType;
 @endphp
 
-<div class="min-h-screen bg-gradient-to-br from-purple-600 via-pink-400 to-yellow-300 text-gray-800 py-10">
+<style>
+  .video-card-gradient {
+    background: linear-gradient(120deg, #ffffff 60%, #e3e8f7 100%);
+  }
+  .video-card-gradient-hover {
+    background: linear-gradient(120deg, #fbeffb 60%, #e3e8f7 100%);
+  }
+</style>
+
+<div class="min-h-screen bg-gradient-to-br from-white via-pink-100 to-sky-100 text-gray-800 py-10">
   <div class="container mx-auto px-4">
 
     {{-- Header --}}
     <div class="mb-8 text-center">
-      <h2 class="text-3xl font-extrabold text-white drop-shadow-lg mb-2">Videos</h2>
+      <h2 class="text-3xl font-extrabold text-gray-800 drop-shadow-lg mb-2">Videos</h2>
       <div id="alertMessage" class="hidden bg-red-500 text-white px-4 py-2 rounded-lg"></div>
     </div>
 
@@ -25,7 +32,7 @@
         <input
           type="text"
           id="searchInput"
-          class="w-full max-w-xl bg-white/80 backdrop-blur-md border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-400 shadow-lg"
+          class="w-full max-w-xl bg-white/80 backdrop-blur-md border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-sky-400 shadow-lg"
           placeholder="Search Videos"
         />
       </div>
@@ -129,7 +136,7 @@
 
       if (videos.length === 0) {
         videoList.append(`
-          <div class="col-span-full text-center text-white/90">
+          <div class="col-span-full text-center text-gray-500">
             <p>No videos found</p>
           </div>
         `);
@@ -140,9 +147,9 @@
         const truncatedDesc = limitWords(video.description, 20);
         const addedOn = new Date(video.added_on).toLocaleDateString();
 
-        // Each card applies Tailwind classes for frosted-glass + hover
+        // Each card applies light white, pink, and sky blue gradient
         const card = $(`
-          <div class="animate-delay delay-${index + 1} video-card bg-white/80 backdrop-blur-md rounded-lg shadow-lg overflow-hidden transform hover:scale-105 transition">
+          <div class="animate-delay delay-${index + 1} video-card video-card-gradient bg-opacity-90 backdrop-blur-md rounded-lg shadow-lg overflow-hidden transform hover:scale-105 hover:video-card-gradient-hover transition border border-gray-200">
             <div class="h-48 w-full bg-gray-200 relative">
               <img
                 src="${video.thumbnail_url}"
@@ -160,7 +167,7 @@
               <div class="mt-4">
                 <a
                   href="/videos/videos-player/${video.id}"
-                  class="inline-flex items-center justify-center w-full bg-gradient-to-r from-pink-500 to-yellow-400 hover:from-pink-600 hover:to-yellow-500 text-white font-bold py-2 px-4 rounded-lg shadow transition"
+                  class="inline-flex items-center justify-center w-full bg-gradient-to-r from-sky-400 to-pink-200 hover:from-sky-500 hover:to-pink-300 text-sky-900 font-bold py-2 px-4 rounded-lg shadow transition"
                 >
                   View Video
                 </a>
@@ -180,11 +187,11 @@
     }
 
     function limitWords(text, limit) {
-      const words = text.trim().split(/\s+/);
+      const words = text ? text.trim().split(/\s+/) : [];
       if (words.length > limit) {
         return words.slice(0, limit).join(" ") + "...";
       }
-      return text;
+      return text || '';
     }
 
     function showAlert(message) {
