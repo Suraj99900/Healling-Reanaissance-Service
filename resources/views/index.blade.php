@@ -74,15 +74,27 @@ HERO SECTION
   <div class="absolute inset-0 bg-black/70"></div>
 
   <div class="relative z-10 flex flex-col justify-center h-full max-w-4xl mx-auto px-6 space-y-6">
-    {{-- Headline from PDF --}}
+
     <h1
-      class="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white leading-tight drop-shadow-lg animate-fade-in delay-200">
-      Transform your life with Manifestation<br>
-      To Recreate the Life of your Dreams
+      class="text-4xl sm:text-5xl md:text-6x2 font-extrabold text-white leading-tight drop-shadow-lg animate-fade-in delay-200">
+      Welcome to <br> Kvita's Healling Renaissance
     </h1>
 
+    {{-- Headline from PDF --}}
+    <h2
+      class="text-3xl sm:text-3xl md:text-4xl font-extrabold text-white leading-tight drop-shadow-lg animate-fade-in delay-200">
+      Transform your life with Manifestation<br>
+      To Recreate the Life of your Dreams<br>
+    </h2>
+
     <p class="mt-4 text-lg sm:text-xl text-gray-300 max-w-2xl animate-fade-in delay-400">
-      Do you feel stuck in the same cycle? Are you ready to create a life full of purpose, abundance, and inner peace?
+      Do you feel stuck in the same cycle? <br> Are you ready to create a life full of purpose, abundance, and inner
+      peace?
+    </p>
+    <p class="mt-4 text-lg sm:text-xl text-gray-200 max-w-2xl animate-fade-in delay-400">
+      At Kvita's Healling Renaissance, we believe that your thoughts shape your reality. Through the power of
+      manifestation, positive thinking, and daily affirmations, you can rewire your mindset, shift your energy, and
+      attract the life you truly desire.
     </p>
 
     <div
@@ -103,13 +115,13 @@ HERO SECTION
       <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-400 animate-pulse" viewBox="0 0 20 20"
         fill="currentColor">
         <path d="M9.049 2.927c.3-.921 1.603-.921 1.902
-             0l1.286 3.966a1 1 0 00.95.69h4.162c.969
-             0 1.371 1.24.588 1.81l-3.37 2.452a1 1
-             0 00-.364 1.118l1.285 3.965c.3.922-.755
-             1.688-1.54 1.118l-3.37-2.451a1 1 0
-             00-1.175 0l-3.37 2.451c-.784.57-1.838-.196-1.539-1.118l1.286-3.965a1 1
-             0 00-.364-1.118L2.713 9.393c-.783-.57-.38-1.81.588-1.81h4.162a1 1
-             0 00.951-.69l1.286-3.966z" />
+         0l1.286 3.966a1 1 0 00.95.69h4.162c.969
+         0 1.371 1.24.588 1.81l-3.37 2.452a1 1
+         0 00-.364 1.118l1.285 3.965c.3.922-.755
+         1.688-1.54 1.118l-3.37-2.451a1 1 0
+         00-1.175 0l-3.37 2.451c-.784.57-1.838-.196-1.539-1.118l1.286-3.965a1 1
+         0 00-.364-1.118L2.713 9.393c-.783-.57-.38-1.81.588-1.81h4.162a1 1
+         0 00.951-.69l1.286-3.966z" />
       </svg>
     @endfor
       </div>
@@ -133,12 +145,6 @@ ABOUT THIS MASTERCLASS
       setting) to activate the Law of Attraction and the Law of Assumption in your favor.
     </p>
 
-    <p class="mt-8 text-lg sm:text-xl text-gray-200 leading-relaxed italic animate-fade-in delay-400">
-      “At Kavita’s Healing Renaissance, we believe your thoughts shape your reality. Through manifestation, positive
-      thinking, and daily affirmations, you can rewire your mindset, shift your energy, and attract the life you truly
-      desire.”
-    </p>
-
     <div class="mt-12 flex justify-center">
       <a href="#benefits"
         class="inline-block bg-white text-pink-600 font-semibold rounded-full px-8 py-4 shadow-lg transform hover:scale-105 transition-transform duration-300 animate-fade-in delay-600">
@@ -157,27 +163,32 @@ CORE MODULES
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
       @php
-    $pdfModules = [
-      'Emotional Alignment',
-      'Reprogramming Subconscious Mind',
-      'Career & Purpose',
-      'The Law of Attraction Decoded',
-      'Money Beliefs',
-      'Mindset Reset',
-      'Manifestation Accelerator',
-      'Energy Alignment'
-    ];
-    @endphp
+        $pdfModules = [
+          ['image1.png','Emotional Alignment'],
+          ['image2.png','Reprogramming Subconscious Mind'],
+          ['image3.png','Career & Purpose'],
+          ['image4.png','The Law of Attraction Decoded'],
+          ['image5.png','Money Beliefs'],
+          ['image6.png','Mindset Reset'],
+          ['image7.png','Manifestation Accelerator'],
+          ['image8.png','Energy Alignment']
+        ];
+      @endphp
 
       @foreach($pdfModules as $idx => $m)
       <div
-      class="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-6 text-center shadow-lg transform hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 animate-fade-in delay-{{ 200 * ($idx + 1) }}">
-      <h3 class="text-xl font-semibold text-pink-600 mb-2">{{ $m }}</h3>
-      <p class="text-gray-600 text-sm">
-        Dive deep into <strong>{{ strtolower($m) }}</strong> techniques to elevate your manifestation journey.
-      </p>
+        class="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-6 text-center shadow-lg transform hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 animate-fade-in delay-{{ 200 * ($idx + 1) }}">
+        <img 
+          src="{{ asset('img/CoreImg/' . $m[0]) }}" 
+          alt="{{ $m[1] }}" 
+          class="mx-auto mb-4 h-24 w-24 object-contain rounded-xl shadow-md border border-pink-100"
+        />
+        <h3 class="text-xl font-semibold text-pink-600 mb-2">{{ $m[1] }}</h3>
+        <p class="text-gray-600 text-sm">
+          Dive deep into <strong>{{ strtolower($m[1]) }}</strong> techniques to elevate your manifestation journey.
+        </p>
       </div>
-    @endforeach
+      @endforeach
     </div>
   </div>
 </section>
@@ -227,7 +238,7 @@ WHY YOU SHOULD JOIN
       'icon' => 'M3 10h18M7 6h10M12 2v20'
       ],
     ];
-    @endphp
+  @endphp
 
       @foreach($pdfBenefits as $idx => $ben)
       <div
@@ -408,7 +419,7 @@ CLIENT FEEDBACK
       ['avatar' => 'feedBack_5.jpeg'],
       ['avatar' => 'feedBack_6.jpeg']
     ];
-    @endphp
+  @endphp
 
       @foreach($feedbacks as $idx => $f)
       <div
@@ -477,7 +488,7 @@ BONUSES
       ]
       ],
     ];
-    @endphp
+  @endphp
 
       @foreach($bonuses as $idx => $b)
       <div

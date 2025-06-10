@@ -15,7 +15,7 @@
                     class="h-8 w-auto md:h-10" />
                 <div class="hidden md:flex flex-col leading-tight">
                     <span class="text-lg md:text-xl font-extrabold text-white">LifeHealer Kvita's</span>
-                    <span class="text-sm md:text-base text-gray-200">Healing Renaissance</span>
+                    <span class="text-sm md:text-base text-gray-200">Healling Renaissance</span>
                 </div>
             </a>
 
