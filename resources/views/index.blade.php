@@ -112,9 +112,9 @@ HERO SECTION
     <div class="mt-8 flex flex-wrap items-center space-x-6 text-gray-300 animate-fade-in delay-800">
       <div class="flex items-center space-x-1">
         @for ($i = 0; $i < 5; $i++)
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-400 animate-pulse" viewBox="0 0 20 20"
-        fill="currentColor">
-        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-400 animate-pulse" viewBox="0 0 20 20"
+          fill="currentColor">
+          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902
          0l1.286 3.966a1 1 0 00.95.69h4.162c.969
          0 1.371 1.24.588 1.81l-3.37 2.452a1 1
          0 00-.364 1.118l1.285 3.965c.3.922-.755
@@ -122,7 +122,7 @@ HERO SECTION
          00-1.175 0l-3.37 2.451c-.784.57-1.838-.196-1.539-1.118l1.286-3.965a1 1
          0 00-.364-1.118L2.713 9.393c-.783-.57-.38-1.81.588-1.81h4.162a1 1
          0 00.951-.69l1.286-3.966z" />
-      </svg>
+        </svg>
     @endfor
       </div>
       <span class="text-sm animate-fade-in delay-1000">4.9/5 (12,000+ Reviews)</span>
@@ -163,32 +163,29 @@ CORE MODULES
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
       @php
-        $pdfModules = [
-          ['image1.png','Emotional Alignment'],
-          ['image2.png','Reprogramming Subconscious Mind'],
-          ['image3.png','Career & Purpose'],
-          ['image4.png','The Law of Attraction Decoded'],
-          ['image5.png','Money Beliefs'],
-          ['image6.png','Mindset Reset'],
-          ['image7.png','Manifestation Accelerator'],
-          ['image8.png','Energy Alignment']
-        ];
-      @endphp
+    $pdfModules = [
+      ['image1.png', 'Emotional Alignment'],
+      ['image2.png', 'Reprogramming Subconscious Mind'],
+      ['image3.png', 'Career & Purpose'],
+      ['image4.png', 'The Law of Attraction Decoded'],
+      ['image5.png', 'Money Beliefs'],
+      ['image6.png', 'Mindset Reset'],
+      ['image7.png', 'Manifestation Accelerator'],
+      ['image8.png', 'Energy Alignment']
+    ];
+  @endphp
 
       @foreach($pdfModules as $idx => $m)
       <div
-        class="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-6 text-center shadow-lg transform hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 animate-fade-in delay-{{ 200 * ($idx + 1) }}">
-        <img 
-          src="{{ asset('img/CoreImg/' . $m[0]) }}" 
-          alt="{{ $m[1] }}" 
-          class="mx-auto mb-4 h-24 w-24 object-contain rounded-xl shadow-md border border-pink-100"
-        />
-        <h3 class="text-xl font-semibold text-pink-600 mb-2">{{ $m[1] }}</h3>
-        <p class="text-gray-600 text-sm">
-          Dive deep into <strong>{{ strtolower($m[1]) }}</strong> techniques to elevate your manifestation journey.
-        </p>
+      class="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-6 text-center shadow-lg transform hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 animate-fade-in delay-{{ 200 * ($idx + 1) }}">
+      <img src="{{ asset('img/CoreImg/' . $m[0]) }}" alt="{{ $m[1] }}"
+        class="mx-auto mb-4 h-24 w-24 object-contain rounded-xl shadow-md border border-pink-100" />
+      <h3 class="text-xl font-semibold text-pink-600 mb-2">{{ $m[1] }}</h3>
+      <p class="text-gray-600 text-sm">
+        Dive deep into <strong>{{ strtolower($m[1]) }}</strong> techniques to elevate your manifestation journey.
+      </p>
       </div>
-      @endforeach
+    @endforeach
     </div>
   </div>
 </section>
@@ -202,6 +199,11 @@ WHY YOU SHOULD JOIN
     <p class="mt-4 text-lg text-gray-600 text-center max-w-3xl mx-auto animate-fade-in delay-200">
       Over <strong>100,000</strong> men and women have used this exact formula to transform their careers, health,
       relationships, and inner peace. Here’s what you’ll gain:
+    </p>
+
+    <p class="mt-4 text-lg text-gray-600 text-center max-w-3xl mx-auto animate-fade-in delay-200">
+      Break Free from Burnout<br>
+      Eliminate stress, anxiety, and overwhelm—step into a state of calm, clarity, and unstoppable energy.
     </p>
 
     <div class="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
@@ -219,7 +221,7 @@ WHY YOU SHOULD JOIN
       ],
       [
       'title' => 'Deep Healing & Peace',
-      'desc' => 'Use proven meditation & energy tools to heal mind, body, and spirit — instantly.',
+      'desc' => 'Use scientifically proven meditation and energy practices to heal body, mind, and spirit—instantly.',
       'icon' => 'M3 7l5 5-5 5M19 7l-5 5 5 5'
       ],
       [
@@ -312,7 +314,7 @@ INSTRUCTOR SECTION
 <section id="instructor" class="py-20 bg-gradient-to-r from-purple-700 to-pink-600">
   <div class="max-w-5xl mx-auto px-6 grid md:grid-cols-2 gap-10 items-center">
     <div class="animate-fade-in">
-      <video controls autoplay loop muted src="{{ asset('img/LifeHealer/user_video_1.mp4') }}" alt="Coach Kavita Video"
+      <video controls autoplay loop muted src="{{ asset('img/LifeHealer/video/main-kvita.mp4') }}" alt="Coach Kavita Video"
         class="rounded-2xl shadow-2xl object-cover w-full h-80"></video>
     </div>
     <div class="space-y-6 animate-fade-in delay-200">
@@ -328,13 +330,157 @@ INSTRUCTOR SECTION
         In 2025, my mission is to empower <strong>1 million+</strong> people to live happier, healthier, and more
         successful lives.
       </p>
-      <a href="#pricing"
+      <a href="https://rzp.io/rzp/Ch1XJWuD" target="_blank"
         class="inline-block bg-gradient-to-r from-yellow-400 to-pink-500 text-black font-semibold rounded-full px-6 py-3 shadow-lg transform hover:scale-105 transition-transform duration-300">
         Claim Your Spot for ₹20,000
       </a>
     </div>
   </div>
 </section>
+
+
+{{-- =========================
+REWARDS & RECOGNITION
+======================== --}}
+<section id="rewards" class="py-20 bg-gradient-to-br from-yellow-100 to-pink-100">
+  <div class="max-w-4xl mx-auto px-6 text-center">
+    <h2 class="text-3xl sm:text-4xl font-bold text-pink-700 mb-8 animate-fade-in">Kavita's Rewards & Recognition</h2>
+    <p class="text-lg text-gray-700 mb-10 animate-fade-in delay-200">
+      Celebrating the achievements and milestones of Kavita's inspiring journey.
+    </p>
+    @php
+      $rewards = [
+        '1 (1).jpeg',
+        '1 (2).jpeg',
+        '1 (3).jpeg',
+        '1 (4).jpeg',
+        '1 (5).jpeg',
+        '1 (6).jpeg',
+      ];
+    @endphp
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
+      @foreach($rewards as $idx => $img)
+        <div class="bg-white rounded-2xl shadow-xl overflow-hidden hover:scale-105 transform transition-all duration-300 animate-fade-in delay-{{ 100 * ($idx + 1) }}">
+          <img src="{{ asset('img/LifeHealer/Reward/' . $img) }}" alt="Reward {{ $idx + 1 }}"
+            class="w-full h-72 object-cover" />
+        </div>
+      @endforeach
+    </div>
+  </div>
+</section>
+
+
+{{-- =========================
+SUCCESS STORIES FROM PAST PARTICIPANTS
+======================== --}}
+<section id="success-stories" class="py-24 bg-gradient-to-b from-gray-50 to-white">
+  <div class="max-w-7xl mx-auto px-4 text-center">
+    <h2 class="text-4xl font-extrabold text-gray-900 mb-6 animate-fade-in">Success Stories from Past Participants</h2>
+    <p class="text-lg text-gray-600 max-w-3xl mx-auto mb-12 leading-relaxed animate-fade-in delay-200">
+      The techniques shared in this workshop are simple and effective for everyone.<br>
+      Over 20,000 participants have transformed their lives using these proven manifestation methods.<br>
+      Even if you have no prior knowledge about manifestation, that’s perfectly okay—start from where you are and
+      experience the results.<br>
+      No special tools or rituals are required—just an open mind and a willingness to learn are enough.
+    </p>
+
+    @php
+    $successVideos = [
+      '1.mp4',
+      '2.mp4',
+      '3.mp4',
+      '4.mp4',
+      '5.mp4',
+      '6.mp4',
+      '7.mp4',
+      '8.mp4',
+      '9.mp4',
+      '10.mp4',
+      '11.mp4',
+      '12.mp4',
+    ];
+    @endphp
+
+    <div class="swiper mySwiper">
+      <div class="swiper-wrapper">
+        @foreach($successVideos as $idx => $video)
+      <div class="swiper-slide flex justify-center">
+        <div
+        class="rounded-3xl bg-white/70 backdrop-blur-lg shadow-xl p-2 w-full max-w-sm transform transition-transform hover:scale-105 duration-300 ease-in-out">
+        <video src="{{ asset('img/LifeHealer/video/' . $video) }}" autoplay loop muted playsinline
+          class="rounded-2xl w-full h-64 object-cover"
+          poster="{{ asset('img/LifeHealer/success/poster_' . ($idx + 1) . '.jpg') }}"
+          controlslist="nodownload nofullscreen noremoteplayback" disablePictureInPicture></video>
+        </div>
+      </div>
+    @endforeach
+      </div>
+    </div>
+  </div>
+
+  <!-- Swiper Configuration -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      new Swiper('.mySwiper', {
+        slidesPerView: 1.2,
+        spaceBetween: 30,
+        loop: true,
+        centeredSlides: true,
+        speed: 500, // smooth animation
+        autoplay: {
+          delay: 3000,
+          disableOnInteraction: false,
+        },
+        breakpoints: {
+          640: { slidesPerView: 1.5 },
+          768: { slidesPerView: 2 },
+          1024: { slidesPerView: 3 },
+          1280: { slidesPerView: 4 },
+        }
+      });
+    });
+  </script>
+</section>
+
+
+</section>
+
+{{-- =========================
+REAL RESULTS, REAL STORIES
+======================== --}}
+<section id="real-results" class="py-24 bg-gradient-to-b from-white to-gray-100">
+  <div class="max-w-7xl mx-auto px-6 text-center">
+    <h2 class="text-4xl font-extrabold text-gray-900 mb-6 animate-fade-in">Real Results, Real Stories</h2>
+    <p class="text-lg text-gray-600 mb-12 animate-fade-in delay-200">• Trained over 20,000 people</p>
+
+    @php
+    $resultImages = [
+      'result_1.png',
+      'result_2.png',
+      'result_3.png',
+      'result_4.png',
+      'result_5.png',
+      'result_6.png',
+      'result_7.png',
+      'result_8.png',
+      'result_9.png',
+    ];
+    @endphp
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10">
+      @foreach($resultImages as $idx => $img)
+      <div
+      class="bg-white/70 backdrop-blur-lg rounded-3xl overflow-hidden shadow-xl transform transition-transform hover:scale-105 duration-300 animate-fade-in delay-{{ 100 * ($idx + 1) }}">
+      <div class="aspect-w-1 aspect-h-1">
+        <img src="{{ asset('img/LifeHealer/results/' . $img) }}" alt="Real Result {{ $idx + 1 }}"
+        class="w-full h-full object-cover rounded-3xl transition-transform duration-300 hover:scale-105" />
+      </div>
+      </div>
+    @endforeach
+    </div>
+  </div>
+</section>
+
 
 {{-- =========================
 TESTIMONIALS CAROUSEL
@@ -401,7 +547,7 @@ TESTIMONIALS CAROUSEL
   </div>
 </section>
 
-{{-- =========================
+<!-- {{-- =========================
 CLIENT FEEDBACK
 ======================== --}}
 <section id="client-feedback" class="py-20 bg-gray-100">
@@ -430,81 +576,102 @@ CLIENT FEEDBACK
     @endforeach
     </div>
   </div>
-</section>
+</section> -->
 
 {{-- =========================
 BONUSES
 ======================== --}}
 <section id="bonuses" class="py-20 bg-gradient-to-r from-purple-700 to-pink-600">
-  <div class="max-w-5xl mx-auto px-6 text-center text-white">
-    <h2 class="text-3xl sm:text-4xl font-bold mb-6 animate-fade-in">Bonuses You’ll Get (Worth ₹20,000+)</h2>
-    <p class="text-gray-200 mb-12 animate-fade-in delay-200">
+  <div class="max-w-6xl mx-auto px-6 text-center text-white">
+    <h2 class="text-3xl sm:text-4xl font-bold mb-4 animate-fade-in">Bonuses If You Register Now</h2>
+    <p class="text-xl font-semibold text-yellow-300 mb-2 animate-fade-in delay-200">Total Value ₹ 50,000</p>
+    <p class="text-2xl font-bold mb-5 mt-5 animate-fade-in delay-400">
+      <span class="bg-yellow-400 text-pink-700 px-6  py-3 rounded-full shadow-lg">TODAY'S OFFER PRICE: ₹20,000</span>
+    </p>
+    <p class="text-gray-200 mb-14 animate-fade-in delay-600">
       When you enroll today, you unlock these exclusive resources at no extra cost:
     </p>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-10">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
       @php
-    $bonuses = [
-      [
-      'icon' => 'b_1.png',
-      'title' => 'BONUS #1: प्रतिज्ञाकरण (Affirmation) eBook',
-      'items' => [
-        'वैयक्तिकृत प्रतिज्ञा (Affirmations)',
-        'आरोग्य प्रतिज्ञा / Health Affirmation',
-        'प्रेम आणि नाते प्रतिज्ञा / Love & Relationship Affirmations',
-        'करिअर आणि पैसा प्रतिज्ञा / Career & Money Affirmations',
-        'सामान्य प्रतिज्ञा / General Affirmations'
-      ]
-      ],
-      [
-      'icon' => 'b_2.png',
-      'title' => 'BONUS #2: कृतज्ञता (Gratitude) & उपचार संगीत/Healing Music',
-      'items' => [
-        '365 कृतज्ञता प्रॉम्प्ट/ 365 Gratitude Prompts',
-        '432 Hz उपचार संगीत/ Healing Music',
-        '528 Hz यश संगीत/ Success Music',
-        'WhatsApp समुदायात प्रवेश/ Access to Liked Mind Community',
-        'युनिक व्हिजन बोर्ड (Vision Board)'
-      ]
-      ],
-      [
-      'icon' => 'b_3.png',
-      'title' => 'BONUS #3: अतिरिक्त बोनस/ Additional Bonus',
-      'items' => [
-        'एक दिवस फ्री माइंड GYM पास/ One Day Free Mind GYM Pass',
-        'मॅनिफेस्टिंग झूम पार्टीमध्ये प्रवेश/ Access to Manifesting Zoom Party',
-        'मोफत 1:1 सल्लामसलत करण्याची संधी/ Chance to get a Free 1:1 Consultation',
-        'मॅनिफेस्टेशन मोबाइल अनुप्रयोग माहिती मिळवा (Access to Manifestation Mobile Applications)'
-      ]
-      ],
-      [
-      'icon' => 'b_2.png',
-      'title' => 'BONUS #4: Exclusive Community Access',
-      'items' => [
-        'Invitation to Private Telegram/Discord Group',
-        'Weekly Live Q&A Sessions with Kavita',
-        'Monthly Guest Expert Workshops',
-        'Direct Messaging & Peer Support'
-      ]
-      ],
-    ];
-  @endphp
+      $bonuses = [
+        [
+          'img' => 'Bounuses/image1.png',
+          'title' => 'BONUS #1: One Day Free Mind GYM Pass',
+          'value' => 'Value: ₹2,999/-',
+          'points' => [
+            'The use of gratitude to bring positive changes in life.',
+            'Practical gratitude exercises for a happy and content life.',
+          ]
+        ],
+        [
+          'img' => 'Bounuses/image2.png',
+          'title' => 'BONUS #2: Gratitude eBook',
+          'value' => 'Value: ₹997/-',
+          'points' => [
+            'The use of gratitude to bring positive changes in life.',
+            'Practical gratitude exercises for a happy and content life.',
+          ]
+        ],
+        [
+          'img' => 'Bounuses/image3.png',
+          'title' => 'BONUS #3: Self Programming Challenge',
+          'value' => 'Value: ₹1,499/-',
+          'points' => [
+            'Activities to reprogram your subconscious mind.',
+            'Confidence-boosting challenges.',
+            'A 7-day step-by-step process to achieve your goals.',
+          ]
+        ],
+        [
+          'img' => 'Bounuses/image4.png',
+          'title' => 'BONUS #4: Gratitude & Healing Music',
+          'value' => 'Value: ₹1,997/-',
+          'points' => [
+            '365 Gratitude Prompts',
+            'Healing Music',
+            'Success Music',
+            'Access to Liked Mind Community',
+            'Vision Board',
+          ]
+        ],
+        [
+          'img' => 'Bounuses/image5.png',
+          'title' => 'BONUS #5: Affirmation eBook',
+          'value' => 'Value: ₹999/-',
+          'points' => [
+            'Affirmations',
+            'Health Affirmation',
+            'Love & Relationship Affirmations',
+            'Career & Money Affirmations',
+            'General Affirmations',
+          ]
+        ],
+        [
+          'img' => 'Bounuses/image6.png',
+          'title' => 'BONUS #6: Routine For Your Manifestation Journey',
+          'value' => 'Value: ₹1,997/-',
+          'points' => [
+            'Guidance to create a positive daily routine.',
+            'Practical tips to manifest consistently.',
+          ]
+        ],
+      ];
+      @endphp
 
       @foreach($bonuses as $idx => $b)
-      <div
-      class="bg-white/10 rounded-2xl p-6 text-left shadow-lg hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 animate-fade-in delay-{{ 200 * ($idx + 1) }}">
-      <div class="flex items-center space-x-4 mb-4">
-        <img src="{{ asset('img/LifeHealer/' . $b['icon']) }}" alt="{{ $b['title'] }}"
-        class="h-12 w-12 object-contain" />
-        <h4 class="text-xl font-semibold text-yellow-300">{{ $b['title'] }}</h4>
+      <div class="bg-white/10 rounded-2xl p-6 text-left shadow-lg hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 animate-fade-in delay-{{ 150 * ($idx + 1) }}">
+        <img src="{{ asset('img/LifeHealer/' . $b['img']) }}" alt="{{ $b['title'] }}"
+          class="w-full h-72 object-contain rounded-xl shadow-md border border-pink-100 mb-6 bg-white" />
+        <h4 class="text-xl font-semibold text-yellow-300 mb-1">{{ $b['title'] }}</h4>
+        <span class="block text-sm text-white/80 font-bold mb-3">{{ $b['value'] }}</span>
+        <ul class="list-disc list-inside text-gray-100 space-y-1 ml-2">
+          @foreach($b['points'] as $li)
+            <li>{{ $li }}</li>
+          @endforeach
+        </ul>
       </div>
-      <ul class="list-disc list-inside text-gray-100 space-y-1">
-        @foreach($b['items'] as $li)
-      <li>{{ $li }}</li>
       @endforeach
-      </ul>
-      </div>
-    @endforeach
     </div>
   </div>
 </section>
@@ -521,7 +688,7 @@ COUNTDOWN & PRICING
     </p>
 
     {{-- Countdown Timer --}}
-    <div id="countdown"
+    <!-- <div id="countdown"
       class="mx-auto flex flex-wrap items-center justify-center space-x-6 text-purple-600 text-2xl font-bold mb-8">
       <div class="flex flex-col items-center animate-fade-in">
         <span id="days" class="text-5xl md:text-6xl">00</span>
@@ -539,7 +706,7 @@ COUNTDOWN & PRICING
         <span id="seconds" class="text-5xl md:text-6xl">00</span>
         <span class="text-sm text-gray-500">Seconds</span>
       </div>
-    </div>
+    </div> -->
 
     {{-- Pricing Card --}}
     <div
@@ -549,7 +716,7 @@ COUNTDOWN & PRICING
         Get instant access to all modules, guided meditations, downloadable resources, plus all four bonus packs—
         valued at ₹20,000+—for just <strong>₹20,000</strong> today.
       </p>
-      <a href="https://rzp.io/i/KNhuciEeUM" target="_blank"
+      <a href="https://rzp.io/rzp/Ch1XJWuD" target="_blank"
         class="inline-block bg-yellow-400 text-black font-semibold rounded-full px-8 py-4 shadow-lg transform hover:scale-105 transition-transform duration-300 mb-4">
         Reserve My Seat Now
       </a>

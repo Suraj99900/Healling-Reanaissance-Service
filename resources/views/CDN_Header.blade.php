@@ -78,7 +78,8 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.css" />
 
     <!-- Google Ads Link -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9834466189010207" crossorigin="anonymous"></script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9834466189010207"
+        crossorigin="anonymous"></script>
     <meta name="google-adsense-account" content="ca-pub-9834466189010207">
 
     <!-- razorpay CDN -->
@@ -112,25 +113,30 @@
     <link rel="stylesheet" href="{{asset('css/nav-style.css')}}"> -->
 
 
-      <!-- ================================
+    <!-- ================================
        T A I L W I N D   C S S   (CDN)
        ================================ -->
-   @vite(['resources/css/app.css', 'resources/js/app.js'])
-   
-<script src="{{asset('js/jquery-3.7.1.min.js')}}"></script>
-  
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-  <!-- Custom CSS Variables & Overrides -->
-  <style>
-    :root {
-      --brand-primary: theme('colors.brand-primary');
-      --brand-secondary: theme('colors.brand-secondary');
-      --brand-accent: theme('colors.brand-accent');
-      --text-light: theme('colors.text-light');
-      --text-dark: theme('colors.text-dark');
-    }
+    <script src="{{asset('js/jquery-3.7.1.min.js')}}"></script>
 
-  </style>
+    <!-- Swiper CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <!-- Swiper JS -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+
+
+    <!-- Custom CSS Variables & Overrides -->
+    <style>
+        :root {
+            --brand-primary: theme('colors.brand-primary');
+            --brand-secondary: theme('colors.brand-secondary');
+            --brand-accent: theme('colors.brand-accent');
+            --text-light: theme('colors.text-light');
+            --text-dark: theme('colors.text-dark');
+        }
+    </style>
 
 </head>
 
