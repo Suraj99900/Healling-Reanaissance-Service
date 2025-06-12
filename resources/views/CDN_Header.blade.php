@@ -7,7 +7,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Title -->
-    <title>Life Healer Kavita - 10X Your Power of Manifestation</title>
+    <title>Life Healer Kvita's - 10X Your Power of Manifestation</title>
 
     <!-- Favicon -->
     <link rel="icon" href="{{ asset('/img/LifeHealer/logo_healer.png')}}" type="image/x-icon">
@@ -19,31 +19,31 @@
     <meta name="keywords"
         content="holistic health, wellness, life healing, spiritual wellness, mental health, physical health, manifestation, career growth, success">
     <meta name="robots" content="index, follow">
-    <link rel="canonical" href="https://lifehealerkavita.com">
+    <link rel="canonical" href="https://lifehealerkavita.com/">
 
     <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="Life Healer Kavita - 10X Your Power of Manifestation">
+    <meta property="og:title" content="Life Healer Kvita's - 10X Your Power of Manifestation">
     <meta property="og:description"
         content="Life Healer offers holistic health solutions to achieve physical, mental, and spiritual wellness. Join us for a healthier you.">
     <meta property="og:image" content="{{ asset('/img/LifeHealer/logo_healer.png')}}">
-    <meta property="og:url" content="https://lifehealerkavita.com">
+    <meta property="og:url" content="https://lifehealerkavita.com/">
     <meta property="og:type" content="website">
 
     <!-- Twitter Card Meta Tags -->
-    <meta name="twitter:card" content="Life Healer Kavita - 10X Your Power of Manifestation">
-    <meta name="twitter:title" content="Life Healer Kavita - 10X Your Power of Manifestation">
+    <meta name="twitter:card" content="Life Healer Kvita - 10X Your Power of Manifestation">
+    <meta name="twitter:title" content="Life Healer Kvita - 10X Your Power of Manifestation">
     <meta name="twitter:description"
         content="Life Healer offers holistic health solutions to achieve physical, mental, and spiritual wellness. Join us for a healthier you.">
     <link rel="shortcut icon" href="{{ asset('/img/LifeHealer/logo_healer.png')}}" type="image/x-icon"
         id="ff_favicon" />
     <meta name="twitter:image" content="{{ asset('/img/LifeHealer/logo_healer.png')}}">
 
-    <link rel="canonical" href="https://lifehealerkavita.com" />
-    <meta property="og:url" content="https://lifehealerkavita.com" />
-    <meta itemprop="url" content="https://lifehealerkavita.com" />
-    <meta name="twitter:url" content="https://lifehealerkavita.com" />
+    <link rel="canonical" href="https://lifehealerkavita.com/" />
+    <meta property="og:url" content="https://lifehealerkavita.com/" />
+    <meta itemprop="url" content="https://lifehealerkavita.com/" />
+    <meta name="twitter:url" content="https://lifehealerkavita.com/" />
 
-    <meta name="author" content="Kavita">
+    <meta name="author" content="Kvita's">
     <meta name="site_id" content="lifehealerkavita.com/">
     <meta name="LifeHealer_id" content="https://lifehealerkavita.com/LifeHealer/index.php">
     <meta name="LifeHealer_page_id" content="https://lifehealerkavita.com/LifeHealer/index.php">

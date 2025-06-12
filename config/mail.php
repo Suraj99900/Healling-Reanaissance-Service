@@ -108,7 +108,7 @@ return [
     */
 
     'from' => [
-        'address' => env('MAIL_FROM_ADDRESS', 'wellness.service@lifehealerkavita.com'),
+        'address' => env('MAIL_FROM_ADDRESS', 'wellness.service@lifehealerKvita.com'),
         'name' => env('MAIL_FROM_NAME', 'Wellness Service'),
     ],
 

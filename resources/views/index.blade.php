@@ -314,13 +314,13 @@ INSTRUCTOR SECTION
 <section id="instructor" class="py-20 bg-gradient-to-r from-purple-700 to-pink-600">
   <div class="max-w-5xl mx-auto px-6 grid md:grid-cols-2 gap-10 items-center">
     <div class="animate-fade-in">
-      <video controls autoplay loop muted src="{{ asset('img/LifeHealer/video/main-kvita.mp4') }}" alt="Coach Kavita Video"
+      <video controls autoplay loop muted src="{{ asset('img/LifeHealer/video/main-kvita.mp4') }}" alt="Coach Kvita Video"
         class="rounded-2xl shadow-2xl object-cover w-full h-80"></video>
     </div>
     <div class="space-y-6 animate-fade-in delay-200">
-      <h2 class="text-3xl sm:text-4xl font-bold text-white">Meet Your Unicorn Coach: Kavita Jadhav</h2>
+      <h2 class="text-3xl sm:text-4xl font-bold text-white">Meet Your Unicorn Coach: Kvita Jadhav</h2>
       <p class="text-gray-200 leading-relaxed">
-        Hello, I’m <strong>Kavita Jadhav</strong>, your Life Transformation Coach. I use cutting‐edge positive
+        Hello, I’m <strong>Kvita Jadhav</strong>, your Life Transformation Coach. I use cutting‐edge positive
         psychology, meditation, and energy healing to help you design your best life.
         <br /><br />
         My work has been featured in <em>Hindustan Times</em>, <em>Business World</em>, and <em>Business Standard</em>.
@@ -344,9 +344,9 @@ REWARDS & RECOGNITION
 ======================== --}}
 <section id="rewards" class="py-20 bg-gradient-to-br from-yellow-100 to-pink-100">
   <div class="max-w-4xl mx-auto px-6 text-center">
-    <h2 class="text-3xl sm:text-4xl font-bold text-pink-700 mb-8 animate-fade-in">Kavita's Rewards & Recognition</h2>
+    <h2 class="text-3xl sm:text-4xl font-bold text-pink-700 mb-8 animate-fade-in">Kvita's Rewards & Recognition</h2>
     <p class="text-lg text-gray-700 mb-10 animate-fade-in delay-200">
-      Celebrating the achievements and milestones of Kavita's inspiring journey.
+      Celebrating the achievements and milestones of Kvita's inspiring journey.
     </p>
     @php
       $rewards = [
@@ -499,17 +499,17 @@ TESTIMONIALS CAROUSEL
       $testimonials = [
         [
         'img' => 'c2oti_980_65.jpg',
-        'text' => "Thank you for guiding me on my journey to financial abundance through manifestation. Kavita’s techniques realigned my mindset, and within weeks I saw transformative results in my career and personal life. This course is pure magic!",
+        'text' => "Thank you for guiding me on my journey to financial abundance through manifestation. Kvita’s techniques realigned my mindset, and within weeks I saw transformative results in my career and personal life. This course is pure magic!",
         'author' => '– Manisha Mane'
         ],
         [
         'img' => 'qxnza_684_56.jpg',
-        'text' => "Working with Life Coach Kavita transformed my relationships. Her guided meditations and energy exercises healed old wounds. I now feel connected, confident, and deeply content.",
+        'text' => "Working with Life Coach Kvita transformed my relationships. Her guided meditations and energy exercises healed old wounds. I now feel connected, confident, and deeply content.",
         'author' => '– Anjali Sharma'
         ],
         [
         'img' => 'u0nzy_720_2.jpg',
-        'text' => "Kavita’s compassion and expertise were a game‐changer. Her personal insights and practical strategies helped me overcome self-doubt and achieve my goals faster than I ever imagined.",
+        'text' => "Kvita’s compassion and expertise were a game‐changer. Her personal insights and practical strategies helped me overcome self-doubt and achieve my goals faster than I ever imagined.",
         'author' => '– Rani Singh'
         ],
       ];
@@ -760,8 +760,8 @@ FOOTER
       <h4 class="font-semibold text-white mb-2">Contact Us</h4>
       <p class="text-sm leading-relaxed">
         <strong>Phone:</strong> +91-7666692367<br />
-        <strong>Email:</strong> <a href="mailto:support@lifehealerkavita.com"
-          class="hover:text-white transition-colors duration-200">support@lifehealerkavita.com</a><br />
+        <strong>Email:</strong> <a href="mailto:support@lifehealerKvita.com"
+          class="hover:text-white transition-colors duration-200">support@lifehealerKvita.com</a><br />
         <strong>Address:</strong> Narhe Gaon, Pune, Maharashtra
       </p>
       <div class="mt-4 flex space-x-4">
