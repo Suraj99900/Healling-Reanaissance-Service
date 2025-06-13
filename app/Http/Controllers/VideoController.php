@@ -175,7 +175,7 @@ class VideoController extends Controller
 
             foreach ($videos as &$video) {
                 $video->thumbnail_url = $video->thumbnail
-                    ? Storage::disk('spaces')->url($video->thumbnail)
+                    ?  Storage::disk('spaces')->temporaryUrl($video->thumbnail,now()->addMinutes(360))
                     : 'https://suraj99900.github.io/myprotfolio.github.io/img/gallery_1.jpg';
 
                 $video->video_url = Storage::disk('spaces')->temporaryUrl($video->path,now()->addMinutes(360));

@@ -433,7 +433,7 @@
                 { data: 'name' },
                 {
                     data: 'thumbnail_url',
-                    render: data => `<img src="${data}" alt="Thumb" width="50" class="rounded" loading="lazy">`
+                    render: data => `<img src="${data}" alt="Thumb" width="50" class="rounded" crossorigin="anonymous" loading="lazy">`
                 },
                 {
                     data: 'hls_path',

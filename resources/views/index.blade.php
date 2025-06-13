@@ -68,51 +68,50 @@
 {{-- =========================
 HERO SECTION
 ======================== --}}
-<section id="hero" class="relative h-screen bg-cover bg-center overflow-hidden"
+<section id="hero" class="relative min-h-[80vh] sm:min-h-screen bg-cover bg-center overflow-hidden flex items-center"
   style="background-image: url('{{ asset('img/LifeHealer/user1.png') }}');">
   {{-- Dark overlay --}}
   <div class="absolute inset-0 bg-black/70"></div>
 
-  <div class="relative z-10 flex flex-col justify-center h-full max-w-4xl mx-auto px-6 space-y-6">
-
+  <div class="relative z-10 flex flex-col justify-center w-full h-full max-w-3xl md:max-w-4xl mx-auto px-4 sm:px-6 space-y-4 sm:space-y-6 py-12 sm:py-0">
     <h1
-      class="text-4xl sm:text-5xl md:text-6x2 font-extrabold text-white leading-tight drop-shadow-lg animate-fade-in delay-200">
-      Welcome to <br> Kvita's Healling Renaissance
+      class="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-white leading-tight drop-shadow-lg animate-fade-in delay-200">
+      Welcome to <br class="hidden xs:block" /> Kvita's Healling Renaissance
     </h1>
 
     {{-- Headline from PDF --}}
     <h2
-      class="text-3xl sm:text-3xl md:text-4xl font-extrabold text-white leading-tight drop-shadow-lg animate-fade-in delay-200">
+      class="text-lg xs:text-xl sm:text-2xl md:text-3xl lg:text-4xl font-extrabold text-white leading-tight drop-shadow-lg animate-fade-in delay-200">
       Transform your life with Manifestation<br>
       To Recreate the Life of your Dreams<br>
     </h2>
 
-    <p class="mt-4 text-lg sm:text-xl text-gray-300 max-w-2xl animate-fade-in delay-400">
-      Do you feel stuck in the same cycle? <br> Are you ready to create a life full of purpose, abundance, and inner
+    <p class="mt-2 sm:mt-4 text-base xs:text-lg sm:text-xl text-gray-300 max-w-xl animate-fade-in delay-400">
+      Do you feel stuck in the same cycle? <br class="hidden sm:block" /> Are you ready to create a life full of purpose, abundance, and inner
       peace?
     </p>
-    <p class="mt-4 text-lg sm:text-xl text-gray-200 max-w-2xl animate-fade-in delay-400">
+    <p class="mt-2 sm:mt-4 text-base xs:text-lg sm:text-xl text-gray-200 max-w-xl animate-fade-in delay-400">
       At Kvita's Healling Renaissance, we believe that your thoughts shape your reality. Through the power of
       manifestation, positive thinking, and daily affirmations, you can rewire your mindset, shift your energy, and
       attract the life you truly desire.
     </p>
 
     <div
-      class="mt-8 flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-4 animate-fade-in delay-600">
-      <a href="{{ url("enroll") }}"
-        class="inline-block bg-gradient-to-r from-yellow-400 to-pink-500 text-black font-semibold rounded-full px-8 py-4 shadow-lg transform hover:scale-105 transition-transform duration-300">
+      class="mt-6 sm:mt-8 flex flex-col sm:flex-row items-start sm:items-center space-y-3 sm:space-y-0 sm:space-x-4 animate-fade-in delay-600">
+      <a href="{{ url('enroll') }}"
+        class="inline-block bg-gradient-to-r from-yellow-400 to-pink-500 text-black font-semibold rounded-full px-6 py-3 sm:px-8 sm:py-4 shadow-lg transform hover:scale-105 transition-transform duration-300 text-base sm:text-lg">
         Enroll Now &bull;
         <span class="ml-2"><i class="fa fa-arrow-right"></i></span>
       </a>
       {{-- Dynamic “Days Left” Badge (JS will fill) --}}
       <span id="daysLeftBadge"
-        class="bg-red-500 text-white font-semibold rounded-full px-4 py-2 shadow-lg animate-pulse text-sm"></span>
+        class="bg-red-500 text-white font-semibold rounded-full px-4 py-2 shadow-lg animate-pulse text-xs sm:text-sm"></span>
     </div>
 
-    <div class="mt-8 flex flex-wrap items-center space-x-6 text-gray-300 animate-fade-in delay-800">
+    <div class="mt-6 sm:mt-8 flex flex-wrap items-center space-x-4 sm:space-x-6 text-gray-300 animate-fade-in delay-800">
       <div class="flex items-center space-x-1">
         @for ($i = 0; $i < 5; $i++)
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-400 animate-pulse" viewBox="0 0 20 20"
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-5 sm:w-5 text-yellow-400 animate-pulse" viewBox="0 0 20 20"
           fill="currentColor">
           <path d="M9.049 2.927c.3-.921 1.603-.921 1.902
          0l1.286 3.966a1 1 0 00.95.69h4.162c.969
@@ -123,10 +122,10 @@ HERO SECTION
          0 00-.364-1.118L2.713 9.393c-.783-.57-.38-1.81.588-1.81h4.162a1 1
          0 00.951-.69l1.286-3.966z" />
         </svg>
-    @endfor
+        @endfor
       </div>
-      <span class="text-sm animate-fade-in delay-1000">4.9/5 (12,000+ Reviews)</span>
-      <span class="text-sm animate-fade-in delay-1200">100K+ Lives Transformed</span>
+      <span class="text-xs sm:text-sm animate-fade-in delay-1000">4.9/5 (12,000+ Reviews)</span>
+      <span class="text-xs sm:text-sm animate-fade-in delay-1200">100K+ Lives Transformed</span>
     </div>
   </div>
 </section>
@@ -273,7 +272,7 @@ HEALTH & WELLNESS HIGHLIGHTS (NEW SECTION)
       <div
         class="bg-gray-50 rounded-2xl p-6 shadow-lg hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 animate-fade-in delay-400">
         <div class="flex flex-col items-center">
-          <i class="fas fa-brain text-5xl text-purple-600 mb-4 pulse-icon"></i>
+          <img src="{{ asset('img/LifeHealer/mental-img/image1.png') }}" alt="Mental Well-being" class="w-40 h-40 hover:shadow-2x1 rounded-2xl mb-4 object-contain" />
           <h3 class="text-xl font-semibold text-gray-800 mb-2">Mental Well-being</h3>
           <p class="text-gray-600">
             Learn mindfulness & meditation to calm a racing mind, reduce anxiety, and boost clarity.
@@ -285,7 +284,7 @@ HEALTH & WELLNESS HIGHLIGHTS (NEW SECTION)
       <div
         class="bg-gray-50 rounded-2xl p-6 shadow-lg hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 animate-fade-in delay-600">
         <div class="flex flex-col items-center">
-          <i class="fas fa-spa text-5xl text-pink-500 mb-4 pulse-icon"></i>
+          <img src="{{ asset('img/LifeHealer/mental-img/image2.png') }}" alt="Stress Reduction" class="w-40 h-40 hover:shadow-2x1 rounded-2xl mb-4 object-contain" />
           <h3 class="text-xl font-semibold text-gray-800 mb-2">Stress Reduction</h3>
           <p class="text-gray-600">
             Master breathing exercises & guided visualizations that release tension and restore balance.
@@ -297,7 +296,7 @@ HEALTH & WELLNESS HIGHLIGHTS (NEW SECTION)
       <div
         class="bg-gray-50 rounded-2xl p-6 shadow-lg hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 animate-fade-in delay-800">
         <div class="flex flex-col items-center">
-          <i class="fas fa-bolt text-5xl text-yellow-400 mb-4 pulse-icon"></i>
+          <img src="{{ asset('img/LifeHealer/mental-img/image3.png') }}" alt="Energy Alignment" class="w-40 h-40 hover:shadow-2x1 rounded-2xl mb-4 object-contain" />
           <h3 class="text-xl font-semibold text-gray-800 mb-2">Energy Alignment</h3>
           <p class="text-gray-600">
             Align your chakras & life force through simple energy practices to feel more vitality every day.

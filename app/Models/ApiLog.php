@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -16,5 +17,9 @@ class ApiLog extends Model
         'response_payload',
         'status_code',
         'ip_address',
+        'time_spent',
+        'user_agent',
+        'created_at',
+        'updated_at',
     ];
 }

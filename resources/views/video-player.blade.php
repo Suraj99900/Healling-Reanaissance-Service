@@ -9,12 +9,15 @@
     .backdrop-blur-md {
         backdrop-filter: blur(12px);
     }
+
     .player-bg {
         background: linear-gradient(135deg, #f8fafc 0%, #e0e7ef 100%);
     }
+
     .card-gradient {
         background: linear-gradient(120deg, #ffffff 60%, #e3e8f7 100%);
     }
+
     .card-border {
         border: 1px solid #e5e7eb;
     }
@@ -35,13 +38,12 @@
             <div id="alertMessage" class="hidden bg-red-500 text-white px-4 py-2 rounded-lg mx-auto max-w-md"></div>
         </div>
 
-        {{-- Video Player Container --}}
+        {{-- Video Player Section --}}
         <div class="card-gradient bg-opacity-90 backdrop-blur-md rounded-lg shadow-lg card-border overflow-hidden">
-            <div class="relative w-full pb-[56.25%]">
-                <video id="cloudflareVideo" class="video-js absolute top-0 left-0 w-full h-full" controls preload="auto"
-                    crossorigin="anonymous">
-                    <source src="" type="application/x-mpegURL" />
-                </video>
+            <div class="relative w-full aspect-video">
+                <video id="cloudflareVideo"
+                    class="video-js vjs-big-play-centered absolute top-0 left-0 w-full h-full rounded-lg" controls
+                    preload="auto" crossorigin="anonymous" poster="" data-setup='{}'></video>
             </div>
         </div>
 
@@ -94,21 +96,17 @@
 
 {{-- Video.js & jQuery --}}
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://vjs.zencdn.net/7.18.1/video.min.js"></script>
-
 <script>
-    $(document).ready(function () {
+    $(document).ready(function() {
         const videoId = {{ $videoId }};
         const userId = {{ $iUserId }};
         const userType = "{{ $iUserType }}";
 
-        // Initial fetches
         fetchVideoDataById(videoId);
         fetchVideoAttachments(videoId);
         fetchCommentsByVideoId(videoId);
 
-        // Post comment
-        $('#postCommentButton').click(function () {
+        $('#postCommentButton').click(function() {
             const comment = $('#commentInput').val().trim();
             if (!comment) return;
             addComment(comment, videoId);
@@ -128,15 +126,25 @@
             $.ajax({
                 url: `/api/video/${vid}`,
                 method: "GET",
+                dataType: "json",
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                beforeSend(xhr) {
+                    xhr.setRequestHeader('X-CSRF-TOKEN', '{{ csrf_token() }}');
+                },
                 success(response) {
                     if (response.status == 200) {
                         const video = response.body[0];
                         $('#videoTitle').text(video.title);
                         $('#videoDescription').text(video.description);
 
-                        // Use HLS URL directly
                         const hlsUrl = video.hls_url;
-                        initializeVideoPlayer(hlsUrl);
+                        const posterUrl = video.thumbnail_url || '';
+
+                        // Only initialize when both are ready
+                        initializeVideoPlayer(hlsUrl, posterUrl);
                     } else {
                         showAlert(response.message || "Unable to load video.");
                     }
@@ -149,12 +157,23 @@
             });
         }
 
-        function initializeVideoPlayer(hlsUrl) {
-            const player = videojs('cloudflareVideo', {
+        function initializeVideoPlayer(hlsUrl, posterUrl = '') {
+            if (window.cloudflareVideoPlayer) {
+                window.cloudflareVideoPlayer.dispose();
+            }
+
+            if (!hlsUrl) {
+                console.error('No video source provided.');
+                showAlert('No video source provided.');
+                return;
+            }
+
+            window.cloudflareVideoPlayer = videojs('cloudflareVideo', {
                 autoplay: false,
                 controls: true,
                 fluid: true,
                 preload: 'auto',
+                poster: posterUrl,
                 controlBar: {
                     volumePanel: true,
                     playToggle: true,
@@ -168,10 +187,23 @@
                 }
             });
 
-            player.src({ src: hlsUrl, type: 'application/x-mpegURL' });
-            player.ready(function () {
-                player.on('error', function () {
-                    console.error('Video.js error:', player.error());
+            window.cloudflareVideoPlayer.src({
+                src: hlsUrl,
+                type: 'application/x-mpegURL'
+            });
+
+            window.cloudflareVideoPlayer.ready(function() {
+                // Set crossorigin and loading attributes on the poster image
+                const posterImg = document.querySelector('.vjs-poster img');
+                if (posterImg) {
+                    posterImg.setAttribute('crossorigin', 'anonymous');
+                    posterImg.setAttribute('loading', 'lazy');
+                    posterImg.src = posterUrl || '';
+                }
+
+                window.cloudflareVideoPlayer.on('error', function() {
+                    console.error('Video.js error:', window.cloudflareVideoPlayer.error());
+                    showAlert('Video playback error!');
                 });
             });
         }
@@ -205,18 +237,19 @@
             }
 
             attachments.forEach(att => {
-                const url = att.attachment_url || `${window.location.origin}/storage/${att.attachment_path}`;
+                const url = att.attachment_url ||
+                    `${window.location.origin}/storage/${att.attachment_path}`;
                 const btn = $(`
-          <button
-            class="inline-flex items-center space-x-2 bg-gradient-to-r from-sky-400 to-pink-200 hover:from-sky-500 hover:to-pink-300 text-sky-900 px-4 py-2 rounded-lg shadow transition"
-            onclick="window.open('${url}', '_blank')"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path d="M4 3a2 2 0 00-2 2v10c0 1.1.9 2 2 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm2 3a1 1 0 112 0v2h2a1 1 0 110 2H8v2a1 1 0 11-2 0V10H4a1 1 0 110-2h2V6z" />
-            </svg>
-            <span>${att.attachment_name}</span>
-          </button>
-        `);
+                    <button
+                        class="inline-flex items-center space-x-2 bg-gradient-to-r from-sky-400 to-pink-200 hover:from-sky-500 hover:to-pink-300 text-sky-900 px-4 py-2 rounded-lg shadow transition"
+                        onclick="window.open('${url}', '_blank')"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M4 3a2 2 0 00-2 2v10c0 1.1.9 2 2 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm2 3a1 1 0 112 0v2h2a1 1 0 110 2H8v2a1 1 0 11-2 0V10H4a1 1 0 110-2h2V6z" />
+                        </svg>
+                        <span>${att.attachment_name}</span>
+                    </button>
+                `);
                 container.append(btn);
             });
         }
@@ -251,14 +284,14 @@
 
             comments.forEach(cmt => {
                 const card = $(`
-          <div class="bg-white/90 backdrop-blur-md rounded-lg shadow-md card-border p-4">
-            <div class="flex justify-between items-center mb-2">
-              <h5 class="text-lg font-semibold text-gray-900">${cmt.user_name}</h5>
-              <span class="text-gray-500 text-sm">${new Date(cmt.added_on).toLocaleString()}</span>
-            </div>
-            <p class="text-gray-800">${cmt.comment}</p>
-          </div>
-        `);
+                <div class="bg-white/90 backdrop-blur-md rounded-lg shadow-md card-border p-4">
+                    <div class="flex justify-between items-center mb-2">
+                    <h5 class="text-lg font-semibold text-gray-900">${cmt.user_name}</h5>
+                    <span class="text-gray-500 text-sm">${new Date(cmt.added_on).toLocaleString()}</span>
+                    </div>
+                    <p class="text-gray-800">${cmt.comment}</p>
+                </div>
+                `);
                 container.append(card);
             });
         }
