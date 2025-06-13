@@ -28,7 +28,7 @@
                     <span class="absolute left-0 bottom-[-2px] h-0.5 w-0 bg-pink-300 scale-x-0 group-hover:scale-x-100
                        {{ request()->is('/') ? 'scale-x-100' : '' }} transition-transform origin-left"></span>
                 </a>
-                <a href="https://play.google.com/store/apps/details?id=com.healingrenaissance.app"
+                <a href="https://play.google.com/store/apps/details?id=com.healingrenaissance.app" target="_blank"
                     class="relative group flex items-center space-x-1 transition-colors duration-200 hover:text-pink-300">
                     <i class="fa fa-download"></i>
                     <span>Download App</span>
@@ -104,7 +104,7 @@
                 <i class="fa fa-home"></i>
                 <span>Home</span>
             </a>
-            <a href="https://drive.google.com/file/d/1lJhqEmxmhLf36ct9CeEqvT9CH7uUfnl6/view?usp=sharing"
+            <a href="https://play.google.com/store/apps/details?id=com.healingrenaissance.app" target="_blank"
                 class="flex items-center space-x-2 hover:text-yellow-300 transition-colors duration-200">
                 <i class="fa fa-download"></i>
                 <span>Download App</span>

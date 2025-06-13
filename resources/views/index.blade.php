@@ -372,6 +372,7 @@ REWARDS & RECOGNITION
 {{-- =========================
 SUCCESS STORIES FROM PAST PARTICIPANTS
 ======================== --}}
+
 <section id="success-stories" class="py-24 bg-gradient-to-b from-gray-50 to-white">
   <div class="max-w-7xl mx-auto px-4 text-center">
     <h2 class="text-4xl font-extrabold text-gray-900 mb-6 animate-fade-in">Success Stories from Past Participants</h2>
@@ -403,21 +404,25 @@ SUCCESS STORIES FROM PAST PARTICIPANTS
     <div class="swiper mySwiper">
       <div class="swiper-wrapper">
         @foreach($successVideos as $idx => $video)
-      <div class="swiper-slide flex justify-center">
-        <div
-        class="rounded-3xl bg-white/70 backdrop-blur-lg shadow-xl p-2 w-full max-w-sm transform transition-transform hover:scale-105 duration-300 ease-in-out">
-        <video src="{{ asset('img/LifeHealer/video/' . $video) }}" autoplay loop muted playsinline
-          class="rounded-2xl w-full h-64 object-cover"
-          poster="{{ asset('img/LifeHealer/success/poster_' . ($idx + 1) . '.jpg') }}"
-          controlslist="nodownload nofullscreen noremoteplayback" disablePictureInPicture></video>
+        <div class="swiper-slide flex justify-center">
+          <div
+            class="rounded-3xl bg-white/70 backdrop-blur-lg shadow-xl p-2 w-full max-w-sm transform transition-transform hover:scale-105 duration-300 ease-in-out">
+            <video 
+              src="{{ asset('img/LifeHealer/video/' . $video) }}" 
+              autoplay loop muted playsinline controls
+              class="rounded-2xl w-full h-64 object-cover success-story-video"
+              poster="{{ asset('img/LifeHealer/success/poster_' . ($idx + 1) . '.jpg') }}"
+              controlslist="nodownload noremoteplayback"
+              style="background: #000"
+            ></video>
+          </div>
         </div>
-      </div>
-    @endforeach
+        @endforeach
       </div>
     </div>
   </div>
 
-  <!-- Swiper Configuration -->
+  <!-- Swiper Configuration & Fullscreen JS -->
   <script>
     document.addEventListener('DOMContentLoaded', function () {
       new Swiper('.mySwiper', {
@@ -425,7 +430,7 @@ SUCCESS STORIES FROM PAST PARTICIPANTS
         spaceBetween: 30,
         loop: true,
         centeredSlides: true,
-        speed: 500, // smooth animation
+        speed: 500,
         autoplay: {
           delay: 3000,
           disableOnInteraction: false,
@@ -437,12 +442,24 @@ SUCCESS STORIES FROM PAST PARTICIPANTS
           1280: { slidesPerView: 4 },
         }
       });
+
+      // Enable fullscreen on double-click for all videos in this section
+      document.querySelectorAll('.success-story-video').forEach(function(video) {
+        video.addEventListener('dblclick', function(e) {
+          if (video.requestFullscreen) {
+            video.requestFullscreen();
+          } else if (video.webkitRequestFullscreen) {
+            video.webkitRequestFullscreen();
+          } else if (video.msRequestFullscreen) {
+            video.msRequestFullscreen();
+          }
+        });
+      });
     });
   </script>
 </section>
 
 
-</section>
 
 {{-- =========================
 REAL RESULTS, REAL STORIES

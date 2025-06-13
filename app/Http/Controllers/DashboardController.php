@@ -28,6 +28,7 @@ class DashboardController extends Controller
             ->groupBy('endpoint')
             ->selectRaw('endpoint, count(*) as total_hits, count(distinct ip_address) as unique_hits, AVG(time_spent) as avg_time_spent')
             ->orderByDesc('total_hits')
+            ->limit(10)
             ->get();
 
         // Total logs (all endpoints, all hits)

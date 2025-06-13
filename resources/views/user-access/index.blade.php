@@ -233,7 +233,7 @@
       $.post('/api/user-category-access', data, function (response) {
         alert(response.message);
         fetchUserAccessList();
-        $('#grantAccessForm')[0].reset();
+        // $('#grantAccessForm')[0].reset();
         $('#user_id').val(null).trigger('change');
         $('#category_id').val(null).trigger('change');
       }).fail(function (err) {
