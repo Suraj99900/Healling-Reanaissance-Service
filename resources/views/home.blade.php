@@ -1,85 +1,116 @@
+{{-- resources/views/user-categories.blade.php --}}
 @include('CDN_Header')
 @include('navbar')
+
 @php
-$sessionManager = new \App\Models\SessionManager();
-$iUserId = $sessionManager->iUserID;
+    $sessionManager = new \App\Models\SessionManager();
+    $iUserId = $sessionManager->iUserID;
 @endphp
 
-<div class="main-content">
-    <section class="service section " id="service">
-        <div class="container">
-            <div class="row">
-                <div class="section-title padd-15">
-                    <h2>Category Videos</h2>
-                </div>
-            </div>
-            <div class="container-fluid">
-                <div class="row" id="categoryGrid">
-                    <!-- Categories will be dynamically inserted here -->
-                </div>
-            </div>
-    </section>
-</div>
+<style>
+    .backdrop-blur-md {
+        backdrop-filter: blur(12px);
+    }
+    .category-card-gradient {
+        background: linear-gradient(120deg, #ffffff 60%, #e3e8f7 100%);
+    }
+    .category-card-gradient-hover {
+        background: linear-gradient(120deg, #fbeffb 60%, #e3e8f7 100%);
+    }
+</style>
 
+<div class="min-h-screen bg-gradient-to-br from-white via-pink-100 to-sky-100 text-gray-800 py-10">
+    <div class="container mx-auto px-4">
+
+        {{-- Page Header --}}
+        <div class="mb-8 text-center">
+            <h2 class="text-3xl font-semibold text-gray-800 drop-shadow-lg">Category Videos</h2>
+        </div>
+
+        {{-- Category Grid --}}
+        <div id="categoryGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {{-- Cards will be injected here --}}
+        </div>
+
+    </div>
+</div>
 
 @include('CDN_Footer')
 
 <script>
-
     $(document).ready(function () {
-
-        // Fetch categories and display them
         fetchCategoryByUserId();
 
         function fetchCategoryByUserId() {
             $.ajax({
-                url: "/api/video-categories/{{ $iUserId }}/user", // Adjust the endpoint as needed
+                url: `/api/video-categories/{{ $iUserId }}/user`,
                 method: "GET",
-                success: function (response) {
+                success(response) {
                     if (response.status == 200) {
-                        console.log(response.body);
-
                         displayCategories(response.body);
                     } else {
-                        $("#alertMessage").removeClass("d-none").addClass("alert-danger").text(response.data.message);
+                        showError("No categories available.");
                     }
                 },
-                error: function (xhr) {
-                    let errorMessage = "Failed to fetch categories!";
+                error(xhr) {
+                    let msg = "Failed to fetch categories!";
                     if (xhr.responseJSON && xhr.responseJSON.error) {
-                        errorMessage = xhr.responseJSON.error;
+                        msg = xhr.responseJSON.error;
                     }
-                    $("#alertMessage").removeClass("d-none").addClass("alert-danger").text(errorMessage);
+                    showError(msg);
                 }
             });
         }
 
         function displayCategories(categories) {
             const categoryGrid = $("#categoryGrid");
-            categoryGrid.empty(); // Clear any existing categories
+            categoryGrid.empty();
 
             categories.forEach(category => {
-                const categoryCard = `
-                                <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
-                                    <div class="card h-100">
-                                        <div class="card-body">
-                                            <h3 class="card-title">${category.name}</h3>
-                                            <p class="card-text" style="font-size: 0.7rem;">${limitWords(category.description, 20)}</p>
-                                            <a href="/videos/${category.id}" class="btnWAN btn-primary btn-lg" style="width:8rem;">View Videos</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            `;
-                categoryGrid.append(categoryCard);
+                const truncatedDesc = limitWords(category.description, 20);
+
+                // Card with light white, pink, and sky blue gradient
+                const cardHtml = `
+                    <a href="/videos/${category.id}"
+                        class="group block category-card-gradient bg-opacity-90 backdrop-blur-md rounded-lg shadow-lg p-6 flex flex-col justify-between hover:category-card-gradient-hover hover:shadow-2xl transition border border-gray-200">
+                        <div>
+                        <h3 class="text-xl font-bold text-gray-800 group-hover:text-sky-600 transition-colors">
+                            ${category.name}
+                        </h3>
+                        <p class="text-gray-600 text-sm mt-2">
+                            ${truncatedDesc}
+                        </p>
+                        </div>
+                        <div class="mt-4 flex justify-end">
+                        <span
+                            class="inline-flex items-center space-x-1 bg-sky-100 hover:bg-pink-100 text-sky-700 px-3 py-1 rounded-full text-sm transition border border-sky-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 5l7 7-7 7" />
+                            </svg>
+                            <span>View Videos</span>
+                        </span>
+                        </div>
+                    </a>`;
+
+                categoryGrid.append(`<div>${cardHtml}</div>`);
             });
         }
 
         function limitWords(text, limit) {
-            const words = text.split(" ");
+            const words = text ? text.trim().split(/\s+/) : [];
             if (words.length > limit) {
                 return words.slice(0, limit).join(" ") + "...";
             }
-            return text;
+            return text || '';
+        }
+
+        function showError(message) {
+            const categoryGrid = $("#categoryGrid");
+            categoryGrid.html(`
+        <div class="col-span-full text-center text-gray-500">
+          <p>${message}</p>
+        </div>`);
         }
     });
 </script>

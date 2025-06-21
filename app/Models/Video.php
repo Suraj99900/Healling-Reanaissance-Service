@@ -22,6 +22,7 @@ class Video extends Model
         'path',
         'cloudflare_video_id',
         'video_json_data',
+        'hls_path',
         'thumbnail',
         'duration',
         'added_on',
@@ -51,7 +52,7 @@ class Video extends Model
     /**
      * Add video details with Cloudflare information
      */
-    public function addVideoDetails($iCategoryId, $sTitle, $sDescription, $sPath, $sThumbnail, $sDuration, $sCloudflareVideoId = null, $aVideoJsonData = null)
+    public function addVideoDetails($iCategoryId, $sTitle, $sDescription, $sPath, $sThumbnail, $sDuration, $sCloudflareVideoId = null, $aVideoJsonData = null, $sHlsPath = null)
     {
         try {
             $oVideo = self::create([
@@ -63,6 +64,7 @@ class Video extends Model
                 'duration' => $sDuration,
                 'cloudflare_video_id' => $sCloudflareVideoId,
                 'video_json_data' => $aVideoJsonData,
+                'hls_path'=>$sHlsPath,
                 'added_on' => now(),
                 'status' => 1, // Assuming 1 means active
                 'deleted' => 0  // Assuming 0 means not deleted
@@ -171,6 +173,7 @@ class Video extends Model
                 ->where('A.deleted', 0)
                 ->where('B.status', 1)
                 ->where('B.deleted', 0)
+                ->orderBy('A.added_on', 'DESC')
                 ->get();
 
             return $oResult;

@@ -6,11 +6,13 @@
     "license": "MIT",
     "require": {
         "php": "^8.1",
+        "aws/aws-sdk-php": "^3.343",
         "firebase/php-jwt": "^6.8",
         "guzzlehttp/guzzle": "^7.2",
         "laravel/framework": "^10.10",
         "laravel/sanctum": "^3.3",
         "laravel/tinker": "^2.8",
+        "league/flysystem-aws-s3-v3": "^3.29",
         "microweber-deps/laravel-cors": "^3.1",
         "php-ffmpeg/php-ffmpeg": "^1.2",
         "pusher/pusher-php-server": "^7.2"

@@ -39,7 +39,7 @@ return [
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),
-            'url' => env('APP_URL').'/storage',
+            'url' => env('APP_URL') . '/storage',
             'visibility' => 'public',
             'throw' => false,
         ],
@@ -56,6 +56,25 @@ return [
             'throw' => false,
         ],
 
+
+        // ← Add your spaces disk here!
+        'spaces' => [
+            'driver' => 's3',
+            'key' => env('DO_SPACES_KEY'),
+            'secret' => env('DO_SPACES_SECRET'),
+            'endpoint' => env('DO_SPACES_ENDPOINT', 'https://blr1.digitaloceanspaces.com'),
+            'region' => env('DO_SPACES_REGION', 'blr1'),
+            'bucket' => env('DO_SPACES_BUCKET'),
+            'visibility' => 'public',
+            'throw' => false,
+
+            'options' => [
+                'http' => [
+                    'timeout' => 5400,  // total request timeout in seconds
+                    'connect_timeout' => 5400,  // connection phase timeout
+                ],
+            ],
+        ],
     ],
 
     /*

@@ -1,593 +1,819 @@
+{{-- resources/views/video-management.blade.php --}}
 @include('CDN_Header')
 @include('navbar')
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
 
+<div class="min-h-screen bg-gradient-to-br from-purple-600 via-pink-400 to-yellow-300 py-10 px-4">
+    <div class="max-w-6xl mx-auto">
+        <div class="mb-8">
+            <h2 class="text-3xl font-bold text-white drop-shadow-lg">Video Management</h2>
+            <nav class="mt-2">
+                <ol class="flex space-x-2 text-sm text-white/80">
+                    <li><a href="{{ url('/dashboard') }}" class="underline hover:text-white">Dashboard</a></li>
+                    <li>/</li>
+                    <li class="font-semibold">Video Management</li>
+                </ol>
+            </nav>
+        </div>
 
-<style>
-    .container-box {
-        box-shadow: 0px 0px 20px rgba(1, 41, 112, 0.1);
-        background-color: #fff;
-        border-radius: 2%;
-        padding: 20px;
-        margin-bottom: 30px;
-    }
+        <div class="bg-white/80 rounded-2xl shadow-lg p-6 mb-8">
+            <div class="flex justify-between items-center mb-4">
+                <button
+                    id="addVideoBtn"
+                    class="bg-gradient-to-r from-pink-500 to-yellow-400 text-white font-semibold px-6 py-2 rounded-full shadow-lg hover:scale-105 transition"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="inline h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd"
+                            d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+                            clip-rule="evenodd" />
+                    </svg>
+                    Add Video
+                </button>
+            </div>
 
-    @media (max-width: 768px) {
-        .dataTables_wrapper {
-            overflow-x: auto;
-        }
+            <div class="overflow-x-auto rounded-lg">
+                <table id="videoTable" class="min-w-full bg-white text-gray-800 rounded-lg shadow-md">
+                    <thead>
+                        <tr class="bg-gradient-to-r from-purple-500 to-pink-400 text-white text-left">
+                            <th class="py-3 px-4">#</th>
+                            <th class="py-3 px-4">Title</th>
+                            <th class="py-3 px-4">Uploader</th>
+                            <th class="py-3 px-4">Thumbnail</th>
+                            <th class="py-3 px-4">Status</th>
+                            <th class="py-3 px-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{-- DataTables will inject rows here --}}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
 
-        table.dataTable {
-            width: 100% !important;
-        }
-    }
+{{-- Add Video Offcanvas Slider --}}
+<div
+    id="addVideoOffcanvas"
+    class="fixed inset-0 z-50 hidden"
+    aria-labelledby="addVideoOffcanvasLabel"
+    aria-modal="true"
+    role="dialog"
+>
+    {{-- Overlay --}}
+    <div
+        id="closeAddOffcanvasOverlay"
+        class="absolute inset-0 bg-black bg-opacity-50 transition-opacity"
+    ></div>
 
-    .progress-indicator {
-        display: none;
-    }
-</style>
+    {{-- Panel (slides in from the right) --}}
+    <div
+        id="addVideoPanel"
+        class="absolute inset-y-0 right-0 w-full max-w-lg bg-white shadow-xl transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col"
+    >
+        {{-- Header/Close Button --}}
+        <div class="flex items-center justify-between p-6 border-b border-gray-200">
+            <h3 id="addVideoOffcanvasLabel" class="text-2xl font-semibold text-pink-600">
+                Add Video
+            </h3>
+            <button id="closeAddOffcanvasBtn" type="button" class="text-gray-400 hover:text-red-600">
+                <span class="sr-only">Close panel</span>
+                &times;
+            </button>
+        </div>
 
-<div class="main-content">
-    <section class="service section" id="service">
-        <div class="container">
-            <div class="row">
-                <div class="section-title padd-15">
-                    <h2> Video Management</h2>
-                    <nav style="margin: 20px 0px;">
-                        <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="{{ url('/dashboard') }}">Dashboard</a></li>
-                            <li class="breadcrumb-item active">Video Management</li>
-                        </ol>
-                    </nav>
+        {{-- Content (scrollable) --}}
+        <div class="flex-1 overflow-y-auto px-6 py-4">
+            <form id="videoForm" enctype="multipart/form-data" class="space-y-6">
+                @csrf
+                <input type="hidden" id="videoId" name="videoId" />
+
+                {{-- Title --}}
+                <div>
+                    <label for="title" class="block text-sm font-semibold mb-1">Title</label>
+                    <input
+                        type="text"
+                        id="title"
+                        name="title"
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-pink-400"
+                        placeholder="Enter Video Title"
+                        required
+                    />
                 </div>
 
+                {{-- Description --}}
+                <div>
+                    <label for="description" class="block text-sm font-semibold mb-1">
+                        Description
+                    </label>
+                    <textarea
+                        id="description"
+                        name="description"
+                        rows="3"
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-pink-400"
+                        placeholder="Enter Description"
+                        required
+                    ></textarea>
+                </div>
 
+                {{-- Category --}}
+                <div>
+                    <label for="category_id" class="block text-sm font-semibold mb-1">Category</label>
+                    <select
+                        id="category_id"
+                        name="category_id"
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-pink-400"
+                        required
+                    >
+                        <option value="">Select Category</option>
+                        {{-- Populated via AJAX --}}
+                    </select>
+                </div>
 
-                <div class=" shadow mb-4">
-                    <div class="card-header py-3 d-flex justify-content-between align-items-center">
-                        <button class="btnWAN btn-primary" id="addVideoBtn">Add Video</button>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-bordered" id="videoTable" width="100%" cellspacing="0">
-                                <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>Title</th>
-                                        <th>Category</th>
-                                        <th>Thumbnail</th>
-                                        <th>Video</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <!-- Data will be loaded via DataTables AJAX -->
-                                </tbody>
-                            </table>
+                {{-- Video File --}}
+                <div>
+                    <label for="videoFile" class="block text-sm font-semibold mb-1">Video File</label>
+                    <input
+                        type="file"
+                        id="videoFile"
+                        name="video"
+                        accept="video/*"
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-pink-400"
+                        required
+                    />
+                </div>
+
+                {{-- Thumbnail File --}}
+                <div>
+                    <label for="thumbnailFile" class="block text-sm font-semibold mb-1">Thumbnail File</label>
+                    <input
+                        type="file"
+                        id="thumbnailFile"
+                        name="thumbnail"
+                        accept="image/*"
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-pink-400"
+                        required
+                    />
+                </div>
+
+                {{-- Attachments Container --}}
+                <div id="attachmentsContainer">
+                    <div class="attachment-item mb-4 flex flex-col space-y-2">
+                        <div>
+                            <label class="block text-sm font-semibold mb-1">Attachment Name</label>
+                            <input
+                                type="text"
+                                name="attachment_names[]"
+                                class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-pink-400"
+                                placeholder="Enter Attachment Name"
+                            />
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold mb-1">Attachment File</label>
+                            <input
+                                type="file"
+                                name="attachment_files[]"
+                                class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-pink-400"
+                            />
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </section>
-</div>
 
+                <button
+                    id="addAttachmentBtn"
+                    type="button"
+                    class="inline-flex items-center space-x-2 bg-gradient-to-r from-purple-500 to-pink-400 text-white px-4 py-2 rounded-lg shadow hover:scale-105 transition"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd"
+                            d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+                            clip-rule="evenodd" />
+                    </svg>
+                    <span>Add Attachment</span>
+                </button>
 
-<!-- Offcanvas for Add Video -->
-<div class="offcanvas offcanvas-end" tabindex="-1" id="videoOffcanvas" style="width:60vw;">
-    <div class="offcanvas-header">
-        <h5 class="offcanvas-title" id="offcanvasVideoLabel">Add Video</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
-    </div>
-    <div class="offcanvas-body">
-        <form id="videoForm" enctype="multipart/form-data">
-            @csrf
-            <input type="hidden" id="videoId" name="videoId">
-            <!-- Title Field -->
-            <div class="mb-3">
-                <label for="title" class="form-label">Title</label>
-                <input type="text" class="form-control" id="title" name="title" placeholder="Enter Video Title"
-                    required>
-            </div>
-            <!-- Description Field -->
-            <div class="mb-3">
-                <label for="description" class="form-label">Description</label>
-                <textarea class="form-control" id="description" name="description" placeholder="Enter Description"
-                    rows="3" required></textarea>
-            </div>
-            <!-- Category Dropdown -->
-            <div class="mb-3">
-                <label for="category_id" class="form-label">Category</label>
-                <select class="form-control" id="category_id" name="category_id" required>
-                    <option value="">Select Category</option>
-                    {{-- Options will be loaded via AJAX --}}
-                </select>
-            </div>
-            <!-- Video File Input -->
-            <div class="mb-3">
-                <label for="videoFile" class="form-label">Video File</label>
-                <input type="file" class="form-control" id="videoFile" name="video" accept="video/*" required>
-            </div>
-            <!-- Thumbnail File Input -->
-            <div class="mb-3">
-                <label for="thumbnailFile" class="form-label">Thumbnail File</label>
-                <input type="file" class="form-control" id="thumbnailFile" name="thumbnail" accept="image/*" required>
-            </div>
-            <!-- Dynamic Attachment Fields -->
-            <div id="attachmentsContainer">
-                <div class="attachment-item mb-3">
-                    <div class="mb-2">
-                        <label class="form-label">Attachment Name</label>
-                        <input type="text" class="form-control attachment-name" name="attachment_names[]"
-                            placeholder="Enter Attachment Name">
-                    </div>
-                    <div>
-                        <label class="form-label">Attachment File</label>
-                        <input type="file" class="form-control attachment-file" name="attachment_files[]">
-                    </div>
-                </div>
-            </div>
-            <button type="button" class="btnWAN btn-secondary mb-3" id="addAttachmentBtn">
-                <i class="bi bi-plus"></i> Add Attachment
-            </button>
-            <!-- Submit Button and Progress Indicator -->
-            <div class="mb-3">
-                <button type="submit" class="btnWAN btn-primary">Save Video</button>
-                <div class="progress-indicator mt-2">
-                    <div class="progress">
-                        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"
-                            style="width: 0%"></div>
-                    </div>
-                </div>
-            </div>
-        </form>
-    </div>
-</div>
-
-<!-- Edit Video Modal -->
-<div class="modal fade" id="editVideoModal" tabindex="-1" aria-labelledby="editVideoModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="editVideoModalLabel">Edit Video</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form id="editVideoForm">
-                <div class="modal-body">
-                    <input type="hidden" id="editVideoId">
-                    <div class="mb-3">
-                        <label for="editTitle" class="form-label">Title</label>
-                        <input type="text" id="editTitle" class="form-control" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="editDescription" class="form-label">Description</label>
-                        <textarea id="editDescription" class="form-control" rows="3" required></textarea>
-                    </div>
-                    <div class="mb-3">
-                        <label for="editCategory" class="form-label">Category</label>
-                        <select id="editCategory" class="form-control" required>
-                            <option value="">Select Category</option>
-                            {{-- Options will be loaded via AJAX --}}
-                        </select>
-                    </div>
-                    <!-- Dynamic Attachment Fields for Edit -->
-                    <div id="editAttachmentsContainer">
-                        <!-- Existing attachments will be loaded here -->
-                    </div>
-                    <button type="button" class="btnWAN btn-secondary mb-3" id="addEditAttachmentBtn">
-                        <i class="bi bi-plus"></i> Add Attachment
+                {{-- Submit --}}
+                <div class="pt-6">
+                    <button
+                        type="submit"
+                        class="w-full bg-gradient-to-r from-pink-500 to-yellow-400 text-white font-semibold px-6 py-2 rounded-full shadow-lg hover:scale-105 transition"
+                    >
+                        Save Video
                     </button>
-                    <!-- Optionally, allow re-uploading files -->
-                    <!-- <div class="mb-3">
-                                            <label for="editVideoFile" class="form-label">Video File (optional)</label>
-                                            <input type="file" id="editVideoFile" class="form-control" accept="video/*">
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="editThumbnailFile" class="form-label">Thumbnail File (optional)</label>
-                                            <input type="file" id="editThumbnailFile" class="form-control" accept="image/*">
-                                        </div> -->
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btnWAN btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btnWAN btn-primary">Save Changes</button>
+                    <div class="progress-indicator mt-2 hidden">
+                        <div class="w-full bg-gray-200 rounded-full h-2.5">
+                            <div
+                                class="progress-bar bg-gradient-to-r from-pink-500 to-yellow-400 h-2.5 rounded-full"
+                                style="width: 0%"
+                            ></div>
+                        </div>
+                    </div>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
+{{-- Edit Video Offcanvas Slider --}}
+<div
+    id="editVideoOffcanvas"
+    class="fixed inset-0 z-50 hidden"
+    aria-labelledby="editVideoOffcanvasLabel"
+    aria-modal="true"
+    role="dialog"
+>
+    {{-- Overlay --}}
+    <div
+        id="closeEditOffcanvasOverlay"
+        class="absolute inset-0 bg-black bg-opacity-50 transition-opacity"
+    ></div>
+
+    {{-- Panel (slides in from the right) --}}
+    <div
+        id="editVideoPanel"
+        class="absolute inset-y-0 right-0 w-full max-w-lg bg-white shadow-xl transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col"
+    >
+        {{-- Header/Close Button --}}
+        <div class="flex items-center justify-between p-6 border-b border-gray-200">
+            <h3 id="editVideoOffcanvasLabel" class="text-2xl font-semibold text-purple-600">
+                Edit Video
+            </h3>
+            <button id="closeEditOffcanvasBtn" type="button" class="text-gray-400 hover:text-red-600">
+                <span class="sr-only">Close panel</span>
+                &times;
+            </button>
+        </div>
+
+        {{-- Content (scrollable) --}}
+        <div class="flex-1 overflow-y-auto px-6 py-4">
+            <form id="editVideoForm" class="space-y-6">
+                @csrf
+                @method('PUT')
+                <input type="hidden" id="editVideoId" name="videoId" />
+
+                {{-- Title --}}
+                <div>
+                    <label for="editTitle" class="block text-sm font-semibold mb-1">Title</label>
+                    <input
+                        type="text"
+                        id="editTitle"
+                        name="title"
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
+                        placeholder="Enter Video Title"
+                        required
+                    />
+                </div>
+
+                {{-- Description --}}
+                <div>
+                    <label for="editDescription" class="block text-sm font-semibold mb-1">Description</label>
+                    <textarea
+                        id="editDescription"
+                        name="description"
+                        rows="3"
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
+                        placeholder="Enter Description"
+                        required
+                    ></textarea>
+                </div>
+
+                {{-- Category --}}
+                <div>
+                    <label for="editCategory" class="block text-sm font-semibold mb-1">Category</label>
+                    <select
+                        id="editCategory"
+                        name="category_id"
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
+                        required
+                    >
+                        <option value="">Select Category</option>
+                        {{-- Populated via AJAX --}}
+                    </select>
+                </div>
+
+                {{-- Existing Attachments Container --}}
+                <div id="editAttachmentsContainer" class="space-y-4">
+                    {{-- Populated via AJAX when “Edit” is clicked --}}
+                </div>
+
+                <button
+                    id="addEditAttachmentBtn"
+                    type="button"
+                    class="inline-flex items-center space-x-2 bg-gradient-to-r from-purple-500 to-pink-400 text-white px-4 py-2 rounded-lg shadow hover:scale-105 transition"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd"
+                            d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+                            clip-rule="evenodd" />
+                    </svg>
+                    <span>Add Attachment</span>
+                </button>
+
+                {{-- Submit --}}
+                <div class="pt-6">
+                    <button
+                        type="submit"
+                        class="w-full bg-gradient-to-r from-purple-500 to-pink-400 text-white font-semibold px-6 py-2 rounded-full shadow-lg hover:scale-105 transition"
+                    >
+                        Update Video
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
 @include('CDN_Footer')
-<!-- jQuery, DataTables, and Bootstrap JS -->
+
+{{-- DataTables, jQuery (only) --}}
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/tus-js-client@latest/dist/tus.min.js"></script>
-
 
 <script>
-    $(document).ready(function () {
+    document.addEventListener('DOMContentLoaded', function () {
+        //
+        // ────────────────
+        // Offcanvas Toggle Logic
+        // ────────────────
+        //
+
+        // Add Video Offcanvas Elements
+        const addVideoBtn          = document.getElementById('addVideoBtn');
+        const addVideoOffcanvas    = document.getElementById('addVideoOffcanvas');
+        const addVideoPanel        = document.getElementById('addVideoPanel');
+        const closeAddBtn          = document.getElementById('closeAddOffcanvasBtn');
+        const closeAddOverlay      = document.getElementById('closeAddOffcanvasOverlay');
+
+        function openAddOffcanvas() {
+            addVideoOffcanvas.classList.remove('hidden');
+            addVideoPanel.classList.replace('translate-x-full', 'translate-x-0');
+        }
+
+        function closeAddOffcanvas() {
+            addVideoPanel.classList.replace('translate-x-0', 'translate-x-full');
+            setTimeout(() => {
+                addVideoOffcanvas.classList.add('hidden');
+            }, 300); // match transition-duration
+        }
+
+        addVideoBtn.addEventListener('click', () => {
+            // Reset “Add” form & attachments
+            document.getElementById('videoForm').reset();
+            document.getElementById('videoId').value = '';
+            const attachmentsContainer = document.getElementById('attachmentsContainer');
+            attachmentsContainer.innerHTML = `
+                <div class="attachment-item mb-4 flex flex-col space-y-2">
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">Attachment Name</label>
+                        <input
+                            type="text"
+                            name="attachment_names[]"
+                            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-pink-400"
+                            placeholder="Enter Attachment Name"
+                        />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">Attachment File</label>
+                        <input
+                            type="file"
+                            name="attachment_files[]"
+                            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-pink-400"
+                        />
+                    </div>
+                </div>
+            `;
+            // Hide progress bar
+            document.querySelector('#addVideoPanel .progress-indicator')?.classList.add('hidden');
+            document.querySelector('#addVideoPanel .progress-bar').style.width = '0%';
+            document.querySelector('#addVideoPanel .progress-bar').textContent = '';
+            openAddOffcanvas();
+        });
+
+        closeAddBtn.addEventListener('click', closeAddOffcanvas);
+        closeAddOverlay.addEventListener('click', closeAddOffcanvas);
+
+
+        // Edit Video Offcanvas Elements
+        const editVideoOffcanvas   = document.getElementById('editVideoOffcanvas');
+        const editVideoPanel       = document.getElementById('editVideoPanel');
+        const closeEditBtn         = document.getElementById('closeEditOffcanvasBtn');
+        const closeEditOverlay     = document.getElementById('closeEditOffcanvasOverlay');
+
+        function openEditOffcanvas() {
+            editVideoOffcanvas.classList.remove('hidden');
+            editVideoPanel.classList.replace('translate-x-full', 'translate-x-0');
+        }
+
+        function closeEditOffcanvas() {
+            editVideoPanel.classList.replace('translate-x-0', 'translate-x-full');
+            setTimeout(() => {
+                editVideoOffcanvas.classList.add('hidden');
+            }, 300);
+        }
+
+        closeEditBtn.addEventListener('click', closeEditOffcanvas);
+        closeEditOverlay.addEventListener('click', closeEditOffcanvas);
+
+
+        //
+        // ────────────────
         // Initialize DataTable
+        // ────────────────
+        //
         let table = $('#videoTable').DataTable({
             ajax: {
                 url: '/api/videos',
                 dataSrc: 'body'
             },
             columns: [
-                { data: null, render: (data, type, row, meta) => meta.row + 1 }, // Serial No.
+                {
+                    data: null,
+                    render: (data, type, row, meta) => meta.row + 1
+                },
                 { data: 'title' },
                 { data: 'name' },
                 {
-                    data: 'thumbnail',
-                    render: (data) => {
-                        let baseUrl = window.location.origin;
-                        let fullThumbnailUrl = `${baseUrl}/storage/${data}`;
-                        return `<img src="${fullThumbnailUrl}" alt="Thumbnail" width="50px">`;
-                    }
+                    data: 'thumbnail_url',
+                    render: data => `<img src="${data}" alt="Thumb" width="50" class="rounded" crossorigin="anonymous" loading="lazy">`
                 },
                 {
-                    data: 'video_json_data',
-                    render: (data, type, row, meta) => {
-                        var aData = JSON.parse(data);
-
-
-                        if (aData != null) {
-                            const previewUrl = aData.preview;
-                            // Return the anchor tag with the preview URL
-                            return `<a href="${previewUrl}" target="_blank">View Video</a>`;
+                    data: 'hls_path',
+                    render: data => {
+                        if (data && data.trim() !== '') {
+                            return `<span class="text-green-600 font-medium">Ready to watch</span>`;
                         } else {
-                            // Return a placeholder or a message indicating no preview is available
-                            return 'No preview available';
+                            return `<span class="text-yellow-600 font-medium">Processing…</span>`;
                         }
                     }
                 },
                 {
                     data: 'id',
-                    render: (data) => `
-                                        <button class="btnWAN btn-info btn-sm edit-video" data-id="${data}">Edit</button>
-                                        <button class="btnWAN btn-danger btn-sm delete-video" data-id="${data}">Delete</button>
-                                    `
+                    orderable: false,
+                    searchable: false,
+                    render: id => `
+                        <button class="edit-video bg-blue-500 text-white text-sm px-3 py-1 rounded hover:bg-blue-600 mr-2" data-id="${id}">
+                          Edit
+                        </button>
+                        <button class="delete-video bg-red-500 text-white text-sm px-3 py-1 rounded hover:bg-red-600" data-id="${id}">
+                          Delete
+                        </button>`
                 }
-            ]
-        });
-
-        // Open offcanvas for adding video
-        $('#addVideoBtn').on('click', function () {
-            $('#videoForm')[0].reset();
-            $('#videoId').val('');
-            $('#offcanvasVideoLabel').text('Add Video');
-            $('#attachmentsContainer').html(`
-                                <div class="attachment-item mb-3">
-                                    <div class="mb-2">
-                                        <label class="form-label">Attachment Name</label>
-                                        <input type="text" class="form-control attachment-name" name="attachment_names[]" placeholder="Enter Attachment Name">
-                                    </div>
-                                    <div>
-                                        <label class="form-label">Attachment File</label>
-                                        <input type="file" class="form-control attachment-file" name="attachment_files[]">
-                                    </div>
-                                </div>
-                            `);
-            let offcanvasEl = document.getElementById('videoOffcanvas');
-            let offcanvas = new bootstrap.Offcanvas(offcanvasEl);
-            offcanvas.show();
-        });
-
-        $('#addEditAttachmentBtn').on('click', function () {
-            $('#editAttachmentsContainer').append(`
-            <div class="attachment-item mb-3">
-                <div class="mb-2">
-                    <label class="form-label">Attachment Name</label>
-                    <input type="text" class="form-control attachment-name" name="editAttachment_names[]" placeholder="Enter Attachment Name">
-                </div>
-                <div>
-                    <label class="form-label">Attachment File</label>
-                    <input type="file" class="form-control attachment-file" name="editAttachment_files[]">
-                </div>
-                <button type="button" class="btnWAN btn-danger btn-sm mt-2 remove-attachment">Remove</button>
-            </div>
-        `);
-        });
-
-        // Remove attachment field in edit modal
-        $('#editAttachmentsContainer').on('click', '.remove-attachment', function () {
-            $(this).closest('.attachment-item').remove();
+            ],
+            responsive: true,
+            pageLength: 10,
+            autoWidth: false,
+            language: {
+                emptyTable: "No videos found.",
+                processing: "Loading..."
+            }
         });
 
 
-        // Load video categories for both add and edit forms
-        function loadCategories(selectElementId) {
+        //
+        // ────────────────
+        // Load Categories (Add & Edit)
+        // ────────────────
+        //
+        function loadCategories(selectId) {
             $.ajax({
                 url: '/api/video-categories',
                 method: 'GET',
                 success: function (data) {
                     let options = '<option value="">Select Category</option>';
-                    $.each(data.body, function (index, category) {
+                    data.body.forEach(category => {
                         options += `<option value="${category.id}">${category.name}</option>`;
                     });
-                    $(selectElementId).html(options);
+                    document.querySelectorAll(selectId).forEach(sel => sel.innerHTML = options);
                 }
             });
         }
         loadCategories('#category_id');
         loadCategories('#editCategory');
 
-        // Add new attachment field
-        $('#addAttachmentBtn').on('click', function () {
-            $('#attachmentsContainer').append(`
-                                <div class="attachment-item mb-3">
-                                    <div class="mb-2">
-                                        <label class="form-label">Attachment Name</label>
-                                        <input type="text" class="form-control attachment-name" name="attachment_names[]" placeholder="Enter Attachment Name">
-                                    </div>
-                                    <div>
-                                        <label class="form-label">Attachment File</label>
-                                        <input type="file" class="form-control attachment-file" name="attachment_files[]">
-                                    </div>
-                                    <button type="button" class="btnWAN btn-danger btn-sm mt-2 remove-attachment">Remove</button>
-                                </div>
-                            `);
+
+        //
+        // ────────────────
+        // Manage Attachments (Add Form)
+        // ────────────────
+        //
+        const attachmentsContainer = document.getElementById('attachmentsContainer');
+        document.getElementById('addAttachmentBtn').addEventListener('click', () => {
+            const wrapper = document.createElement('div');
+            wrapper.classList.add('attachment-item', 'mb-3', 'flex', 'flex-col', 'space-y-2');
+            wrapper.innerHTML = `
+                <div>
+                  <label class="block font-semibold mb-1">Attachment Name</label>
+                  <input
+                    type="text"
+                    name="attachment_names[]"
+                    class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-pink-400"
+                    placeholder="Enter Attachment Name"
+                  />
+                </div>
+                <div>
+                  <label class="block font-semibold mb-1">Attachment File</label>
+                  <input
+                    type="file"
+                    name="attachment_files[]"
+                    class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-pink-400"
+                  />
+                </div>
+                <button
+                  type="button"
+                  class="remove-attachment self-start bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-sm"
+                >
+                  Remove Attachment
+                </button>
+            `;
+            attachmentsContainer.appendChild(wrapper);
         });
 
-        // Remove attachment field
-        $('#attachmentsContainer').on('click', '.remove-attachment', function () {
-            $(this).closest('.attachment-item').remove();
-        });
-
-        // Handle form submission for adding video
-        $('#videoForm').on('submit', async function (e) {
-            e.preventDefault();
-            $('.progress-indicator').show();
-            let progressBar = $('.progress-bar');
-
-            try {
-                const videoFile = $('#videoFile')[0].files[0];
-                const accountId = '{{ $cloudflareAccountId }}';
-                const apiToken = '{{ $cloudflareApiToken }}';
-
-                // Initialize tus upload
-                const upload = new tus.Upload(videoFile, {
-                    endpoint: `https://api.cloudflare.com/client/v4/accounts/${accountId}/stream`,
-                    chunkSize: 5 * 1024 * 1024, // Set chunk size to 5 MB
-                    retryDelays: [0, 3000, 5000, 10000, 20000],
-                    metadata: {
-                        name: videoFile.name,
-                        filetype: videoFile.type
-                    },
-                    headers: {
-                        'Authorization': `Bearer ${apiToken}`,
-                    },
-                    onError: function (error) {
-                        console.log('Failed upload:', error);
-                        $('.progress-indicator').hide();
-                        alert('Error uploading video: ' + error.message);
-                    },
-                    onProgress: function (bytesUploaded, bytesTotal) {
-                        const percentage = ((bytesUploaded / bytesTotal) * 100).toFixed(2);
-                        progressBar.css('width', percentage + '%').text(percentage + '%');
-                    },
-                    onSuccess: async function () {
-                        // Parse the Cloudflare Stream video ID from the TUS upload URL
-                        const url = new URL(upload.url);
-                        const cloudflareVideoId = url.pathname.split('/').pop();
-
-                        // Fetch stream details from Cloudflare
-                        $.ajax({
-                            url: `https://api.cloudflare.com/client/v4/accounts/${accountId}/stream/${cloudflareVideoId}`,
-                            method: 'GET',
-                            headers: {
-                                'Authorization': `Bearer ${apiToken}`
-                            },
-                            success: function (streamDetails) {
-                                // Build FormData for the rest of the submission
-                                const formData = new FormData();
-                                formData.append('title', $('#title').val());
-                                formData.append('description', $('#description').val());
-                                formData.append('category_id', $('#category_id').val());
-                                formData.append('cloudflare_video_id', cloudflareVideoId);
-                                formData.append('video_json_data', JSON.stringify(streamDetails.result));
-                                formData.append('thumbnail', $('#thumbnailFile')[0].files[0]);
-
-                                // Decide whether to create or update
-                                const videoId = $('#videoId').val();
-                                const url = videoId ? `/api/video/${videoId}` : '/api/video';
-                                const method = videoId ? 'PUT' : 'POST';
-
-                                // Save the data to your backend
-                                $.ajax({
-                                    url: url,
-                                    method: method,
-                                    data: formData,
-                                    processData: false,
-                                    contentType: false,
-                                    success: function (response) {
-                                        $('.progress-indicator').hide();
-
-                                        // Handle attachments
-                                        const newVideoId = response.body.id;
-                                        handleAttachments(newVideoId);
-
-                                        // Reset form and close modal
-                                        $('#videoForm')[0].reset();
-                                        const offcanvasEl = document.getElementById('videoOffcanvas');
-                                        const offcanvas = bootstrap.Offcanvas.getInstance(offcanvasEl);
-                                        offcanvas.hide();
-                                        table.ajax.reload();
-                                        alert("Video saved successfully!");
-                                    },
-                                    error: function (xhr, status, error) {
-                                        $('.progress-indicator').hide();
-                                        alert("Error saving video details: " + error);
-                                    }
-                                });
-                            },
-                            error: function (xhr, status, error) {
-                                console.log('Failed to fetch stream details:', error);
-                                $('.progress-indicator').hide();
-                                alert('Error fetching stream details: ' + error.message);
-                            }
-                        });
-                    }
-                });
-
-                // Start the upload
-                upload.start();
-
-            } catch (error) {
-                $('.progress-indicator').hide();
-                alert("Error initializing upload: " + error.message);
+        // Remove attachment in Add form
+        attachmentsContainer.addEventListener('click', e => {
+            if (e.target.classList.contains('remove-attachment')) {
+                e.target.closest('.attachment-item').remove();
             }
         });
 
-        // Helper function to handle attachments
-        function handleAttachments(videoId) {
-            $('.attachment-item').each(function () {
-                const attachmentName = $(this).find('.attachment-name').val();
-                const attachmentFile = $(this).find('.attachment-file')[0].files[0];
 
+        //
+        // ────────────────
+        // Handle Add Video Form Submission (Chunked Upload)
+        // ────────────────
+        //
+        $('#videoForm').on('submit', function (e) {
+            e.preventDefault();
+            const title = $('#title').val();
+            const description = $('#description').val();
+            const categoryId = $('#category_id').val();
+            const thumbnailFile = $('#thumbnailFile')[0].files[0];
+            const videoFile = $('#videoFile')[0].files[0];
+
+            if (!videoFile) {
+                alert("Please select a video file.");
+                return;
+            }
+
+            $('.progress-indicator').removeClass('hidden');
+            const progressBar = $('.progress-bar');
+            const chunkSize = 5 * 1024 * 1024; // 5MB
+            const totalChunks = Math.ceil(videoFile.size / chunkSize);
+            let chunkIndex = 0;
+
+            function uploadChunk() {
+                if (chunkIndex >= totalChunks) return;
+
+                const start = chunkIndex * chunkSize;
+                const end = Math.min(start + chunkSize, videoFile.size);
+                const chunk = videoFile.slice(start, end);
+
+                const formData = new FormData();
+                formData.append('video', chunk);
+                formData.append('chunk_index', chunkIndex);
+                formData.append('total_chunks', totalChunks);
+                formData.append('filename', videoFile.name);
+                formData.append('title', title);
+                formData.append('description', description);
+                formData.append('category_id', categoryId);
+                formData.append('thumbnail', thumbnailFile);
+
+                $.ajax({
+                    url: "/api/uploadChunk",
+                    method: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        const percentage = ((chunkIndex + 1) / totalChunks) * 100;
+                        progressBar.css('width', percentage + '%').text(percentage.toFixed(2) + '%');
+                        chunkIndex++;
+                        if (chunkIndex < totalChunks) {
+                            uploadChunk();
+                        } else {
+                            // All chunks done
+                            const newVideoId = response.video.id;
+                            handleAttachments(newVideoId);
+                            alert("✅ All chunks uploaded successfully!");
+                            table.ajax.reload();
+                            $('.progress-indicator').addClass('hidden');
+                            closeAddOffcanvas();
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        $('.progress-indicator').addClass('hidden');
+                        alert("Error uploading chunk: " + error);
+                        console.error(xhr.responseText);
+                    }
+                });
+            }
+
+            uploadChunk();
+        });
+
+        // Helper: send attachments to server (Add)
+        function handleAttachments(videoId) {
+            document.querySelectorAll('#attachmentsContainer .attachment-item').forEach(item => {
+                const attachmentName = item.querySelector('input[name="attachment_names[]"]').value;
+                const attachmentFile = item.querySelector('input[name="attachment_files[]"]').files[0];
                 if (attachmentName && attachmentFile) {
-                    const attachmentFormData = new FormData();
-                    attachmentFormData.append('video_id', videoId);
-                    attachmentFormData.append('attachment_name', attachmentName);
-                    attachmentFormData.append('attachment', attachmentFile);
+                    const formData = new FormData();
+                    formData.append('video_id', videoId);
+                    formData.append('attachment_name', attachmentName);
+                    formData.append('attachment', attachmentFile);
 
                     $.ajax({
                         url: '/api/app-attachment',
                         method: 'POST',
-                        data: attachmentFormData,
+                        data: formData,
                         processData: false,
                         contentType: false,
-                        success: function () {
-                            console.log("Attachment uploaded successfully!");
-                        },
-                        error: function (xhr, status, error) {
-                            console.error("Error uploading attachment:", error);
-                        }
+                        success: () => console.log("Attachment uploaded"),
+                        error: (xhr, status, error) => console.error("Attachment error:", error)
                     });
                 }
             });
         }
 
-        // Edit video - open modal and populate fields
-        $('#videoTable tbody').on('click', '.edit-video', function () {
-            let videoId = $(this).data('id');
+
+        //
+        // ────────────────
+        // Delete Video
+        // ────────────────
+        //
+        $('#videoTable tbody').on('click', '.delete-video', function () {
+            const videoId = $(this).data('id');
+            if (confirm("Are you sure you want to delete this video?")) {
+                $.ajax({
+                    url: `/api/video/${videoId}`,
+                    type: 'DELETE',
+                    success: () => {
+                        table.ajax.reload();
+                        alert("Video deleted successfully!");
+                    },
+                    error: () => alert("Error deleting video.")
+                });
+            }
+        });
+
+
+        //
+        // ────────────────
+        // Edit Video: Fetch Details & Open Offcanvas
+        // ────────────────
+        //
+        $('#videoTable').on('click', '.edit-video', function () {
+            const videoId = $(this).data('id');
             $.ajax({
                 url: `/api/video/${videoId}`,
                 type: 'GET',
                 success: function (response) {
-                    let video = response['body'][0];
-                    console.log(video);
+                    const video = response.body[0];
+                    // Populate form fields
+                    document.getElementById('editVideoId').value      = video.id;
+                    document.getElementById('editTitle').value        = video.title;
+                    document.getElementById('editDescription').value  = video.description;
+                    document.getElementById('editCategory').value     = video.category_id;
 
-                    $('#editVideoId').val(video.id);
-                    $('#editTitle').val(video.title);
-                    $('#editDescription').val(video.description);
-                    $('#editCategory').val(video.category_id);
-
-                    // Load existing attachments
-                    $('#editAttachmentsContainer').empty();
-                    if (video.attachments && video.attachments.length > 0) {
-                        video.attachments.forEach(attachment => {
-                            $('#editAttachmentsContainer').append(`
-                            <div class="attachment-item mb-3">
-                                <div class="mb-2">
-                                    <label class="form-label">Attachment Name</label>
-                                    <input type="text" class="form-control attachment-name" name="existingAttachment_names[]" value="${attachment.name}" placeholder="Enter Attachment Name">
+                    // Build existing attachments
+                    const editAttachmentsContainer = document.getElementById('editAttachmentsContainer');
+                    editAttachmentsContainer.innerHTML = '';
+                    if (video.attachments && video.attachments.length) {
+                        video.attachments.forEach(att => {
+                            const wrapper = document.createElement('div');
+                            wrapper.className = 'attachment-item mb-4 flex flex-col space-y-2';
+                            wrapper.innerHTML = `
+                                <div>
+                                  <label class="block text-sm font-semibold mb-1">Attachment Name</label>
+                                  <input
+                                    type="text"
+                                    name="existingAttachment_names[]"
+                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
+                                    value="${att.name}"
+                                  />
                                 </div>
                                 <div>
-                                    <label class="form-label">Attachment File</label>
-                                    <input type="file" class="form-control attachment-file" name="existingAttachment_files[]">
+                                  <label class="block text-sm font-semibold mb-1">Attachment File (replace)</label>
+                                  <input
+                                    type="file"
+                                    name="existingAttachment_files[]"
+                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
+                                  />
                                 </div>
-                                <button type="button" class="btnWAN btn-danger btn-sm mt-2 remove-attachment">Remove</button>
-                            </div>
-                        `);
+                                <button
+                                  type="button"
+                                  class="remove-attachment self-start bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-sm"
+                                >
+                                  Remove Attachment
+                                </button>
+                            `;
+                            editAttachmentsContainer.appendChild(wrapper);
                         });
                     }
-
-                    let editModal = new bootstrap.Modal(document.getElementById('editVideoModal'));
-                    editModal.show();
+                    openEditOffcanvas();
                 },
-                error: function () {
-                    alert("Error fetching video details.");
-                }
+                error: () => alert('Error fetching video details.')
             });
         });
 
-        // Handle update form submission for editing video
+
+        //
+        // ────────────────
+        // Manage Attachments (Edit Form)
+        // ────────────────
+        //
+        document.getElementById('addEditAttachmentBtn').addEventListener('click', function () {
+            const editAttachmentsContainer = document.getElementById('editAttachmentsContainer');
+            const wrapper = document.createElement('div');
+            wrapper.className = 'attachment-item mb-4 flex flex-col space-y-2';
+            wrapper.innerHTML = `
+                <div>
+                  <label class="block text-sm font-semibold mb-1">Attachment Name</label>
+                  <input
+                    type="text"
+                    name="editAttachment_names[]"
+                    class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
+                    placeholder="Enter Attachment Name"
+                  />
+                </div>
+                <div>
+                  <label class="block text-sm font-semibold mb-1">Attachment File</label>
+                  <input
+                    type="file"
+                    name="editAttachment_files[]"
+                    class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
+                  />
+                </div>
+                <button
+                  type="button"
+                  class="remove-attachment self-start bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-sm"
+                >
+                  Remove Attachment
+                </button>
+            `;
+            editAttachmentsContainer.appendChild(wrapper);
+        });
+
+        // Remove attachment in Edit form
+        document.addEventListener('click', function (e) {
+            if (e.target.classList.contains('remove-attachment')) {
+                e.target.closest('.attachment-item').remove();
+            }
+        });
+
+
+        //
+        // ────────────────
+        // Submit Edit Video Form
+        // ────────────────
+        //
         $('#editVideoForm').on('submit', function (e) {
             e.preventDefault();
-            let videoId = $('#editVideoId').val();
-            let updatedData = {
+            const videoId = $('#editVideoId').val();
+            const updatedData = {
                 title: $('#editTitle').val(),
                 description: $('#editDescription').val(),
                 category_id: $('#editCategory').val()
             };
 
+            // Update basic info first
             $.ajax({
                 url: `/api/video/${videoId}`,
                 type: 'PUT',
                 data: JSON.stringify(updatedData),
                 contentType: 'application/json',
-                success: function (response) {
-                    // Handle attachments
-                    handleEditAttachments(videoId);
+                success: function () {
+                    // Upload any new/edited attachments
+                    document.querySelectorAll('#editAttachmentsContainer .attachment-item').forEach(item => {
+                        const attachmentNameField = item.querySelector('input[name="existingAttachment_names[]"], input[name="editAttachment_names[]"]');
+                        const fileField           = item.querySelector('input[type="file"]');
+                        const attachmentName      = attachmentNameField.value;
+                        const attachmentFile      = fileField.files[0];
 
-                    $('#editVideoModal').modal('hide');
+                        if (attachmentName && attachmentFile) {
+                            const formData = new FormData();
+                            formData.append('video_id', videoId);
+                            formData.append('attachment_name', attachmentName);
+                            formData.append('attachment', attachmentFile);
+
+                            $.ajax({
+                                url: '/api/app-attachment',
+                                method: 'POST',
+                                data: formData,
+                                processData: false,
+                                contentType: false,
+                                success: () => console.log("Attachment uploaded"),
+                                error: (xhr, status, error) => console.error("Error uploading attachment:", error)
+                            });
+                        }
+                    });
+
                     table.ajax.reload();
                     alert("Video updated successfully!");
+                    closeEditOffcanvas();
                 },
                 error: function (xhr, status, error) {
                     alert("Error updating video: " + error);
                 }
             });
-        });
-
-        // Helper function to handle attachments in edit modal
-        function handleEditAttachments(videoId) {
-            $('.attachment-item').each(function () {
-                const attachmentName = $(this).find('.attachment-name').val();
-                const attachmentFile = $(this).find('.attachment-file')[0].files[0];
-
-                if (attachmentName && attachmentFile) {
-                    const attachmentFormData = new FormData();
-                    attachmentFormData.append('video_id', videoId);
-                    attachmentFormData.append('attachment_name', attachmentName);
-                    attachmentFormData.append('attachment', attachmentFile);
-
-                    $.ajax({
-                        url: '/api/app-attachment',
-                        method: 'POST',
-                        data: attachmentFormData,
-                        processData: false,
-                        contentType: false,
-                        success: function () {
-                            console.log("Attachment uploaded successfully!");
-                        },
-                        error: function (xhr, status, error) {
-                            console.error("Error uploading attachment:", error);
-                        }
-                    });
-                }
-            });
-        }
-
-
-
-        // Delete video
-        $('#videoTable tbody').on('click', '.delete-video', function () {
-            let videoId = $(this).data('id');
-            if (confirm("Are you sure you want to delete this video?")) {
-                $.ajax({
-                    url: `/api/video/${videoId}`,
-                    type: 'DELETE',
-                    success: function () {
-                        table.ajax.reload();
-                        alert("Video deleted successfully!");
-                    },
-                    error: function () {
-                        alert("Error deleting video.");
-                    }
-                });
-            }
         });
     });
 </script>

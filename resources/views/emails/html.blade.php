@@ -52,7 +52,7 @@
             <div class="card-body">
                 <div class="max-w-lg mx-auto">
                     <div class="text-center">
-                        <h1 class="text-3xl font-bold card-title center">kavitas Healling Reanaissance OTP Verification</h1>
+                        <h1 class="text-3xl font-bold card-title center">Kvita's Healling Reanaissance OTP Verification</h1>
                         <p class="text-gray-500 center">This OTP is valid for 60 min.</p>
                     </div>
                     <card class="mt-8">

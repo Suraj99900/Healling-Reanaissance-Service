@@ -7,7 +7,7 @@ use App\Service\Client;
 
 class RegisterClient extends Command
 {
-    // example :- register-client --name="suraj" --callback=https://lifehealerkavita.com/LifeHealer/index.php
+    // example :- register-client --name="suraj" --callback=https://lifehealerKvita.com/LifeHealer/index.php
     protected $signature = 'register-client {--name= : Name of the client} {--callback= : Callback url of client}';
 
     protected $description = 'Register client';

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\EnrollmentController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AppPostController;
@@ -39,6 +40,7 @@ Route::post('email', [EmailController::class, 'generateMail']);
 
 // Video upload
 Route::post('video', [VideoController::class, 'upload']);
+Route::post('uploadChunk', [VideoController::class, 'uploadChunk']);
 Route::get('video/{id}', [VideoController::class, 'fetchById']);
 Route::get('videos', [VideoController::class, 'fetchAll']);
 Route::get('videos-category/{id}', [VideoController::class, 'fetchAllVideoDataByCategoryId']);
@@ -80,3 +82,21 @@ Route::get('/user-category-access', [UserCategoryAccessController::class, 'getUs
 Route::post('/user-category-access', [UserCategoryAccessController::class, 'grantAccess']);
 Route::put('/user-category-access/{id}', [UserCategoryAccessController::class, 'updateAccess']);
 Route::delete('/user-category-access/{id}', [UserCategoryAccessController::class, 'deleteAccess']);
+
+Route::get('/test-s3-connection', function () {
+    try {
+        $files = Storage::disk('spaces')->files('/');
+        dd('✅ Connection successful!', $files);
+    } catch (\Exception $e) {
+        dd('❌ Connection failed:', $e->getMessage());
+    }
+});
+
+
+Route::get('/enrollments', [EnrollmentController::class, 'listEnrollments'])->name('enrollment.list'); // List all
+Route::get('/enrollments/{id}', [EnrollmentController::class, 'showEnrollment'])->name('enrollment.show'); // View single
+
+Route::get('/enrollments/{id}/edit', [EnrollmentController::class, 'editEnrollment'])->name('enrollment.edit'); // Edit form
+Route::post('/enrollments/{id}/update', [EnrollmentController::class, 'updateEnrollment'])->name('enrollment.update'); // Update
+
+Route::delete('/enrollments/{id}', [EnrollmentController::class, 'deleteEnrollment'])->name('enrollment.delete'); // Delete
