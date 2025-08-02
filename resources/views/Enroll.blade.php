@@ -97,9 +97,9 @@ FOOTER
     <div class="animate-fade-in delay-400">
       <h4 class="font-semibold text-white mb-2">Contact Us</h4>
       <p class="text-sm leading-relaxed">
-        <strong>Phone:</strong> +91-7666692367<br />
-        <strong>Email:</strong> <a href="mailto:support@lifehealerKvita.com"
-          class="hover:text-white transition-colors duration-200">support@lifehealerKvita.com</a><br />
+        <strong>Phone:</strong> +91-7350911456<br />
+        <strong>Email:</strong> <a href="mailto:lifehealerkavita26@gmail.com"
+          class="hover:text-white transition-colors duration-200">lifehealerkavita26@gmail.com</a><br />
         <strong>Address:</strong> Narhe Gaon, Pune, Maharashtra
       </p>
       <div class="mt-4 flex space-x-4">
