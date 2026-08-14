@@ -210,23 +210,24 @@ class VideoController extends Controller
             foreach ($videos as &$video) {
 
                 // THUMBNAIL
-                if (
-                    !empty($video->thumbnail)
-                    && Storage::disk('spaces')->exists($video->thumbnail)
-                ) {
+                if (!empty($video->thumbnail)) {
                     $video->thumbnail_url = Storage::disk('spaces')->temporaryUrl($video->thumbnail, now()->addMinutes(360));
                 } else {
                     $video->thumbnail_url = 'https://suraj99900.github.io/myprotfolio.github.io/img/gallery_1.jpg';
                 }
 
                 // VIDEO
-                if (
-                    !empty($video->path)
-                    && Storage::disk('spaces')->exists($video->path)
-                ) {
-                    $video->video_url = Storage::disk('spaces')->temporaryUrl($video->path,now()->addMinutes(360));
+                if (!empty($video->path)) {
+                    $video->video_url = Storage::disk('spaces')->temporaryUrl($video->path, now()->addMinutes(360));
                 } else {
-                    $video->video_url = null;  // or a default/fallback URL
+                    $video->video_url = null;
+                }
+
+                // HLS
+                if (!empty($video->hls_path)) {
+                    $video->hls_url = Storage::disk('spaces')->temporaryUrl($video->hls_path, now()->addMinutes(360));
+                } else {
+                    $video->hls_url = null;
                 }
             }
 
@@ -255,6 +256,27 @@ class VideoController extends Controller
         try {
             $perPage = $request->input('per_page', 10);
             $videos = (new Video)->fetchAllVideosWithPagination($perPage);
+
+            foreach ($videos as &$video) {
+                if (!empty($video->thumbnail)) {
+                    $video->thumbnail_url = Storage::disk('spaces')->temporaryUrl($video->thumbnail, now()->addMinutes(360));
+                } else {
+                    $video->thumbnail_url = 'https://suraj99900.github.io/myprotfolio.github.io/img/gallery_1.jpg';
+                }
+
+                if (!empty($video->path)) {
+                    $video->video_url = Storage::disk('spaces')->temporaryUrl($video->path, now()->addMinutes(360));
+                } else {
+                    $video->video_url = null;
+                }
+
+                if (!empty($video->hls_path)) {
+                    $video->hls_url = Storage::disk('spaces')->temporaryUrl($video->hls_path, now()->addMinutes(360));
+                } else {
+                    $video->hls_url = null;
+                }
+            }
+
             return response()->json([
                 'message' => "Videos fetched successfully!",
                 'body' => $videos,
@@ -276,16 +298,13 @@ class VideoController extends Controller
 
             foreach ($videos as &$video) {
                 $thumbnailPath = $video->thumbnail;
-                if (!$thumbnailPath || !Storage::disk('spaces')->exists($thumbnailPath)) {
-                    // If thumbnail does not exist, set a default URL
+                if (!$thumbnailPath) {
                     $video->thumbnail_url = "https://suraj99900.github.io/myprotfolio.github.io/img/gallery_1.jpg";
                 } else {
-                    // Generate the proper URL for the thumbnail stored in the 'public' disk
-                    $video->thumbnail_url = Storage::disk('spaces')->temporaryUrl($video->thumbnailPath, now()->addMinutes(360));
+                    $video->thumbnail_url = Storage::disk('spaces')->temporaryUrl($thumbnailPath, now()->addMinutes(360));
                 }
 
-                // Assuming the videos are stored in the 'public' disk
-                $video->video_url = Storage::disk('spaces')->temporaryUrl($video->path, now()->addMinutes(360));
+                $video->video_url = $video->path ? Storage::disk('spaces')->temporaryUrl($video->path, now()->addMinutes(360)) : null;
             }
 
             return response()->json([
@@ -306,16 +325,13 @@ class VideoController extends Controller
 
             foreach ($videos as &$video) {
                 $thumbnailPath = $video->thumbnail;
-                if (!$thumbnailPath || !Storage::disk('spaces')->exists($thumbnailPath)) {
-                    // If thumbnail does not exist, set a default URL
+                if (!$thumbnailPath) {
                     $video->thumbnail_url = "https://suraj99900.github.io/myprotfolio.github.io/img/gallery_1.jpg";
                 } else {
-                    // Generate the proper URL for the thumbnail stored in the 'public' disk
                     $video->thumbnail_url = Storage::disk('spaces')->temporaryUrl($thumbnailPath, now()->addMinutes(360));
                 }
 
-                // Assuming the videos are stored in the 'public' disk
-                $video->video_url = Storage::disk('spaces')->temporaryUrl($video->path, now()->addMinutes(360));
+                $video->video_url = $video->path ? Storage::disk('spaces')->temporaryUrl($video->path, now()->addMinutes(360)) : null;
             }
 
             return response()->json([
@@ -408,8 +424,8 @@ class VideoController extends Controller
                 return response()->json(['error' => 'Video not found'], 404);
             }
 
-            $thumbnailPath = $video->thumbnail; // Assuming the column name in the database is `thumbnail_path`
-            if (!$thumbnailPath || !Storage::disk('spaces')->exists($thumbnailPath)) {
+            $thumbnailPath = $video->thumbnail;
+            if (!$thumbnailPath) {
                 return response()->json([
                     'message' => 'Thumbnail URL fetched successfully!',
                     'thumbnail_url' => "https://suraj99900.github.io/myprotfolio.github.io/img/gallery_1.jpg",
@@ -417,7 +433,6 @@ class VideoController extends Controller
                 ], 200);
             }
 
-            // Generate the proper URL for the thumbnail stored in the 'public' disk
             $thumbnailUrl = Storage::disk('spaces')->temporaryUrl($thumbnailPath, now()->addMinutes(360));
 
             return response()->json([

@@ -60,19 +60,19 @@ class LogApiRequests
         }
 
         if (!in_array($request->ip(), $excludedIps)) {
-            ApiLog::create([
-                'unique_visitor_id' => $uniqueVisitorId,
-                'method' => $request->method(),
-                'endpoint' => $request->path(),
-                'request_payload' => json_encode($request->all()),
-                'response_payload' => $sResData,
-                'status_code' => $response->getStatusCode(),
-                'ip_address' => $request->ip(),
-                'time_spent' => $timeSpent,
-                'user_agent' => $request->header('User-Agent'),
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
+            // ApiLog::create([
+            //     'unique_visitor_id' => $uniqueVisitorId,
+            //     'method' => $request->method(),
+            //     'endpoint' => $request->path(),
+            //     'request_payload' => json_encode($request->all()),
+            //     'response_payload' => $sResData,
+            //     'status_code' => $response->getStatusCode(),
+            //     'ip_address' => $request->ip(),
+            //     'time_spent' => $timeSpent,
+            //     'user_agent' => $request->header('User-Agent'),
+            //     'created_at' => now(),
+            //     'updated_at' => now(),
+            // ]);
         }
 
         return $response;
