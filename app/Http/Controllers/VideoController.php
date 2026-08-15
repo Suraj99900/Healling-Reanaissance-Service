@@ -399,12 +399,10 @@ class VideoController extends Controller
                 return response()->json(['error' => 'Video file not found'], 404);
             }
 
-            $stream = new \Symfony\Component\HttpFoundation\StreamedResponse(function () use ($video) {
-                $readStream = Storage::disk('spaces')->readStream($video->path);
-                if ($readStream) {
-                    fpassthru($readStream);
-                    fclose($readStream);
-                }
+            $stream = new \Symfony\Component\HttpFoundation\StreamedResponse(function () use ($path) {
+                $stream = fopen($path, 'rb');
+                fpassthru($stream);
+                fclose($stream);
             });
 
             $stream->headers->set('Content-Type', 'video/mp4');
