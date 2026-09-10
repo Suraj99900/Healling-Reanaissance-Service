@@ -32,9 +32,9 @@ class LogApiRequests
             }
         }
 
-        // Exclude static assets and media files
+        // Exclude static assets, media files, and browser devtools probes
         $path = $request->path();
-        if (preg_match('/\.(css|js|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot|mp4|m3u8|ts)$/i', $path) || str_contains($path, 'proxy-thumb')) {
+        if (preg_match('/\.(css|js|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot|mp4|m3u8|ts)$/i', $path) || str_contains($path, 'proxy-thumb') || str_contains($path, '.well-known') || str_contains($path, 'devtools')) {
             return $next($request);
         }
 
