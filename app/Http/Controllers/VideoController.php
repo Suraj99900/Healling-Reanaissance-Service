@@ -211,21 +211,33 @@ class VideoController extends Controller
 
                 // THUMBNAIL
                 if (!empty($video->thumbnail)) {
-                    $video->thumbnail_url = Storage::disk('spaces')->temporaryUrl($video->thumbnail, now()->addMinutes(360));
+                    try {
+                        $video->thumbnail_url = Storage::disk('spaces')->temporaryUrl($video->thumbnail, now()->addMinutes(360));
+                    } catch (\Throwable $e) {
+                        $video->thumbnail_url = 'https://suraj99900.github.io/myprotfolio.github.io/img/gallery_1.jpg';
+                    }
                 } else {
                     $video->thumbnail_url = 'https://suraj99900.github.io/myprotfolio.github.io/img/gallery_1.jpg';
                 }
 
                 // VIDEO
                 if (!empty($video->path)) {
-                    $video->video_url = Storage::disk('spaces')->temporaryUrl($video->path, now()->addMinutes(360));
+                    try {
+                        $video->video_url = Storage::disk('spaces')->temporaryUrl($video->path, now()->addMinutes(360));
+                    } catch (\Throwable $e) {
+                        $video->video_url = null;
+                    }
                 } else {
                     $video->video_url = null;
                 }
 
                 // HLS
                 if (!empty($video->hls_path)) {
-                    $video->hls_url = Storage::disk('spaces')->temporaryUrl($video->hls_path, now()->addMinutes(360));
+                    try {
+                        $video->hls_url = Storage::disk('spaces')->temporaryUrl($video->hls_path, now()->addMinutes(360));
+                    } catch (\Throwable $e) {
+                        $video->hls_url = null;
+                    }
                 } else {
                     $video->hls_url = null;
                 }

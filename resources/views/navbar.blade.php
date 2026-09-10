@@ -5,80 +5,69 @@
     $iActive = request()->query('iActive', '');
 @endphp
 
-<header class="fixed top-0 left-0 w-full z-50">
-    <div class="bg-gradient-to-r from-indigo-700 via-purple-700 to-pink-600 bg-opacity-90 backdrop-blur-md shadow-lg">
-        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+<header class="fixed top-0 left-0 w-full z-50 transition-all duration-300">
+    <div class="bg-white/95 backdrop-blur-md border-b border-slate-200/90 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
             {{-- Logo + Brand --}}
-            <a href="{{ url('/') }}"
-                class="flex items-center space-x-3 hover:scale-105 transition-transform duration-300">
-                <img src="{{ asset('/img/LifeHealer/logo_healer.png') }}" alt="Kvita's Healing Renaissance"
-                    class="h-8 w-auto md:h-10" />
-                <div class="hidden md:flex flex-col leading-tight">
-                    <span class="text-lg md:text-xl font-extrabold text-white">LifeHealer Kvita's</span>
-                    <span class="text-sm md:text-base text-gray-200">Healling Renaissance</span>
+            <a href="{{ url('/') }}" class="flex items-center space-x-3 group">
+                <div class="p-1.5 rounded-xl bg-slate-950 border border-slate-800 shadow-md group-hover:scale-105 transition-transform duration-300">
+                    <img src="{{ asset('/img/LifeHealer/logo_healer.png') }}" alt="Kvita's Healing Renaissance"
+                        class="h-8 w-auto md:h-9 object-contain" />
+                </div>
+                <div class="flex flex-col leading-tight">
+                    <span class="text-base md:text-lg font-extrabold tracking-tight text-slate-900 group-hover:text-indigo-600 transition-colors">
+                        LifeHealer <span class="text-indigo-600">Kvita's</span>
+                    </span>
+                    <span class="text-[10px] font-bold text-slate-500 tracking-wider uppercase">Healing Renaissance</span>
                 </div>
             </a>
 
-            {{-- Desktop Links --}}
-            <nav class="hidden md:flex space-x-8 text-sm font-medium text-white">
-                <a href="{{ url('/') }}" class="relative group flex items-center space-x-1 transition-colors duration-200
-             {{ request()->is('/') ? 'text-pink-300' : 'hover:text-pink-300' }}">
-                    <i class="fa fa-home"></i>
+            {{-- Desktop Links (Pill Buttons) --}}
+            <nav class="hidden md:flex items-center space-x-2 font-semibold text-slate-700 text-xs">
+                <a href="{{ url('/') }}" 
+                   class="px-4 py-2 rounded-full border transition-all duration-200 flex items-center space-x-2 {{ request()->is('/') ? 'bg-indigo-50 border-indigo-200 text-indigo-700 font-bold shadow-xs' : 'bg-white border-slate-200/90 text-slate-700 hover:bg-slate-50 hover:border-slate-300 hover:text-slate-900 shadow-2xs' }}">
+                    <i class="fa fa-home text-xs text-indigo-600"></i>
                     <span>Home</span>
-                    <span class="absolute left-0 bottom-[-2px] h-0.5 w-0 bg-pink-300 scale-x-0 group-hover:scale-x-100
-                       {{ request()->is('/') ? 'scale-x-100' : '' }} transition-transform origin-left"></span>
                 </a>
+
                 <a href="https://play.google.com/store/apps/details?id=com.healingrenaissance.app" target="_blank"
-                    class="relative group flex items-center space-x-1 transition-colors duration-200 hover:text-pink-300">
-                    <i class="fa fa-download"></i>
-                    <span>Download App</span>
-                    <span class="absolute left-0 bottom-[-2px] h-0.5 w-0 bg-pink-300 scale-x-0 group-hover:scale-x-100
-                       transition-transform origin-left"></span>
+                   class="px-4 py-2 rounded-full bg-white border border-slate-200/90 text-slate-700 hover:bg-slate-50 hover:border-slate-300 hover:text-slate-900 shadow-2xs transition-all duration-200 flex items-center space-x-2">
+                    <i class="fa fa-download text-xs text-purple-600"></i>
+                    <span>App</span>
                 </a>
 
                 @if ($bIsLogin)
                     @if ($iUserType == 1)
                         <a href="{{ url('dashboard') }}"
-                            class="relative group flex items-center space-x-1 transition-colors duration-200 hover:text-pink-300">
-                            <i class="fa-solid fa-chart-line"></i>
+                           class="px-4 py-2 rounded-full border transition-all duration-200 flex items-center space-x-2 {{ request()->is('dashboard*') ? 'bg-indigo-50 border-indigo-200 text-indigo-700 font-bold shadow-xs' : 'bg-white border-slate-200/90 text-slate-700 hover:bg-slate-50 hover:border-slate-300 hover:text-slate-900 shadow-2xs' }}">
+                            <i class="fa-solid fa-chart-pie text-xs text-indigo-600"></i>
                             <span>Dashboard</span>
-                            <span class="absolute left-0 bottom-[-2px] h-0.5 w-0 bg-pink-300 scale-x-0 group-hover:scale-x-100
-                                   transition-transform origin-left"></span>
                         </a>
                     @endif
+
                     <a href="{{ url('home') }}"
-                        class="relative group flex items-center space-x-1 transition-colors duration-200 hover:text-pink-300">
-                        <i class="fa-solid fa-film"></i>
-                        <span>Video Category</span>
-                        <span class="absolute left-0 bottom-[-2px] h-0.5 w-0 bg-pink-300 scale-x-0 group-hover:scale-x-100
-                             transition-transform origin-left"></span>
+                       class="px-4 py-2 rounded-full border transition-all duration-200 flex items-center space-x-2 {{ request()->is('home*') || request()->is('videos*') ? 'bg-indigo-50 border-indigo-200 text-indigo-700 font-bold shadow-xs' : 'bg-white border-slate-200/90 text-slate-700 hover:bg-slate-50 hover:border-slate-300 hover:text-slate-900 shadow-2xs' }}">
+                        <i class="fa-solid fa-layer-group text-xs text-pink-600"></i>
+                        <span>Categories</span>
                     </a>
 
+                    <div class="h-4 w-[1px] bg-slate-200 mx-1"></div>
+
                     <button id="logoutDesktop"
-                        class="flex items-center space-x-1 hover:text-pink-300 transition-colors duration-200 focus:outline-none">
-                        <i class="fa fa-sign-out-alt"></i>
+                        class="px-4 py-2 rounded-full bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold transition-all duration-200 shadow-2xs flex items-center space-x-2">
+                        <i class="fa fa-sign-out-alt text-xs"></i>
                         <span>Log Out</span>
                     </button>
                 @else
-                    <a href="{{ url('login') }}" class="relative group transition-colors duration-200 hover:text-pink-300">
-                        <span>Login</span>
-                        <span class="absolute left-0 bottom-[-2px] h-0.5 w-0 bg-pink-300 scale-x-0 group-hover:scale-x-100
-                             transition-transform origin-left"></span>
-                    </a>
-                    <a href="{{ url('register') }}"
-                        class="relative group transition-colors duration-200 hover:text-pink-300">
-                        <span>Register</span>
-                        <span class="absolute left-0 bottom-[-2px] h-0.5 w-0 bg-pink-300 scale-x-0 group-hover:scale-x-100
-                             transition-transform origin-left"></span>
-                    </a>
+                    <a href="{{ url('login') }}" class="px-4 py-2 rounded-full bg-white border border-slate-200 text-slate-700 font-bold hover:bg-slate-50 transition shadow-2xs">Login</a>
+                    <a href="{{ url('register') }}" class="px-5 py-2 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-bold transition shadow-md shadow-pink-500/20">Register</a>
                 @endif
             </nav>
 
             {{-- Mobile Hamburger --}}
             <button id="mobileMenuBtn"
-                class="md:hidden text-white focus:outline-none transition-transform transform hover:scale-110">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor">
+                class="md:hidden p-2 rounded-xl bg-white text-slate-700 hover:text-slate-900 focus:outline-none border border-slate-200 shadow-2xs">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
             </button>
@@ -86,70 +75,68 @@
     </div>
 
     {{-- Mobile Slide-in Menu --}}
-    <div id="mobileMenu" class="fixed inset-y-0 right-0 w-64 bg-gradient-to-b from-purple-700 to-pink-600 text-white
-              transform translate-x-full transition-transform duration-300 ease-in-out shadow-xl z-50">
-        <div class="px-6 py-4 flex items-center justify-between">
-            <span class="text-2xl font-bold">Menu</span>
+    <div id="mobileMenu" class="fixed inset-y-0 right-0 w-72 bg-white border-l border-slate-200 text-slate-800
+              transform translate-x-full transition-transform duration-300 ease-in-out shadow-2xl z-50 flex flex-col">
+        <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+            <span class="text-base font-bold text-slate-900 tracking-wide">Menu Navigation</span>
             <button id="mobileMenuClose"
-                class="focus:outline-none transition-transform transform hover:rotate-90 duration-200">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor">
+                class="p-2 rounded-lg bg-slate-200/60 text-slate-600 hover:text-slate-900 focus:outline-none transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
             </button>
         </div>
-        <nav class="px-6 py-4 space-y-4 text-base font-medium">
+        <nav class="p-6 space-y-3 text-xs font-bold flex-1">
             <a href="{{ url('/') }}"
-                class="flex items-center space-x-2 hover:text-yellow-300 transition-colors duration-200">
-                <i class="fa fa-home"></i>
+                class="flex items-center space-x-3 px-4 py-3 rounded-full bg-slate-50 border border-slate-200 text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 transition-all">
+                <i class="fa fa-home w-5 text-indigo-600"></i>
                 <span>Home</span>
             </a>
             <a href="https://play.google.com/store/apps/details?id=com.healingrenaissance.app" target="_blank"
-                class="flex items-center space-x-2 hover:text-yellow-300 transition-colors duration-200">
-                <i class="fa fa-download"></i>
+                class="flex items-center space-x-3 px-4 py-3 rounded-full bg-slate-50 border border-slate-200 text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 transition-all">
+                <i class="fa fa-download w-5 text-purple-600"></i>
                 <span>Download App</span>
             </a>
 
             @if ($bIsLogin)
                 @if ($iUserType == 1)
                     <a href="{{ url('dashboard') }}"
-                        class="flex items-center space-x-2 hover:text-yellow-300 transition-colors duration-200">
-                        <i class="fa-solid fa-chart-line"></i>
+                        class="flex items-center space-x-3 px-4 py-3 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">
+                        <i class="fa-solid fa-chart-pie w-5"></i>
                         <span>Dashboard</span>
                     </a>
                 @endif
                 <a href="{{ url('home') }}"
-                    class="flex items-center space-x-2 hover:text-yellow-300 transition-colors duration-200">
-                    <i class="fa-solid fa-film"></i>
-                    <span>Video Category</span>
+                    class="flex items-center space-x-3 px-4 py-3 rounded-full bg-slate-50 border border-slate-200 text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 transition-all">
+                    <i class="fa-solid fa-layer-group w-5 text-pink-600"></i>
+                    <span>Video Categories</span>
                 </a>
-                <button id="logoutMobile"
-                    class="flex items-center space-x-2 hover:text-yellow-300 transition-colors duration-200 focus:outline-none">
-                    <i class="fa fa-sign-out-alt"></i>
-                    <span>Log Out</span>
-                </button>
+                <div class="pt-4 border-t border-slate-100">
+                    <button id="logoutMobile"
+                        class="w-full flex items-center justify-center space-x-2 px-4 py-3 rounded-full bg-rose-50 text-rose-700 border border-rose-200 font-bold hover:bg-rose-100 transition-all">
+                        <i class="fa fa-sign-out-alt"></i>
+                        <span>Log Out</span>
+                    </button>
+                </div>
             @else
-                <a href="{{ url('login') }}" class="hover:text-yellow-300 transition-colors duration-200">Login</a>
-                <a href="{{ url('register') }}" class="hover:text-yellow-300 transition-colors duration-200">Register</a>
+                <div class="pt-4 space-y-2 border-t border-slate-100">
+                    <a href="{{ url('login') }}" class="block w-full text-center px-4 py-3 rounded-full bg-slate-100 text-slate-900 font-bold">Login</a>
+                    <a href="{{ url('register') }}" class="block w-full text-center px-4 py-3 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 text-white font-bold shadow-md shadow-pink-500/20">Register</a>
+                </div>
             @endif
         </nav>
     </div>
 
     {{-- Overlay for Mobile Menu --}}
     <div id="mobileOverlay"
-        class="fixed inset-0 bg-black bg-opacity-50 opacity-0 pointer-events-none transition-opacity duration-300 z-40">
+        class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs opacity-0 pointer-events-none transition-opacity duration-300 z-40">
     </div>
 </header>
 
-{{-- Spacer so fixed navbar won’t cover content --}}
 <div class="h-20"></div>
 
-{{-- ----------------------------
-Corrected JavaScript
------------------------------ --}}
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        // ----- Mobile menu toggle -----
         const mobileMenuBtn = document.getElementById('mobileMenuBtn');
         const mobileMenu = document.getElementById('mobileMenu');
         const mobileOverlay = document.getElementById('mobileOverlay');
@@ -170,41 +157,21 @@ Corrected JavaScript
             }
         }
 
-        // ----- Logout buttons (only present if logged in) -----
         const logoutDesktop = document.getElementById('logoutDesktop');
         const logoutMobile = document.getElementById('logoutMobile');
 
-        if (logoutDesktop) {
-            logoutDesktop.addEventListener('click', function () {
-                $.ajax({
-                    url: "{{ url('logout') }}",
-                    type: 'POST',
-                    data: {
-                        _token
-                            : '{{ csrf_token() }}'
-                    },
-                    success: function (response) {
-                        // Handle successful logout, e.g., redirect to home
-                        window.location.href = "{{ url('/') }}";
-                    },
-                });
+        function performLogout() {
+            $.ajax({
+                url: "{{ url('logout') }}",
+                type: 'POST',
+                data: { _token: '{{ csrf_token() }}' },
+                success: function () {
+                    window.location.href = "{{ url('/') }}";
+                }
             });
         }
-        if (logoutMobile) {
-            logoutMobile.addEventListener('click', function () {
-                $.ajax({
-                    url: "{{ url('logout') }}",
-                    type: 'POST',
-                    data: {
-                        _token
-                            : '{{ csrf_token() }}'
-                    },
-                    success: function (response) {
-                        // Handle successful logout, e.g., redirect to home
-                        window.location.href = "{{ url('/') }}";
-                    },
-                });
-            });
-        }
+
+        if (logoutDesktop) logoutDesktop.addEventListener('click', performLogout);
+        if (logoutMobile) logoutMobile.addEventListener('click', performLogout);
     });
 </script>

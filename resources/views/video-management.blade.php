@@ -2,48 +2,51 @@
 @include('CDN_Header')
 @include('navbar')
 
-<div class="min-h-screen bg-gradient-to-br from-purple-600 via-pink-400 to-yellow-300 py-10 px-4">
-    <div class="max-w-6xl mx-auto">
-        <div class="mb-8">
-            <h2 class="text-3xl font-bold text-white drop-shadow-lg">Video Management</h2>
-            <nav class="mt-2">
-                <ol class="flex space-x-2 text-sm text-white/80">
-                    <li><a href="{{ url('/dashboard') }}" class="underline hover:text-white">Dashboard</a></li>
-                    <li>/</li>
-                    <li class="font-semibold">Video Management</li>
-                </ol>
-            </nav>
-        </div>
-
-        <div class="bg-white/80 rounded-2xl shadow-lg p-6 mb-8">
-            <div class="flex justify-between items-center mb-4">
-                <button
-                    id="addVideoBtn"
-                    class="bg-gradient-to-r from-pink-500 to-yellow-400 text-white font-semibold px-6 py-2 rounded-full shadow-lg hover:scale-105 transition"
-                >
-                    <svg xmlns="http://www.w3.org/2000/svg" class="inline h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd"
-                            d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
-                            clip-rule="evenodd" />
-                    </svg>
-                    Add Video
+<div class="min-h-screen bg-[#F8FAFC] text-slate-900 font-sans pb-16">
+    <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+        
+        {{-- Page Header --}}
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200/80 pb-6">
+            <div>
+                <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 flex items-center gap-3">
+                    <span class="p-2.5 rounded-2xl bg-indigo-50 text-indigo-600 border border-indigo-200/80 shadow-xs">
+                        <i class="fa-solid fa-video text-lg"></i>
+                    </span>
+                    Video Catalog Management
+                </h1>
+                <nav class="mt-1">
+                    <ol class="flex space-x-2 text-slate-500 text-xs font-medium">
+                        <li><a href="{{ url('/dashboard') }}" class="hover:text-indigo-600 transition">Dashboard</a></li>
+                        <li>/</li>
+                        <li class="text-indigo-600 font-bold">Video Catalog</li>
+                    </ol>
+                </nav>
+            </div>
+            <div>
+                <button id="addVideoBtn"
+                    class="inline-flex items-center space-x-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow-md shadow-indigo-600/20 transition-all hover:scale-[1.02]">
+                    <i class="fa-solid fa-circle-plus text-xs"></i>
+                    <span>Add New Video</span>
                 </button>
             </div>
+        </div>
 
-            <div class="overflow-x-auto rounded-lg">
-                <table id="videoTable" class="min-w-full bg-white text-gray-800 rounded-lg shadow-md">
-                    <thead>
-                        <tr class="bg-gradient-to-r from-purple-500 to-pink-400 text-white text-left">
-                            <th class="py-3 px-4">#</th>
-                            <th class="py-3 px-4">Title</th>
-                            <th class="py-3 px-4">Uploader</th>
-                            <th class="py-3 px-4">Thumbnail</th>
-                            <th class="py-3 px-4">Status</th>
-                            <th class="py-3 px-4">Actions</th>
+        {{-- Video List Table Card --}}
+        <div class="bg-white border border-slate-200/90 rounded-2xl shadow-sm overflow-hidden p-6">
+            <div class="overflow-x-auto w-full">
+                <table id="videoTable" class="w-full text-left text-sm text-slate-700">
+                    <thead class="bg-slate-100/80 text-[11px] font-bold uppercase text-slate-600 tracking-wider border-b border-slate-200">
+                        <tr>
+                            <th class="py-3 px-5">#</th>
+                            <th class="py-3 px-5">Title</th>
+                            <th class="py-3 px-5">Uploader</th>
+                            <th class="py-3 px-5">Thumbnail</th>
+                            <th class="py-3 px-5">HLS Status</th>
+                            <th class="py-3 px-5 text-right">Actions</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        {{-- DataTables will inject rows here --}}
+                    <tbody class="divide-y divide-slate-100 font-sans">
+                        {{-- DataTables will inject rows --}}
                     </tbody>
                 </table>
             </div>
@@ -51,160 +54,95 @@
     </div>
 </div>
 
-{{-- Add Video Offcanvas Slider --}}
-<div
-    id="addVideoOffcanvas"
-    class="fixed inset-0 z-50 hidden"
-    aria-labelledby="addVideoOffcanvasLabel"
-    aria-modal="true"
-    role="dialog"
->
-    {{-- Overlay --}}
-    <div
-        id="closeAddOffcanvasOverlay"
-        class="absolute inset-0 bg-black bg-opacity-50 transition-opacity"
-    ></div>
+{{-- Add Video Offcanvas Drawer --}}
+<div id="addVideoOffcanvas" class="fixed inset-0 z-50 hidden" aria-labelledby="addVideoOffcanvasLabel" role="dialog">
+    <div id="closeAddOffcanvasOverlay" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs transition-opacity"></div>
 
-    {{-- Panel (slides in from the right) --}}
-    <div
-        id="addVideoPanel"
-        class="absolute inset-y-0 right-0 w-full max-w-lg bg-white shadow-xl transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col"
-    >
-        {{-- Header/Close Button --}}
-        <div class="flex items-center justify-between p-6 border-b border-gray-200">
-            <h3 id="addVideoOffcanvasLabel" class="text-2xl font-semibold text-pink-600">
-                Add Video
-            </h3>
-            <button id="closeAddOffcanvasBtn" type="button" class="text-gray-400 hover:text-red-600">
-                <span class="sr-only">Close panel</span>
-                &times;
+    <div id="addVideoPanel"
+        class="fixed inset-y-0 right-0 w-full max-w-lg bg-white border-l border-slate-200 shadow-2xl transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col z-50">
+        
+        <div class="flex items-center justify-between px-6 py-5 border-b border-slate-100 bg-slate-50">
+            <div class="flex items-center space-x-3">
+                <div class="p-2 rounded-xl bg-indigo-50 text-indigo-600 border border-indigo-100">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                </div>
+                <h3 id="addVideoOffcanvasLabel" class="text-base font-extrabold text-slate-900">Upload New Video Asset</h3>
+            </div>
+            <button id="closeAddOffcanvasBtn" type="button" class="p-2 rounded-lg bg-slate-200/60 text-slate-600 hover:text-slate-900 transition">
+                <i class="fa-solid fa-xmark text-base"></i>
             </button>
         </div>
 
-        {{-- Content (scrollable) --}}
-        <div class="flex-1 overflow-y-auto px-6 py-4">
-            <form id="videoForm" enctype="multipart/form-data" class="space-y-6">
+        <div class="flex-1 overflow-y-auto p-6">
+            <form id="videoForm" enctype="multipart/form-data" class="space-y-5">
                 @csrf
                 <input type="hidden" id="videoId" name="videoId" />
 
-                {{-- Title --}}
                 <div>
-                    <label for="title" class="block text-sm font-semibold mb-1">Title</label>
-                    <input
-                        type="text"
-                        id="title"
-                        name="title"
-                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-pink-400"
-                        placeholder="Enter Video Title"
-                        required
-                    />
+                    <label for="title" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">Video Title</label>
+                    <input type="text" id="title" name="title"
+                        class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-slate-900 text-xs font-medium focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-500/20 transition"
+                        placeholder="Enter Descriptive Video Title" required />
                 </div>
 
-                {{-- Description --}}
                 <div>
-                    <label for="description" class="block text-sm font-semibold mb-1">
-                        Description
-                    </label>
-                    <textarea
-                        id="description"
-                        name="description"
-                        rows="3"
-                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-pink-400"
-                        placeholder="Enter Description"
-                        required
-                    ></textarea>
+                    <label for="description" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">Description</label>
+                    <textarea id="description" name="description" rows="3"
+                        class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-slate-900 text-xs font-medium focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-500/20 transition"
+                        placeholder="Brief summary of video content" required></textarea>
                 </div>
 
-                {{-- Category --}}
                 <div>
-                    <label for="category_id" class="block text-sm font-semibold mb-1">Category</label>
-                    <select
-                        id="category_id"
-                        name="category_id"
-                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-pink-400"
-                        required
-                    >
+                    <label for="category_id" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">Category</label>
+                    <select id="category_id" name="category_id"
+                        class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-slate-900 text-xs font-medium focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-500/20 transition" required>
                         <option value="">Select Category</option>
-                        {{-- Populated via AJAX --}}
                     </select>
                 </div>
 
-                {{-- Video File --}}
                 <div>
-                    <label for="videoFile" class="block text-sm font-semibold mb-1">Video File</label>
-                    <input
-                        type="file"
-                        id="videoFile"
-                        name="video"
-                        accept="video/*"
-                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-pink-400"
-                        required
-                    />
+                    <label for="videoFile" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">MP4 Video File</label>
+                    <input type="file" id="videoFile" name="video" accept="video/*"
+                        class="w-full bg-slate-50 border border-slate-300 text-slate-700 rounded-xl px-4 py-2.5 text-xs file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" required />
                 </div>
 
-                {{-- Thumbnail File --}}
                 <div>
-                    <label for="thumbnailFile" class="block text-sm font-semibold mb-1">Thumbnail File</label>
-                    <input
-                        type="file"
-                        id="thumbnailFile"
-                        name="thumbnail"
-                        accept="image/*"
-                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-pink-400"
-                        required
-                    />
+                    <label for="thumbnailFile" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">Cover Thumbnail Image</label>
+                    <input type="file" id="thumbnailFile" name="thumbnail" accept="image/*"
+                        class="w-full bg-slate-50 border border-slate-300 text-slate-700 rounded-xl px-4 py-2.5 text-xs file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" required />
                 </div>
 
-                {{-- Attachments Container --}}
-                <div id="attachmentsContainer">
-                    <div class="attachment-item mb-4 flex flex-col space-y-2">
+                <div id="attachmentsContainer" class="space-y-4 pt-2">
+                    <div class="attachment-item bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
                         <div>
-                            <label class="block text-sm font-semibold mb-1">Attachment Name</label>
-                            <input
-                                type="text"
-                                name="attachment_names[]"
-                                class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-pink-400"
-                                placeholder="Enter Attachment Name"
-                            />
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Attachment Title</label>
+                            <input type="text" name="attachment_names[]"
+                                class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-indigo-600"
+                                placeholder="PDF / Resource Title" />
                         </div>
                         <div>
-                            <label class="block text-sm font-semibold mb-1">Attachment File</label>
-                            <input
-                                type="file"
-                                name="attachment_files[]"
-                                class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-pink-400"
-                            />
+                            <label class="block text-xs font-bold text-slate-400 mb-1">Attachment File</label>
+                            <input type="file" name="attachment_files[]"
+                                class="w-full bg-slate-900 border border-slate-800 text-slate-400 text-xs rounded-lg px-3 py-1.5" />
                         </div>
                     </div>
                 </div>
 
-                <button
-                    id="addAttachmentBtn"
-                    type="button"
-                    class="inline-flex items-center space-x-2 bg-gradient-to-r from-purple-500 to-pink-400 text-white px-4 py-2 rounded-lg shadow hover:scale-105 transition"
-                >
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd"
-                            d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
-                            clip-rule="evenodd" />
-                    </svg>
-                    <span>Add Attachment</span>
+                <button id="addAttachmentBtn" type="button"
+                    class="inline-flex items-center space-x-2 text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-pink-400 px-4 py-2 rounded-xl border border-slate-700 transition">
+                    <i class="fa-solid fa-paperclip"></i>
+                    <span>+ Add Another Attachment</span>
                 </button>
 
-                {{-- Submit --}}
                 <div class="pt-6">
-                    <button
-                        type="submit"
-                        class="w-full bg-gradient-to-r from-pink-500 to-yellow-400 text-white font-semibold px-6 py-2 rounded-full shadow-lg hover:scale-105 transition"
-                    >
-                        Save Video
+                    <button type="submit"
+                        class="w-full inline-flex items-center justify-center space-x-2 bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 hover:to-rose-500 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-pink-600/30 transition-all">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                        <span>Start Chunked Video Upload</span>
                     </button>
-                    <div class="progress-indicator mt-2 hidden">
-                        <div class="w-full bg-gray-200 rounded-full h-2.5">
-                            <div
-                                class="progress-bar bg-gradient-to-r from-pink-500 to-yellow-400 h-2.5 rounded-full"
-                                style="width: 0%"
-                            ></div>
+                    <div class="progress-indicator mt-4 hidden">
+                        <div class="w-full bg-slate-950 rounded-full h-3 p-0.5 border border-slate-800">
+                            <div class="progress-bar bg-gradient-to-r from-pink-500 to-rose-500 h-2 rounded-full transition-all duration-300 text-[10px] text-white font-bold text-center leading-3" style="width: 0%"></div>
                         </div>
                     </div>
                 </div>
@@ -213,120 +151,70 @@
     </div>
 </div>
 
-{{-- Edit Video Offcanvas Slider --}}
-<div
-    id="editVideoOffcanvas"
-    class="fixed inset-0 z-50 hidden"
-    aria-labelledby="editVideoOffcanvasLabel"
-    aria-modal="true"
-    role="dialog"
->
-    {{-- Overlay --}}
-    <div
-        id="closeEditOffcanvasOverlay"
-        class="absolute inset-0 bg-black bg-opacity-50 transition-opacity"
-    ></div>
+{{-- Edit Video Offcanvas Drawer --}}
+<div id="editVideoOffcanvas" class="fixed inset-0 z-50 hidden" aria-labelledby="editVideoOffcanvasLabel" role="dialog">
+    <div id="closeEditOffcanvasOverlay" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs transition-opacity"></div>
 
-    {{-- Panel (slides in from the right) --}}
-    <div
-        id="editVideoPanel"
-        class="absolute inset-y-0 right-0 w-full max-w-lg bg-white shadow-xl transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col"
-    >
-        {{-- Header/Close Button --}}
-        <div class="flex items-center justify-between p-6 border-b border-gray-200">
-            <h3 id="editVideoOffcanvasLabel" class="text-2xl font-semibold text-purple-600">
-                Edit Video
-            </h3>
-            <button id="closeEditOffcanvasBtn" type="button" class="text-gray-400 hover:text-red-600">
-                <span class="sr-only">Close panel</span>
-                &times;
+    <div id="editVideoPanel"
+        class="fixed inset-y-0 right-0 w-full max-w-lg bg-white border-l border-slate-200 shadow-2xl transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col z-50">
+        
+        <div class="flex items-center justify-between px-6 py-5 border-b border-slate-100 bg-slate-50">
+            <div class="flex items-center space-x-3">
+                <div class="p-2 rounded-xl bg-purple-50 text-purple-600 border border-purple-100">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                </div>
+                <h3 id="editVideoOffcanvasLabel" class="text-base font-extrabold text-slate-900">Update Video Details</h3>
+            </div>
+            <button id="closeEditOffcanvasBtn" type="button" class="p-2 rounded-lg bg-slate-200/60 text-slate-600 hover:text-slate-900 transition">
+                <i class="fa-solid fa-xmark text-base"></i>
             </button>
         </div>
 
-        {{-- Content (scrollable) --}}
-        <div class="flex-1 overflow-y-auto px-6 py-4">
-            <form id="editVideoForm" class="space-y-6">
+        <div class="flex-1 overflow-y-auto p-6">
+            <form id="editVideoForm" class="space-y-5">
                 @csrf
                 @method('PUT')
                 <input type="hidden" id="editVideoId" name="videoId" />
 
-                {{-- Title --}}
                 <div>
-                    <label for="editTitle" class="block text-sm font-semibold mb-1">Title</label>
-                    <input
-                        type="text"
-                        id="editTitle"
-                        name="title"
-                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
-                        placeholder="Enter Video Title"
-                        required
-                    />
+                    <label for="editTitle" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">Video Title</label>
+                    <input type="text" id="editTitle" name="title"
+                        class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-slate-900 text-xs font-medium focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-500/20 transition" required />
                 </div>
 
-                {{-- Description --}}
                 <div>
-                    <label for="editDescription" class="block text-sm font-semibold mb-1">Description</label>
-                    <textarea
-                        id="editDescription"
-                        name="description"
-                        rows="3"
-                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
-                        placeholder="Enter Description"
-                        required
-                    ></textarea>
+                    <label for="editDescription" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">Description</label>
+                    <textarea id="editDescription" name="description" rows="3"
+                        class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-slate-900 text-xs font-medium focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-500/20 transition" required></textarea>
                 </div>
 
-                {{-- Category --}}
                 <div>
-                    <label for="editCategory" class="block text-sm font-semibold mb-1">Category</label>
-                    <select
-                        id="editCategory"
-                        name="category_id"
-                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
-                        required
-                    >
+                    <label for="editCategory" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">Category</label>
+                    <select id="editCategory" name="category_id"
+                        class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-slate-900 text-xs font-medium focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-500/20 transition" required>
                         <option value="">Select Category</option>
-                        {{-- Populated via AJAX --}}
                     </select>
                 </div>
 
-                {{-- Existing Attachments Container --}}
-                <div id="editAttachmentsContainer" class="space-y-4">
-                    {{-- Populated via AJAX when “Edit” is clicked --}}
-                </div>
+                <div id="editAttachmentsContainer" class="space-y-4"></div>
 
-                <button
-                    id="addEditAttachmentBtn"
-                    type="button"
-                    class="inline-flex items-center space-x-2 bg-gradient-to-r from-purple-500 to-pink-400 text-white px-4 py-2 rounded-lg shadow hover:scale-105 transition"
-                >
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd"
-                            d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
-                            clip-rule="evenodd" />
-                    </svg>
-                    <span>Add Attachment</span>
+                <button id="addEditAttachmentBtn" type="button"
+                    class="inline-flex items-center space-x-2 text-xs font-bold bg-slate-100 hover:bg-slate-200 text-indigo-700 px-4 py-2.5 rounded-xl border border-slate-200 transition">
+                    <i class="fa-solid fa-paperclip text-xs"></i>
+                    <span>+ Add Another Attachment</span>
                 </button>
 
-                {{-- Submit --}}
                 <div class="pt-6">
-                    <button
-                        type="submit"
-                        class="w-full bg-gradient-to-r from-purple-500 to-pink-400 text-white font-semibold px-6 py-2 rounded-full shadow-lg hover:scale-105 transition"
-                    >
-                        Update Video
+                    <button type="submit"
+                        class="w-full inline-flex items-center justify-center space-x-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 rounded-xl shadow-md shadow-indigo-600/20 transition-all text-xs">
+                        <i class="fa-solid fa-floppy-disk"></i>
+                        <span>Save Changes</span>
                     </button>
                 </div>
             </form>
         </div>
     </div>
 </div>
-
-@include('CDN_Footer')
-
-{{-- DataTables, jQuery (only) --}}
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -363,20 +251,20 @@
             attachmentsContainer.innerHTML = `
                 <div class="attachment-item mb-4 flex flex-col space-y-2">
                     <div>
-                        <label class="block text-sm font-semibold mb-1">Attachment Name</label>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Attachment Name</label>
                         <input
                             type="text"
                             name="attachment_names[]"
-                            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-pink-400"
+                            class="w-full border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-400"
                             placeholder="Enter Attachment Name"
                         />
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold mb-1">Attachment File</label>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Attachment File</label>
                         <input
                             type="file"
                             name="attachment_files[]"
-                            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-pink-400"
+                            class="w-full border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-400"
                         />
                     </div>
                 </div>
@@ -427,34 +315,38 @@
             columns: [
                 {
                     data: null,
+                    className: 'py-3.5 px-5 font-mono text-xs text-slate-400',
                     render: (data, type, row, meta) => meta.row + 1
                 },
-                { data: 'title' },
-                { data: 'name' },
+                { data: 'title', className: 'py-3.5 px-5 font-bold text-slate-900' },
+                { data: 'name', className: 'py-3.5 px-5 text-slate-600 font-medium' },
                 {
                     data: 'thumbnail_url',
-                    render: data => `<img src="${data}" alt="Thumb" width="50" class="rounded" crossorigin="anonymous" loading="lazy">`
+                    className: 'py-3.5 px-5',
+                    render: data => `<img src="${data}" alt="Thumb" class="h-12 w-20 object-cover rounded-xl border border-slate-200 shadow-xs" crossorigin="anonymous" loading="lazy">`
                 },
                 {
                     data: 'hls_path',
+                    className: 'py-3.5 px-5',
                     render: data => {
                         if (data && data.trim() !== '') {
-                            return `<span class="text-green-600 font-medium">Ready to watch</span>`;
+                            return `<span class="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold"><span class="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span><span>Ready to Stream</span></span>`;
                         } else {
-                            return `<span class="text-yellow-600 font-medium">Processing…</span>`;
+                            return `<span class="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200 text-xs font-bold"><span class="h-1.5 w-1.5 rounded-full bg-amber-500 animate-ping"></span><span>Processing (HLS)</span></span>`;
                         }
                     }
                 },
                 {
                     data: 'id',
+                    className: 'py-3.5 px-5 text-right',
                     orderable: false,
                     searchable: false,
                     render: id => `
-                        <button class="edit-video bg-blue-500 text-white text-sm px-3 py-1 rounded hover:bg-blue-600 mr-2" data-id="${id}">
-                          Edit
+                        <button class="edit-video px-3 py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-bold mr-2 transition" data-id="${id}">
+                          <i class="fa-solid fa-pen-to-square mr-1"></i> Edit
                         </button>
-                        <button class="delete-video bg-red-500 text-white text-sm px-3 py-1 rounded hover:bg-red-600" data-id="${id}">
-                          Delete
+                        <button class="delete-video px-3 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold transition" data-id="${id}">
+                          <i class="fa-solid fa-trash-can mr-1"></i> Delete
                         </button>`
                 }
             ],
@@ -817,3 +709,5 @@
         });
     });
 </script>
+
+@include('CDN_Footer')
