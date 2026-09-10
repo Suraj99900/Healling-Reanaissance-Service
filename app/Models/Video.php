@@ -23,6 +23,7 @@ class Video extends Model
         'cloudflare_video_id',
         'video_json_data',
         'hls_path',
+        'is_converted_hls_video',
         'thumbnail',
         'duration',
         'added_on',
@@ -38,9 +39,14 @@ class Video extends Model
     {
         parent::boot();
         
-        // Auto-generate UUID before creating a new record
+        // Auto-generate UUID and default added_on timestamp before creating a new record
         static::creating(function ($video) {
-            $video->video_uid = (string) Str::uuid();
+            if (empty($video->video_uid)) {
+                $video->video_uid = (string) Str::uuid();
+            }
+            if (empty($video->added_on)) {
+                $video->added_on = now();
+            }
         });
     }
 
