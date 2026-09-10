@@ -12,9 +12,11 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // $schedule->command('inspire')->hourly();
-        $schedule->command('convert:pending-videos')->everyFiveMinutes()->withoutOverlapping();
-        $schedule->command('video:update-hls-status')->everyFiveMinutes();
+        // Nightly pending video conversion queueing (every 30 mins between 10 PM and 6 AM)
+        $schedule->command('convert:pending-videos')->cron('*/30 22-23,0-5 * * *')->withoutOverlapping();
+
+        // Daytime HLS status sync (every 15 mins starting at 6 AM until 10 PM)
+        $schedule->command('video:update-hls-status')->cron('*/15 6-21 * * *');
     }
 
     /**

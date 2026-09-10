@@ -15,32 +15,41 @@ class LogApiRequests
 {
     public function handle(Request $request, Closure $next): Response
     {
-        // Get all route URIs from web.php and api.php
-        $allRoutes = collect(Route::getRoutes())->map(function ($route) {
-            return ltrim($route->uri(), '/');
-        })->unique()->toArray();
+        $userAgent = strtolower($request->header('User-Agent') ?? '');
 
-        // Always allow /proxy-thumb
-        $allRoutes[] = 'proxy-thumb';
+        // Detect and ignore automated bots, crawlers, uptime monitors, and CLI tools
+        $botPatterns = [
+            'bot', 'spider', 'crawler', 'uptime', 'monitor', 'ping', 'curl', 'wget', 
+            'python', 'postman', 'head', 'go-http-client', 'semrush', 'ahrefs', 
+            'bingbot', 'googlebot', 'yandex', 'duckduckbot', 'baiduspider', 
+            'facebookexternalhit', 'twitterbot', 'bytespider', 'cfnetwork', 
+            'apache-httpclient', 'java/', 'php/', 'zgrab', 'nmap', 'headless'
+        ];
 
-        // Check if current request matches any registered route
-        $currentPath = ltrim($request->path(), '/');
-        if (!in_array($currentPath, $allRoutes)) {
-            // Skip logging for other routes
+        foreach ($botPatterns as $bot) {
+            if (str_contains($userAgent, $bot)) {
+                return $next($request);
+            }
+        }
+
+        // Exclude static assets and media files
+        $path = $request->path();
+        if (preg_match('/\.(css|js|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot|mp4|m3u8|ts)$/i', $path) || str_contains($path, 'proxy-thumb')) {
             return $next($request);
         }
 
-        $sResData = " ";
         $sessionData = Session::all();
         if ((new SessionManager())->isLoggedIn()) {
-            $uniqueVisitorId = $sessionData['iUserID'] ?? " ";
+            $uniqueVisitorId = $sessionData['iUserID'] ?? ($sessionData['user_name'] ?? 'User');
         } else {
-            $uniqueVisitorId = "visitor_" . Str::random(10);
+            $uniqueVisitorId = "visitor_" . Str::substr(md5($request->ip() . $request->header('User-Agent')), 0, 8);
         }
-        $startTime = microtime(true); // Start timer
+
+        $startTime = microtime(true);
 
         $response = $next($request);
-        $endTime = microtime(true); // End timer
+
+        $endTime = microtime(true);
         $timeSpent = (int)(($endTime - $startTime) * 1000);
 
         $excludedIps = [
@@ -50,31 +59,32 @@ class LogApiRequests
             '104.248.218.35',
         ];
 
-        $contentType = $response->headers->get('Content-Type');
-        $isStorableContent = $contentType && (str_contains($contentType, 'application/json') || str_contains($contentType, 'text/plain'));
-
-        if ($isStorableContent) {
-            $sResData = $response->getContent();
-        } else {
-            $sResData = " ";
-        }
-
         if (!in_array($request->ip(), $excludedIps)) {
-            ApiLog::create([
-                'unique_visitor_id' => $uniqueVisitorId,
-                'method' => $request->method(),
-                'endpoint' => $request->path(),
-                'request_payload' => json_encode($request->all()),
-                'response_payload' => $sResData,
-                'status_code' => $response->getStatusCode(),
-                'ip_address' => $request->ip(),
-                'time_spent' => $timeSpent,
-                'user_agent' => $request->header('User-Agent'),
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
+            try {
+                $contentType = $response->headers->get('Content-Type');
+                $isStorableContent = $contentType && (str_contains($contentType, 'application/json') || str_contains($contentType, 'text/plain'));
+                $sResData = $isStorableContent ? Str::limit($response->getContent(), 1000) : " ";
+
+                ApiLog::create([
+                    'unique_visitor_id' => (string)$uniqueVisitorId,
+                    'method'            => $request->method(),
+                    'endpoint'          => $path,
+                    'request_payload'   => json_encode($request->except(['password', 'password_confirmation'])),
+                    'response_payload'  => $sResData,
+                    'status_code'       => $response->getStatusCode(),
+                    'ip_address'        => $request->ip() ?? '127.0.0.1',
+                    'time_spent'        => $timeSpent,
+                    'user_agent'        => Str::limit($request->header('User-Agent'), 255),
+                    'created_at'        => now(),
+                    'updated_at'        => now(),
+                ]);
+            } catch (\Throwable $e) {
+                // Prevent middleware failure from breaking request flow
+                \Illuminate\Support\Facades\Log::error('LogApiRequests Middleware Error: ' . $e->getMessage());
+            }
         }
 
         return $response;
     }
 }
+

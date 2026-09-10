@@ -1,51 +1,35 @@
 <?php
-function main(array $args) : array
-{
-    // Retrieve the video path and output folder from the POST request
-    $videoPath = $args['videoPath'] ?? null;
-    $outputFolder = $args['outputFolder'] ?? null;
 
-    if (!$videoPath || !$outputFolder) {
-        return [
-            "body" => "Missing required parameters: videoPath and outputFolder."
-        ];
-    }
+$projectRoot = 'E:/Code Base/Projeoct/Healling-Reanaissance-Service';
+require $projectRoot . '/vendor/autoload.php';
+$app = require_once $projectRoot . '/bootstrap/app.php';
+$app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 
-    // Ensure the output folder exists
-    if (!file_exists($outputFolder)) {
-        if (!mkdir($outputFolder, 0775, true)) {
-            return [
-                "body" => "Failed to create output folder: $outputFolder"
-            ];
-        }
-    }
+use Illuminate\Support\Facades\Storage;
 
-    // Define the output HLS file and segment pattern
-    $outputFolder = rtrim($outputFolder, DIRECTORY_SEPARATOR);
-    $hlsFile = "$outputFolder" . DIRECTORY_SEPARATOR . "index.m3u8";
-    $segmentPattern = "$outputFolder" . DIRECTORY_SEPARATOR . "segment%03d.ts";
+$disk = Storage::disk('spaces');
+$hlsFolder = 'hls/bc22cabb-95ec-44be-90f2-f7b2b817038b';
 
-    // Build the FFmpeg command
-    $command = sprintf(
-        'ffmpeg -i "%s" -codec:v libx264 -codec:a aac -hls_time 10 -hls_playlist_type vod -hls_segment_filename "%s" -start_number 0 "%s" 2>&1',
-        $videoPath,
-        $segmentPattern,
-        $hlsFile
-    );
+echo "=== CHECKING HLS FOLDER: $hlsFolder ===\n";
 
-    // Execute the command and capture output and return status
-    exec($command, $output, $returnVar);
+$files = $disk->files($hlsFolder);
+echo "Files in folder: " . count($files) . "\n";
 
-    if ($returnVar !== 0) {
-        // Conversion failed; return error details.
-        return [
-            "body" => "FFmpeg conversion failed.",
-            "error" => implode("\n", $output)
-        ];
-    }
-
-    // If successful, return the HLS file path.
-    return [
-        "body" => "Video converted successfully! HLS file: $hlsFile"
-    ];
+foreach ($files as $file) {
+    echo "Setting $file to public...\n";
+    $disk->setVisibility($file, 'public');
 }
+
+$testSegmentUrl = "https://storagevideos-new.sfo3.digitaloceanspaces.com/{$hlsFolder}/segment000.ts";
+
+echo "\nTesting HTTP GET for segment000.ts:\n$testSegmentUrl\n";
+
+$ch = curl_init($testSegmentUrl);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_NOBODY, true);
+curl_exec($ch);
+$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+curl_close($ch);
+
+echo "HTTP Code: $httpCode " . ($httpCode == 200 ? "[PASS: NOW WORKING!]" : "[FAIL]") . "\n";
+

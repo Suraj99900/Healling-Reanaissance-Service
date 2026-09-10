@@ -81,17 +81,10 @@ class AttachmentFileController extends Controller
             $attachments = (new Attachment)->fetchAttchmentByVideoId($videoId);
 
             foreach ($attachments as $att) {
-                if ($att->attachment_path && Storage::disk('spaces')->exists($att->attachment_path)) {
-                    // Copy file from Spaces to local storage if not already present
-                    $localPath = 'attachments/' . basename($att->attachment_path);
-                    if (!Storage::disk('public')->exists($localPath)) {
-                        $fileContent = Storage::disk('spaces')->get($att->attachment_path);
-                        Storage::disk('public')->put($localPath, $fileContent);
-                    }
-                    // Generate local download URL
-                    $att->attachment_url = asset('storage/' . $localPath);
+                if (!empty($att->attachment_path)) {
+                    $att->attachment_url = Storage::disk('spaces')->temporaryUrl($att->attachment_path, now()->addMinutes(360));
                 } else {
-                    $att->attachment_url = null; // or a default placeholder URL
+                    $att->attachment_url = null;
                 }
             }
 

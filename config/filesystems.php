@@ -62,9 +62,10 @@ return [
             'driver' => 's3',
             'key' => env('DO_SPACES_KEY'),
             'secret' => env('DO_SPACES_SECRET'),
-            'endpoint' => env('DO_SPACES_ENDPOINT', 'https://blr1.digitaloceanspaces.com'),
-            'region' => env('DO_SPACES_REGION', 'blr1'),
+            'endpoint' => env('DO_SPACES_ENDPOINT', 'https://sfo3.digitaloceanspaces.com'),
+            'region' => env('DO_SPACES_REGION', 'sfo3'),
             'bucket' => env('DO_SPACES_BUCKET'),
+            'url' => env('DO_SPACES_URL'),
             'visibility' => 'public',
             'throw' => false,
 

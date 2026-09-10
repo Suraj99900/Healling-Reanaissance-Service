@@ -4,6 +4,12 @@
 /public/hot
 /public/storage
 /storage/*.key
+/storage/app/public/videos
+/storage/app/temp
+/storage/framework/cache
+/storage/framework/sessions
+/storage/framework/views
+/storage/logs
 /vendor
 .env
 .env.backup
@@ -17,3 +23,4 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
+
