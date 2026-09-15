@@ -13,7 +13,7 @@ class ConvertPendingVideos extends Command
 
     public function handle()
     {
-        $videos = Video::where(function ($query) {
+        $video = Video::where(function ($query) {
                 $query->whereNull('is_converted_hls_video')
                     ->orWhere('is_converted_hls_video', false);
             })
@@ -25,16 +25,14 @@ class ConvertPendingVideos extends Command
             ->where('status', 1)
             ->where('deleted', 0)
             ->where('created_at', '<=', now()->subHours(1))
-            ->get();
+            ->first();
 
-        if ($videos->isEmpty()) {
+        if (! $video) {
             $this->info('No pending videos found for conversion.');
             return;
         }
 
-        foreach ($videos as $video) {
-            dispatch(new ConvertVideoToHLS($video));
-            $this->info("Queued video ID {$video->id} for conversion.");
-        }
+        dispatch(new ConvertVideoToHLS($video));
+        $this->info("Queued video ID {$video->id} for conversion.");
     }
 }
