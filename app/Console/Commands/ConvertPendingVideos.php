@@ -24,7 +24,7 @@ class ConvertPendingVideos extends Command
             ->where('path', '!=', '')
             ->where('status', 1)
             ->where('deleted', 0)
-            ->where('created_at', '<=', now()->subMinutes(30))
+            ->where('created_at', '<=', now()->subHours(1))
             ->first(); // Fetch only ONE video
 
         if (!$video) {

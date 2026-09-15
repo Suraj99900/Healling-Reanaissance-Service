@@ -40,12 +40,18 @@ class ConvertVideoToHLS implements ShouldQueue
         $localMp4Path = $tmpDir . basename($remoteKey);
 
         if (! is_dir($tmpDir)) {
-            File::makeDirectory($tmpDir, 0755, true);
+            File::makeDirectory($tmpDir, 0775, true);
         }
 
         try {
-            $contents = Storage::disk('spaces')->get($remoteKey);
-            File::put($localMp4Path, $contents);
+            $readStream = Storage::disk('spaces')->readStream($remoteKey);
+            $writeStream = fopen($localMp4Path, 'w+b');
+            if (! $readStream || ! $writeStream) {
+                throw new \Exception("Could not open read/write stream for {$remoteKey}");
+            }
+            stream_copy_to_stream($readStream, $writeStream);
+            if (is_resource($readStream)) fclose($readStream);
+            if (is_resource($writeStream)) fclose($writeStream);
         } catch (\Exception $e) {
             \Log::error("Failed to download source MP4: {$e->getMessage()}");
             return;
@@ -55,7 +61,7 @@ class ConvertVideoToHLS implements ShouldQueue
         $lessonId    = (string) Str::uuid();
         $hlsFolder   = storage_path("app/temp/hls/{$lessonId}");
         if (! is_dir($hlsFolder)) {
-            File::makeDirectory($hlsFolder, 0755, true);
+            File::makeDirectory($hlsFolder, 0775, true);
         }
 
         $hlsIndex       = "{$hlsFolder}/index.m3u8";
