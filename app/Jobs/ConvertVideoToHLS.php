@@ -40,7 +40,7 @@ class ConvertVideoToHLS implements ShouldQueue
         $localMp4Path = $tmpDir . basename($remoteKey);
 
         if (! is_dir($tmpDir)) {
-            File::makeDirectory($tmpDir, 0775, true);
+            File::makeDirectory($tmpDir, 0777, true, true);
         }
 
         try {
@@ -61,7 +61,7 @@ class ConvertVideoToHLS implements ShouldQueue
         $lessonId    = (string) Str::uuid();
         $hlsFolder   = storage_path("app/temp/hls/{$lessonId}");
         if (! is_dir($hlsFolder)) {
-            File::makeDirectory($hlsFolder, 0775, true);
+            File::makeDirectory($hlsFolder, 0777, true, true);
         }
 
         $hlsIndex       = "{$hlsFolder}/index.m3u8";
