@@ -13,7 +13,7 @@ class ConvertPendingVideos extends Command
 
     public function handle()
     {
-        $video = Video::where(function ($query) {
+        $videos = Video::where(function ($query) {
                 $query->whereNull('is_converted_hls_video')
                     ->orWhere('is_converted_hls_video', false);
             })
