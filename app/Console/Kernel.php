@@ -16,7 +16,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('convert:pending-videos')->cron('*/30 22-23,0-5 * * *')->withoutOverlapping();
 
         // Daytime HLS status sync (every 15 mins starting at 6 AM until 10 PM)
-        $schedule->command('video:update-hls-status')->cron('*/15 6-21 * * *');
+        $schedule->command('video:update-hls-status')->cron('*/15 6-21 * * *')->withoutOverlapping();
     }
 
     /**
