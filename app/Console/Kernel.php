@@ -12,8 +12,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // Check and queue videos uploaded at least 1 hour ago (runs 24/7 every 15 mins)
-        $schedule->command('convert:pending-videos')->everyFifteenMinutes()->withoutOverlapping();
+        // Check and queue videos uploaded at least 1 hour ago (runs 24/7 every minute)
+        $schedule->command('convert:pending-videos')->everyMinute()->withoutOverlapping();
 
         // Daytime HLS status sync (every 15 mins starting at 6 AM until 10 PM)
         $schedule->command('video:update-hls-status')->cron('*/15 6-21 * * *')->withoutOverlapping();
