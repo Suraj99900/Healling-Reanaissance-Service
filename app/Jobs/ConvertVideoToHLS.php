@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Models\Video;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
@@ -15,15 +16,20 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\File;
 use Aws\S3\S3Client;
 
-class ConvertVideoToHLS implements ShouldQueue
+class ConvertVideoToHLS implements ShouldQueue, ShouldBeUnique
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected Video $video;
+    public Video $video;
 
     public function __construct(Video $video)
     {
         $this->video = $video;
+    }
+
+    public function uniqueId(): string
+    {
+        return (string) $this->video->id;
     }
 
     public function handle(): void
