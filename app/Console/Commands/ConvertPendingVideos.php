@@ -25,14 +25,16 @@ class ConvertPendingVideos extends Command
             ->where('status', 1)
             ->where('deleted', 0)
             ->where('created_at', '<=', now()->subHours(1))
-            ->first(); // Fetch only ONE video
+            ->get();
 
-        if (!$video) {
+        if ($videos->isEmpty()) {
             $this->info('No pending videos found for conversion.');
             return;
         }
 
-        dispatch(new ConvertVideoToHLS($video));
-        $this->info("Queued video ID {$video->id} for conversion.");
+        foreach ($videos as $video) {
+            dispatch(new ConvertVideoToHLS($video));
+            $this->info("Queued video ID {$video->id} for conversion.");
+        }
     }
 }
