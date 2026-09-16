@@ -97,7 +97,9 @@ class ConvertVideoToHLS implements ShouldQueue, ShouldBeUnique
             \Log::error("FFmpeg failed: " . $e->getMessage());
             // cleanup and exit
             @unlink($localMp4Path);
-            File::deleteDirectory(dirname($hlsFolder));
+            if (File::isDirectory($hlsFolder)) {
+                File::deleteDirectory($hlsFolder);
+            }
             return;
         }
 
@@ -115,7 +117,9 @@ class ConvertVideoToHLS implements ShouldQueue, ShouldBeUnique
 
         // 6. Cleanup local temp files
         @unlink($localMp4Path);
-        File::deleteDirectory(dirname($hlsFolder));
+        if (File::isDirectory($hlsFolder)) {
+            File::deleteDirectory($hlsFolder);
+        }
 
         
         $video->refresh();
