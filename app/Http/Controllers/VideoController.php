@@ -202,45 +202,45 @@ class VideoController extends Controller
     /**
      * Fetch all
      */
-    public function fetchAll()
+    /**
+     * Fetch all (supports DataTables server-side pagination and fast proxy thumbnails)
+     */
+    public function fetchAll(Request $request)
     {
         try {
+            // DataTables Server-Side Processing
+            if ($request->has('draw')) {
+                $start = (int) $request->input('start', 0);
+                $length = (int) $request->input('length', 10);
+                $search = $request->input('search.value') ?? $request->input('search');
+                $orderCol = (int) $request->input('order.0.column', 0);
+                $orderDir = $request->input('order.0.dir', 'desc');
+
+                $res = (new Video)->fetchVideosServerSide($start, $length, $search, $orderCol, $orderDir);
+
+                foreach ($res['data'] as &$video) {
+                    $video->thumbnail_url = !empty($video->thumbnail)
+                        ? url('/proxy-thumb') . '?file=' . urlencode($video->thumbnail)
+                        : 'https://suraj99900.github.io/myprotfolio.github.io/img/gallery_1.jpg';
+                }
+
+                return response()->json([
+                    'draw'            => (int) $request->input('draw'),
+                    'recordsTotal'    => $res['total'],
+                    'recordsFiltered' => $res['filtered'],
+                    'data'            => $res['data'],
+                ], 200);
+            }
+
+            // Fast Full Fetch without slow repeated S3 SDK presigning loops
             $videos = (new Video)->fetchAllVideos();
 
             foreach ($videos as &$video) {
-
-                // THUMBNAIL
-                if (!empty($video->thumbnail)) {
-                    try {
-                        $video->thumbnail_url = Storage::disk('spaces')->temporaryUrl($video->thumbnail, now()->addMinutes(360));
-                    } catch (\Throwable $e) {
-                        $video->thumbnail_url = 'https://suraj99900.github.io/myprotfolio.github.io/img/gallery_1.jpg';
-                    }
-                } else {
-                    $video->thumbnail_url = 'https://suraj99900.github.io/myprotfolio.github.io/img/gallery_1.jpg';
-                }
-
-                // VIDEO
-                if (!empty($video->path)) {
-                    try {
-                        $video->video_url = Storage::disk('spaces')->temporaryUrl($video->path, now()->addMinutes(360));
-                    } catch (\Throwable $e) {
-                        $video->video_url = null;
-                    }
-                } else {
-                    $video->video_url = null;
-                }
-
-                // HLS
-                if (!empty($video->hls_path)) {
-                    try {
-                        $video->hls_url = Storage::disk('spaces')->temporaryUrl($video->hls_path, now()->addMinutes(360));
-                    } catch (\Throwable $e) {
-                        $video->hls_url = null;
-                    }
-                } else {
-                    $video->hls_url = null;
-                }
+                $video->thumbnail_url = !empty($video->thumbnail)
+                    ? url('/proxy-thumb') . '?file=' . urlencode($video->thumbnail)
+                    : 'https://suraj99900.github.io/myprotfolio.github.io/img/gallery_1.jpg';
+                $video->video_url = null;
+                $video->hls_url = null;
             }
 
             return response()->json([
@@ -270,23 +270,11 @@ class VideoController extends Controller
             $videos = (new Video)->fetchAllVideosWithPagination($perPage);
 
             foreach ($videos as &$video) {
-                if (!empty($video->thumbnail)) {
-                    $video->thumbnail_url = Storage::disk('spaces')->temporaryUrl($video->thumbnail, now()->addMinutes(360));
-                } else {
-                    $video->thumbnail_url = 'https://suraj99900.github.io/myprotfolio.github.io/img/gallery_1.jpg';
-                }
-
-                if (!empty($video->path)) {
-                    $video->video_url = Storage::disk('spaces')->temporaryUrl($video->path, now()->addMinutes(360));
-                } else {
-                    $video->video_url = null;
-                }
-
-                if (!empty($video->hls_path)) {
-                    $video->hls_url = Storage::disk('spaces')->temporaryUrl($video->hls_path, now()->addMinutes(360));
-                } else {
-                    $video->hls_url = null;
-                }
+                $video->thumbnail_url = !empty($video->thumbnail)
+                    ? url('/proxy-thumb') . '?file=' . urlencode($video->thumbnail)
+                    : 'https://suraj99900.github.io/myprotfolio.github.io/img/gallery_1.jpg';
+                $video->video_url = null;
+                $video->hls_url = null;
             }
 
             return response()->json([
@@ -309,14 +297,10 @@ class VideoController extends Controller
             $videos = (new Video)->searchVideosByTitle($title);
 
             foreach ($videos as &$video) {
-                $thumbnailPath = $video->thumbnail;
-                if (!$thumbnailPath) {
-                    $video->thumbnail_url = "https://suraj99900.github.io/myprotfolio.github.io/img/gallery_1.jpg";
-                } else {
-                    $video->thumbnail_url = Storage::disk('spaces')->temporaryUrl($thumbnailPath, now()->addMinutes(360));
-                }
-
-                $video->video_url = $video->path ? Storage::disk('spaces')->temporaryUrl($video->path, now()->addMinutes(360)) : null;
+                $video->thumbnail_url = !empty($video->thumbnail)
+                    ? url('/proxy-thumb') . '?file=' . urlencode($video->thumbnail)
+                    : 'https://suraj99900.github.io/myprotfolio.github.io/img/gallery_1.jpg';
+                $video->video_url = null;
             }
 
             return response()->json([
@@ -330,30 +314,40 @@ class VideoController extends Controller
     }
 
 
-    public function fetchAllVideoDataByCategoryId($id)
+    /**
+     * Fetch videos by Category ID with pagination
+     */
+    public function fetchAllVideoDataByCategoryId(Request $request, $id)
     {
         try {
-            $videos = (new Video)->fetchAllVideoDataByCategoryId($id);
+            $perPage = (int) $request->input('per_page', 12);
+            $page = (int) $request->input('page', 1);
 
-            foreach ($videos as &$video) {
-                $thumbnailPath = $video->thumbnail;
-                if (!$thumbnailPath) {
-                    $video->thumbnail_url = "https://suraj99900.github.io/myprotfolio.github.io/img/gallery_1.jpg";
-                } else {
-                    $video->thumbnail_url = Storage::disk('spaces')->temporaryUrl($thumbnailPath, now()->addMinutes(360));
-                }
+            $paginated = (new Video)->fetchAllVideoDataByCategoryId($id, $perPage, $page);
 
-                $video->video_url = $video->path ? Storage::disk('spaces')->temporaryUrl($video->path, now()->addMinutes(360)) : null;
+            foreach ($paginated->items() as &$video) {
+                $video->thumbnail_url = !empty($video->thumbnail)
+                    ? url('/proxy-thumb') . '?file=' . urlencode($video->thumbnail)
+                    : 'https://suraj99900.github.io/myprotfolio.github.io/img/gallery_1.jpg';
+                $video->video_url = null;
             }
 
             return response()->json([
                 'message' => "Videos fetched successfully!",
-                'body' => $videos,
+                'body' => $paginated->items(),
+                'pagination' => [
+                    'current_page' => $paginated->currentPage(),
+                    'last_page'    => $paginated->lastPage(),
+                    'per_page'     => $paginated->perPage(),
+                    'total'        => $paginated->total(),
+                    'from'         => $paginated->firstItem(),
+                    'to'           => $paginated->lastItem(),
+                ],
                 'status' => 200,
             ], 200);
 
         } catch (Exception $e) {
-            return response()->json(['error' => 'An error occurred while Fecthing the video: ' . $e->getMessage()], 500);
+            return response()->json(['error' => 'An error occurred while fetching category videos: ' . $e->getMessage()], 500);
         }
     }
 
@@ -458,5 +452,226 @@ class VideoController extends Controller
         }
     }
 
+    /**
+     * Get real-time conversion status for a specific video
+     */
+    public function conversionStatus($id)
+    {
+        try {
+            $video = Video::with('category')->find($id);
+            if (! $video) {
+                return response()->json(['error' => 'Video not found'], 404);
+            }
+
+            $status = (int) $video->is_converted_hls_video;
+            $durationSeconds = (float) $video->duration;
+
+            // Probe duration dynamically if not yet stored and video is currently converting
+            if ($durationSeconds <= 0 && $status === 2) {
+                $tempFiles = glob(storage_path('app/temp/*.mp4'));
+                if (! empty($tempFiles) && file_exists($tempFiles[0])) {
+                    $probeOut = shell_exec("nice -n 19 ionice -c 3 ffmpeg -i " . escapeshellarg($tempFiles[0]) . " 2>&1");
+                    if (preg_match('/Duration: (\d+):(\d+):(\d+\.\d+)/', $probeOut, $m)) {
+                        $durationSeconds = ($m[1] * 3600) + ($m[2] * 60) + floatval($m[3]);
+                        $video->update(['duration' => $durationSeconds]);
+                    }
+                }
+            }
+
+            // Segments count and elapsed timing
+            $segmentsCount = 0;
+            $elapsedSeconds = 0;
+            $progressPercent = 0;
+            $etaSeconds = null;
+            $etaFormatted = null;
+            $speedRate = null;
+
+            if ($status === 2) {
+                $files = glob(storage_path('app/temp/hls/*/*.ts'));
+                $segmentsCount = $files ? count($files) : 0;
+
+                // Elapsed time from first segment creation or updated_at
+                if (! empty($files)) {
+                    $firstTsTime = filemtime($files[0]);
+                    $elapsedSeconds = max(1, time() - $firstTsTime);
+                } elseif ($video->updated_at) {
+                    $elapsedSeconds = max(1, time() - $video->updated_at->timestamp);
+                }
+
+                // If duration is known, compute exact progress and ETA
+                if ($durationSeconds > 0) {
+                    $totalSegmentsExpected = max(1, ceil($durationSeconds / 10));
+                    $progressPercent = min(99, max(1, (int) round(($segmentsCount / $totalSegmentsExpected) * 100)));
+
+                    // Converted video seconds so far (10s per segment)
+                    $convertedVideoSec = $segmentsCount * 10;
+                    if ($elapsedSeconds > 0 && $convertedVideoSec > 0) {
+                        $speedRate = round($convertedVideoSec / $elapsedSeconds, 2);
+                        $remainingVideoSec = max(0, $durationSeconds - $convertedVideoSec);
+                        $etaSeconds = (int) round($remainingVideoSec / max(0.5, $speedRate));
+                        $etaMins = floor($etaSeconds / 60);
+                        $etaRemSecs = $etaSeconds % 60;
+                        $etaFormatted = $etaMins > 0 ? "{$etaMins}m {$etaRemSecs}s" : "{$etaRemSecs}s";
+                    }
+                } else {
+                    $progressPercent = min(95, max(5, $segmentsCount * 2));
+                }
+            } elseif ($status === 1) {
+                $progressPercent = 100;
+                $metadata = $video->video_json_data['hls_conversion'] ?? [];
+                $segmentsCount = $metadata['segments_count'] ?? ($durationSeconds > 0 ? (int) ceil($durationSeconds / 10) : 0);
+                $elapsedSeconds = $metadata['total_time_sec'] ?? null;
+            }
+
+            // Format duration
+            $durationFormatted = null;
+            if ($durationSeconds > 0) {
+                $hrs = floor($durationSeconds / 3600);
+                $mins = floor(($durationSeconds % 3600) / 60);
+                $secs = round($durationSeconds % 60);
+                $durationFormatted = $hrs > 0 ? "{$hrs}h {$mins}m {$secs}s" : "{$mins}m {$secs}s";
+            }
+
+            // Format elapsed
+            $elapsedFormatted = null;
+            if ($elapsedSeconds > 0) {
+                $eMins = floor($elapsedSeconds / 60);
+                $eSecs = round($elapsedSeconds % 60);
+                $elapsedFormatted = $eMins > 0 ? "{$eMins}m {$eSecs}s" : "{$eSecs}s";
+            }
+
+            $ffmpegRunning = ! empty(trim(shell_exec("pgrep ffmpeg 2>/dev/null") ?? ''));
+
+            $hlsUrl = null;
+            if (! empty($video->hls_path)) {
+                try {
+                    $hlsUrl = Storage::disk('spaces')->temporaryUrl($video->hls_path, now()->addMinutes(360));
+                } catch (\Throwable $e) {}
+            }
+
+            $sourceUrl = null;
+            if (! empty($video->path)) {
+                try {
+                    $sourceUrl = Storage::disk('spaces')->temporaryUrl($video->path, now()->addMinutes(360));
+                } catch (\Throwable $e) {}
+            }
+
+            // Thumbnail URLs: Local same-origin proxy to completely avoid CORS/COEP browser blocks
+            $proxyThumbUrl = null;
+            $thumbUrl = null;
+            if (! empty($video->thumbnail)) {
+                $proxyThumbUrl = url('/proxy-thumb') . '?file=' . urlencode($video->thumbnail);
+                try {
+                    $thumbUrl = Storage::disk('spaces')->temporaryUrl($video->thumbnail, now()->addMinutes(360));
+                } catch (\Throwable $e) {}
+            }
+
+            // Lifecycle tracking stages
+            $trackingStages = [
+                [
+                    'step'        => 1,
+                    'title'       => 'Source Upload & Cloud Ingestion',
+                    'description' => 'Original MP4 assembled and stored on DigitalOcean Spaces',
+                    'status'      => 'completed',
+                    'badge'       => 'Completed'
+                ],
+                [
+                    'step'        => 2,
+                    'title'       => 'Worker Queue & Resource Guard',
+                    'description' => 'Supervisor queue worker (Worker 00) locked single-thread job',
+                    'status'      => in_array($status, [1, 2]) ? 'completed' : ($status === 3 ? 'failed' : 'in_progress'),
+                    'badge'       => in_array($status, [1, 2]) ? 'Dispatched' : ($status === 3 ? 'Failed' : 'Queued')
+                ],
+                [
+                    'step'        => 3,
+                    'title'       => '720p HLS Segment Encoding',
+                    'description' => $status === 1
+                        ? 'Transcoding finished (' . ($video->video_json_data['hls_conversion']['encoding_sec'] ?? 'done') . 's)'
+                        : ($status === 2
+                            ? "Encoding {$segmentsCount} segments ({$progressPercent}% complete, ETA: " . ($etaFormatted ?: 'calculating...') . ")"
+                            : ($status === 3 ? 'Transcoding error' : 'Waiting for worker turn')),
+                    'status'      => $status === 1 ? 'completed' : ($status === 2 ? 'in_progress' : ($status === 3 ? 'failed' : 'pending')),
+                    'badge'       => $status === 1 ? 'Complete' : ($status === 2 ? "{$progressPercent}% Live" : ($status === 3 ? 'Failed' : 'Waiting'))
+                ],
+                [
+                    'step'        => 4,
+                    'title'       => 'HLS Stream Manifest & CDN Deployment',
+                    'description' => $status === 1
+                        ? 'Master playlist (.m3u8) ready for instant playback'
+                        : ($status === 2 ? 'Will be published immediately upon completion' : 'Waiting for transcode'),
+                    'status'      => $status === 1 ? 'completed' : ($status === 2 ? 'pending' : 'pending'),
+                    'badge'       => $status === 1 ? 'Active Stream' : 'Pending'
+                ]
+            ];
+
+            return response()->json([
+                'status' => 200,
+                'data'   => [
+                    'id'                     => $video->id,
+                    'title'                  => $video->title,
+                    'category_name'          => $video->category ? $video->category->name : 'Uncategorized',
+                    'thumbnail_url'          => $proxyThumbUrl ?: $thumbUrl,
+                    'thumbnail_direct_url'   => $thumbUrl,
+                    'is_converted_hls_video' => $status,
+                    'hls_path'               => $video->hls_path,
+                    'hls_url'                => $hlsUrl,
+                    'source_path'            => $video->path,
+                    'source_url'             => $sourceUrl,
+                    'duration'               => $durationSeconds,
+                    'duration_formatted'     => $durationFormatted,
+                    'segments_count'         => $segmentsCount,
+                    'progress_percent'       => $progressPercent,
+                    'elapsed_seconds'        => $elapsedSeconds,
+                    'elapsed_formatted'      => $elapsedFormatted,
+                    'eta_seconds'            => $etaSeconds,
+                    'eta_formatted'          => $etaFormatted,
+                    'speed_rate'             => $speedRate,
+                    'ffmpeg_running'         => $ffmpegRunning,
+                    'tracking_stages'        => $trackingStages,
+                    'conversion_metadata'    => $video->video_json_data['hls_conversion'] ?? null,
+                    'conversion_error'       => $video->conversion_error ?? ($video->video_json_data['hls_conversion']['error'] ?? null),
+                    'created_at'             => $video->created_at ? $video->created_at->toDateTimeString() : null,
+                    'updated_at'             => $video->updated_at ? $video->updated_at->toDateTimeString() : null,
+                ]
+            ], 200);
+        } catch (\Throwable $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Manually trigger / retry HLS conversion for a video
+     */
+    public function retryConversion($id)
+    {
+        try {
+            $video = Video::find($id);
+            if (! $video) {
+                return response()->json(['error' => 'Video not found'], 404);
+            }
+
+            // Check if any video is actively converting
+            $isBusy = Video::where('is_converted_hls_video', 2)->exists();
+            if ($isBusy) {
+                return response()->json([
+                    'error' => 'Another video is currently converting. Only 1 conversion can run at a time to protect server stability.'
+                ], 422);
+            }
+
+            // Mark as processing and dispatch
+            $video->update([
+                'is_converted_hls_video' => 2,
+            ]);
+
+            dispatch(new \App\Jobs\ConvertVideoToHLS($video));
+
+            return response()->json([
+                'message' => "Video ID #{$video->id} queued for HLS conversion successfully.",
+                'status'  => 200
+            ], 200);
+        } catch (\Throwable $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
 
 }

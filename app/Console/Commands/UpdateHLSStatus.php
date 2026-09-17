@@ -27,8 +27,11 @@ class UpdateHLSStatus extends Command
             $this->info('🔍 Found ' . $videos->count() . ' videos to process.');
 
             foreach ($videos as $video) {
-                // Log video details
-                $this->info("Processing Video ID: {$video->id}, Title: {$video->title}");
+                // Do not reset status of videos that are currently processing
+                if ((int)$video->is_converted_hls_video === 2) {
+                    $this->info("Skipping Video ID: {$video->id} (Currently processing)");
+                    continue;
+                }
 
                 // Check if hls_path is not null and not blank
                 $hlsPathValid = !empty($video->hls_path) && $video->hls_path !== null;

@@ -50,6 +50,8 @@ Route::put('video/{id}', [VideoController::class, 'update']);
 Route::delete('video/{id}', [VideoController::class, 'destroy']);
 Route::get('stream/{id}', [VideoController::class, 'stream']);
 Route::get('thumbnail/{id}', [VideoController::class, 'thumbnailImages']);
+Route::get('videos/{id}/conversion-status', [VideoController::class, 'conversionStatus']);
+Route::post('videos/{id}/retry-conversion', [VideoController::class, 'retryConversion']);
 
 // Video Category
 Route::post('video-category', [VideoCategoryController::class, 'addCategory']);

@@ -83,12 +83,12 @@ class Video extends Model
     }
 
     /**
-     * Fetch all video data by category ID
+     * Fetch all video data by category ID (supports optional pagination)
      */
-    public function fetchAllVideoDataByCategoryId($iCategoryId)
+    public function fetchAllVideoDataByCategoryId($iCategoryId, $perPage = null, $page = null)
     {
         try {
-            $oResult = DB::table('videos AS A')
+            $query = DB::table('videos AS A')
                 ->leftJoin('video_category AS B', 'A.category_id', '=', 'B.id')
                 ->select('A.*', 'B.name')
                 ->where('A.category_id', $iCategoryId)
@@ -96,9 +96,65 @@ class Video extends Model
                 ->where('A.deleted', 0)
                 ->where('B.status', 1)
                 ->where('B.deleted', 0)
+                ->orderBy('A.added_on', 'DESC');
+
+            if ($perPage) {
+                return $query->paginate($perPage, ['*'], 'page', $page);
+            }
+
+            return $query->get();
+        } catch (Exception $e) {
+            throw $e;
+        }
+    }
+
+    /**
+     * Server-side paginated & searchable video list for DataTables
+     */
+    public function fetchVideosServerSide($start = 0, $length = 10, $search = null, $orderColumn = 0, $orderDir = 'desc')
+    {
+        try {
+            $baseQuery = DB::table('videos AS A')
+                ->leftJoin('video_category AS B', 'A.category_id', '=', 'B.id')
+                ->select('A.*', 'B.name')
+                ->where('A.status', 1)
+                ->where('A.deleted', 0)
+                ->where('B.status', 1)
+                ->where('B.deleted', 0);
+
+            $totalRecords = (clone $baseQuery)->count();
+
+            if (!empty($search)) {
+                $baseQuery->where(function ($q) use ($search) {
+                    $q->where('A.title', 'like', "%{$search}%")
+                      ->orWhere('B.name', 'like', "%{$search}%")
+                      ->orWhere('A.id', '=', $search);
+                });
+            }
+
+            $filteredRecords = (clone $baseQuery)->count();
+
+            // Map DataTables column index to database column
+            $columnMap = [
+                0 => 'A.id',
+                1 => 'A.title',
+                2 => 'B.name',
+                4 => 'A.is_converted_hls_video',
+                5 => 'A.added_on',
+            ];
+            $col = $columnMap[$orderColumn] ?? 'A.added_on';
+            $dir = strtolower($orderDir) === 'asc' ? 'asc' : 'desc';
+
+            $data = $baseQuery->orderBy($col, $dir)
+                ->skip((int)$start)
+                ->take((int)$length)
                 ->get();
 
-            return $oResult;
+            return [
+                'total'    => $totalRecords,
+                'filtered' => $filteredRecords,
+                'data'     => $data,
+            ];
         } catch (Exception $e) {
             throw $e;
         }

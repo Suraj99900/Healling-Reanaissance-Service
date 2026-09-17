@@ -61,6 +61,12 @@
       </div>
     </div>
 
+    {{-- Pagination Bar --}}
+    <div id="paginationContainer" class="hidden mt-10 pt-6 border-t border-slate-200/90 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <p id="paginationInfo" class="text-xs text-slate-500 font-medium"></p>
+      <div id="paginationButtons" class="inline-flex items-center space-x-1.5"></div>
+    </div>
+
   </div>
 </div>
 
@@ -70,10 +76,12 @@
   $(document).ready(function () {
     const categoryId = {{ $categoryId ?? 'null' }};
     const userType   = "{{ $iUserType }}";
+    let currentPage  = 1;
+    const perPage    = 12;
 
     if (categoryId) {
       fetchCategoryById(categoryId);
-      fetchVideosByCategoryId(categoryId);
+      fetchVideosByCategoryId(categoryId, 1);
     }
 
     $('#searchInput').on('input', function () {
@@ -83,7 +91,7 @@
         searchVideos(query);
       } else {
         $('#clearSearchBtn').addClass('hidden');
-        if (categoryId) fetchVideosByCategoryId(categoryId);
+        if (categoryId) fetchVideosByCategoryId(categoryId, 1);
       }
     });
 
@@ -106,13 +114,21 @@
       });
     }
 
-    function fetchVideosByCategoryId(id) {
+    function fetchVideosByCategoryId(id, page = 1) {
+      currentPage = page;
+      $('#videoList').html(`
+        <div class="col-span-full text-center py-16">
+          <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-indigo-500 border-t-transparent"></div>
+          <p class="mt-3 text-slate-500 text-sm font-medium">Loading page ${page}...</p>
+        </div>
+      `);
+
       $.ajax({
-        url: `/api/videos-category/${id}`,
+        url: `/api/videos-category/${id}?page=${page}&per_page=${perPage}`,
         method: "GET",
         success(response) {
           if (response.status == 200) {
-            displayVideos(response.body);
+            displayVideos(response.body, response.pagination);
           } else {
             showAlert(response.message || "No videos found.");
           }
@@ -135,6 +151,7 @@
         success(response) {
           if (response.status == 200) {
             displayVideos(response.body);
+            $('#paginationContainer').addClass('hidden');
           } else {
             showAlert(response.message || "No matching videos.");
           }
@@ -149,12 +166,13 @@
       });
     }
 
-    function displayVideos(videos) {
+    function displayVideos(videos, pagination) {
       const videoList = $("#videoList");
       videoList.empty();
 
       if (!videos || videos.length === 0) {
         $('#videoCountBadge').text('0 Videos');
+        $('#paginationContainer').addClass('hidden');
         videoList.append(`
           <div class="col-span-full text-center py-16 bg-white rounded-2xl border border-slate-200/90 shadow-sm p-8 max-w-md mx-auto">
             <div class="w-12 h-12 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-3">
@@ -166,7 +184,8 @@
         return;
       }
 
-      $('#videoCountBadge').text(`${videos.length} Videos`);
+      const totalCount = pagination ? pagination.total : videos.length;
+      $('#videoCountBadge').text(`${totalCount} Videos`);
 
       videos.forEach((video) => {
         const truncatedDesc = limitWords(video.description, 14);
@@ -225,7 +244,48 @@
 
         videoList.append(card);
       });
+
+      // Render Pagination Controls
+      if (pagination && pagination.last_page > 1) {
+        $('#paginationContainer').removeClass('hidden');
+        $('#paginationInfo').html(`Showing <span class="font-bold text-slate-800">${pagination.from || 1}</span> to <span class="font-bold text-slate-800">${pagination.to || videos.length}</span> of <span class="font-bold text-slate-800">${pagination.total}</span> videos`);
+
+        let btns = '';
+        // Previous Button
+        if (pagination.current_page > 1) {
+          btns += `<button type="button" class="page-nav-btn px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition cursor-pointer" data-page="${pagination.current_page - 1}"><i class="fa-solid fa-chevron-left text-[10px] mr-1"></i> Prev</button>`;
+        }
+
+        // Page Number Buttons
+        for (let p = 1; p <= pagination.last_page; p++) {
+          if (p === pagination.current_page) {
+            btns += `<button type="button" class="px-3 py-1.5 rounded-lg bg-indigo-600 text-white text-xs font-bold shadow-xs cursor-default">${p}</button>`;
+          } else if (p === 1 || p === pagination.last_page || Math.abs(p - pagination.current_page) <= 2) {
+            btns += `<button type="button" class="page-nav-btn px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition cursor-pointer" data-page="${p}">${p}</button>`;
+          } else if (Math.abs(p - pagination.current_page) === 3) {
+            btns += `<span class="px-1 text-slate-400 text-xs select-none">...</span>`;
+          }
+        }
+
+        // Next Button
+        if (pagination.current_page < pagination.last_page) {
+          btns += `<button type="button" class="page-nav-btn px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition cursor-pointer" data-page="${pagination.current_page + 1}">Next <i class="fa-solid fa-chevron-right text-[10px] ml-1"></i></button>`;
+        }
+
+        $('#paginationButtons').html(btns);
+      } else {
+        $('#paginationContainer').addClass('hidden');
+      }
     }
+
+    // Delegated pagination click
+    $(document).on('click', '.page-nav-btn', function () {
+      const targetPage = $(this).data('page');
+      if (targetPage && categoryId) {
+        fetchVideosByCategoryId(categoryId, targetPage);
+        $('html, body').animate({ scrollTop: $('#categoryHeaderTitle').offset().top - 80 }, 200);
+      }
+    });
 
     function limitWords(text, limit) {
       const words = text ? text.trim().split(/\s+/) : [];
