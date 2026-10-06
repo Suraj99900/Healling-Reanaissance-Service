@@ -96,7 +96,7 @@ class Video extends Model
                 ->where('A.deleted', 0)
                 ->where('B.status', 1)
                 ->where('B.deleted', 0)
-                ->orderBy('A.added_on', 'DESC');
+                ->orderBy('A.added_on', 'ASC');
 
             if (!empty($perPage) && (int)$perPage > 0) {
                 return $query->paginate((int)$perPage, ['*'], 'page', $page ? (int)$page : 1);
