@@ -266,7 +266,7 @@ class VideoController extends Controller
     public function fetchAllWithPagination(Request $request)
     {
         try {
-            $perPage = $request->input('per_page', 10);
+            $perPage = $request->input('per_page', 0);
             $videos = (new Video)->fetchAllVideosWithPagination($perPage);
 
             foreach ($videos as &$video) {
@@ -320,8 +320,8 @@ class VideoController extends Controller
     public function fetchAllVideoDataByCategoryId(Request $request, $id)
     {
         try {
-            $perPage = (int) $request->input('per_page', 12);
-            $page = (int) $request->input('page', 1);
+            $perPage = (int) $request->input('per_page', 0);
+            $page = (int) $request->input('page', 0);
 
             $paginated = (new Video)->fetchAllVideoDataByCategoryId($id, $perPage, $page);
 
