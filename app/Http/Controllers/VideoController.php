@@ -315,17 +315,41 @@ class VideoController extends Controller
 
 
     /**
-     * Fetch videos by Category ID with pagination
+     * Fetch videos by Category ID with optional pagination
      */
     public function fetchAllVideoDataByCategoryId(Request $request, $id)
     {
         try {
             $perPage = (int) $request->input('per_page', 0);
-            $page = (int) $request->input('page', 0);
+            $page = (int) $request->input('page', 1);
 
-            $paginated = (new Video)->fetchAllVideoDataByCategoryId($id, $perPage, $page);
+            $result = (new Video)->fetchAllVideoDataByCategoryId($id, $perPage > 0 ? $perPage : null, $page > 0 ? $page : 1);
 
-            foreach ($paginated->items() as &$video) {
+            if ($result instanceof \Illuminate\Contracts\Pagination\LengthAwarePaginator || $result instanceof \Illuminate\Contracts\Pagination\Paginator) {
+                $videos = $result->items();
+                foreach ($videos as &$video) {
+                    $video->thumbnail_url = !empty($video->thumbnail)
+                        ? url('/proxy-thumb') . '?file=' . urlencode($video->thumbnail)
+                        : 'https://suraj99900.github.io/myprotfolio.github.io/img/gallery_1.jpg';
+                    $video->video_url = null;
+                }
+
+                return response()->json([
+                    'message' => "Videos fetched successfully!",
+                    'body' => $videos,
+                    'pagination' => [
+                        'current_page' => $result->currentPage(),
+                        'last_page'    => $result->lastPage(),
+                        'per_page'     => $result->perPage(),
+                        'total'        => $result->total(),
+                        'from'         => $result->firstItem(),
+                        'to'           => $result->lastItem(),
+                    ],
+                    'status' => 200,
+                ], 200);
+            }
+
+            foreach ($result as &$video) {
                 $video->thumbnail_url = !empty($video->thumbnail)
                     ? url('/proxy-thumb') . '?file=' . urlencode($video->thumbnail)
                     : 'https://suraj99900.github.io/myprotfolio.github.io/img/gallery_1.jpg';
@@ -334,15 +358,7 @@ class VideoController extends Controller
 
             return response()->json([
                 'message' => "Videos fetched successfully!",
-                'body' => $paginated->items(),
-                'pagination' => [
-                    'current_page' => $paginated->currentPage(),
-                    'last_page'    => $paginated->lastPage(),
-                    'per_page'     => $paginated->perPage(),
-                    'total'        => $paginated->total(),
-                    'from'         => $paginated->firstItem(),
-                    'to'           => $paginated->lastItem(),
-                ],
+                'body' => $result,
                 'status' => 200,
             ], 200);
 
